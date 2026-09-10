@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Lattice",
+      "hasCanvas": false,
+      "bodyTextLen": 2488,
+      "bodyTextHash": "0562caeb89d89b1f5ad58c687e9355b01f68db44bc558fd73883961a16d3fff8",
+      "bodyTextPrefix": "Lattice SYSTEM DESIGN Studio HLD Concepts LLD Concepts System De",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Lattice",
+      "hasCanvas": false,
+      "bodyTextLen": 2386,
+      "bodyTextHash": "0bb4d50a252ca3b6274031d9db134675573c7aee1998e651935689247bcb8543",
+      "bodyTextPrefix": "Lattice SYSTEM DESIGN STUDIO Learn the map, then run the labs. H",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

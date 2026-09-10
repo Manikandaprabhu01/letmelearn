@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Lattice</title>
+<style>
+  @font-face {
+    font-family: "Fraunces";
+    src: url("file:///workspace/.grok/fonts/Fraunces.ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: block;
+  }
+  @font-face {
+    font-family: "IBM Plex Sans";
+    src: url("file:///workspace/.grok/fonts/IBMPlexSans.ttf") format("truetype");
+    font-weight: 100 700;
+    font-style: normal;
+    font-display: block;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 1200px;
+    height: 630px;
+    background: #0b0c0e;
+    overflow: hidden;
+  }
+  .card {
+    position: relative;
+    width: 1200px;
+    height: 630px;
+    background: #0b0c0e;
+  }
+  .grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(232,230,225,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,230,225,0.045) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 78% 70% at 50% 48%, black 8%, transparent 72%);
+    -webkit-mask-image: radial-gradient(ellipse 78% 70% at 50% 48%, black 8%, transparent 72%);
+  }
+  svg.graph {
+    position: absolute;
+    inset: 0;
+  }
+  .vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 72% 68% at 50% 48%, transparent 42%, #0b0c0e 100%);
+    pointer-events: none;
+  }
+  .lockup {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #e8e6e1;
+    width: 920px;
+  }
+  .mark {
+    display: block;
+    margin: 0 auto 18px;
+  }
+  h1 {
+    margin: 0;
+    font-family: "Fraunces", "Liberation Serif", serif;
+    font-weight: 520;
+    font-size: 176px;
+    line-height: 0.9;
+    letter-spacing: 0.06em;
+    font-optical-sizing: auto;
+    font-variation-settings: "SOFT" 12, "WONK" 0, "opsz" 144;
+    color: #e8e6e1;
+  }
+  .rule {
+    width: 64px;
+    height: 1px;
+    background: #9eb4c8;
+    margin: 26px auto 18px;
+    opacity: 0.85;
+  }
+  p {
+    margin: 0;
+    font-family: "IBM Plex Sans", "Liberation Sans", sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #8b8d93;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="grid"></div>
+    <svg class="graph" viewBox="0 0 1200 630" width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="#9eb4c8" stroke-opacity="0.38" stroke-width="1.25" stroke-linecap="round">
+        <line x1="52.0" y1="58.0" x2="190.0" y2="58.0"/><line x1="52.0" y1="58.0" x2="130.0" y2="161.0"/><line x1="190.0" y1="58.0" x2="328.0" y2="58.0"/><line x1="190.0" y1="58.0" x2="130.0" y2="161.0"/><line x1="190.0" y1="58.0" x2="268.0" y2="161.0"/><line x1="328.0" y1="58.0" x2="466.0" y2="58.0"/><line x1="328.0" y1="58.0" x2="268.0" y2="161.0"/><line x1="466.0" y1="58.0" x2="604.0" y2="58.0"/><line x1="604.0" y1="58.0" x2="742.0" y2="58.0"/><line x1="742.0" y1="58.0" x2="880.0" y2="58.0"/><line x1="742.0" y1="58.0" x2="820.0" y2="161.0"/><line x1="880.0" y1="58.0" x2="1018.0" y2="58.0"/><line x1="880.0" y1="58.0" x2="820.0" y2="161.0"/><line x1="880.0" y1="58.0" x2="958.0" y2="161.0"/><line x1="1018.0" y1="58.0" x2="1156.0" y2="58.0"/><line x1="1018.0" y1="58.0" x2="958.0" y2="161.0"/><line x1="1018.0" y1="58.0" x2="1096.0" y2="161.0"/><line x1="1156.0" y1="58.0" x2="1096.0" y2="161.0"/><line x1="130.0" y1="161.0" x2="268.0" y2="161.0"/><line x1="130.0" y1="161.0" x2="52.0" y2="264.0"/><line x1="130.0" y1="161.0" x2="190.0" y2="264.0"/><line x1="268.0" y1="161.0" x2="190.0" y2="264.0"/><line x1="820.0" y1="161.0" x2="958.0" y2="161.0"/><line x1="958.0" y1="161.0" x2="1096.0" y2="161.0"/><line x1="958.0" y1="161.0" x2="1018.0" y2="264.0"/><line x1="1096.0" y1="161.0" x2="1018.0" y2="264.0"/><line x1="1096.0" y1="161.0" x2="1156.0" y2="264.0"/><line x1="52.0" y1="264.0" x2="190.0" y2="264.0"/><line x1="52.0" y1="264.0" x2="130.0" y2="367.0"/><line x1="190.0" y1="264.0" x2="130.0" y2="367.0"/><line x1="1018.0" y1="264.0" x2="1156.0" y2="264.0"/><line x1="1018.0" y1="264.0" x2="958.0" y2="367.0"/><line x1="1018.0" y1="264.0" x2="1096.0" y2="367.0"/><line x1="1156.0" y1="264.0" x2="1096.0" y2="367.0"/><line x1="130.0" y1="367.0" x2="52.0" y2="470.0"/><line x1="130.0" y1="367.0" x2="190.0" y2="470.0"/><line x1="958.0" y1="367.0" x2="1096.0" y2="367.0"/><line x1="958.0" y1="367.0" x2="880.0" y2="470.0"/><line x1="958.0" y1="367.0" x2="1018.0" y2="470.0"/><line x1="1096.0" y1="367.0" x2="1018.0" y2="470.0"/><line x1="1096.0" y1="367.0" x2="1156.0" y2="470.0"/><line x1="52.0" y1="470.0" x2="190.0" y2="470.0"/><line x1="52.0" y1="470.0" x2="130.0" y2="573.0"/><line x1="190.0" y1="470.0" x2="328.0" y2="470.0"/><line x1="190.0" y1="470.0" x2="130.0" y2="573.0"/><line x1="190.0" y1="470.0" x2="268.0" y2="573.0"/><line x1="328.0" y1="470.0" x2="268.0" y2="573.0"/><line x1="328.0" y1="470.0" x2="406.0" y2="573.0"/><line x1="880.0" y1="470.0" x2="1018.0" y2="470.0"/><line x1="880.0" y1="470.0" x2="820.0" y2="573.0"/><line x1="880.0" y1="470.0" x2="958.0" y2="573.0"/><line x1="1018.0" y1="470.0" x2="1156.0" y2="470.0"/><line x1="1018.0" y1="470.0" x2="958.0" y2="573.0"/><line x1="1018.0" y1="470.0" x2="1096.0" y2="573.0"/><line x1="1156.0" y1="470.0" x2="1096.0" y2="573.0"/><line x1="130.0" y1="573.0" x2="268.0" y2="573.0"/><line x1="268.0" y1="573.0" x2="406.0" y2="573.0"/><line x1="406.0" y1="573.0" x2="544.0" y2="573.0"/><line x1="544.0" y1="573.0" x2="682.0" y2="573.0"/><line x1="682.0" y1="573.0" x2="820.0" y2="573.0"/><line x1="820.0" y1="573.0" x2="958.0" y2="573.0"/><line x1="958.0" y1="573.0" x2="1096.0" y2="573.0"/>
+      </g>
+      <g>
+        <circle cx="52.0" cy="58.0" r="12.0" fill="#9eb4c8" fill-opacity="0.12"/><circle cx="52.0" cy="58.0" r="7.0" fill="#9eb4c8"/><circle cx="190.0" cy="58.0" r="3.6" fill="#8b8d93"/><circle cx="328.0" cy="58.0" r="6.2" fill="none" stroke="#9eb4c8" stroke-width="1.6"/><circle cx="328.0" cy="58.0" r="2.1" fill="#9eb4c8"/><circle cx="466.0" cy="58.0" r="3.6" fill="#8b8d93"/><circle cx="604.0" cy="58.0" r="3.6" fill="#8b8d93"/><circle cx="742.0" cy="58.0" r="12.0" fill="#9eb4c8" fill-opacity="0.12"/><circle cx="742.0" cy="58.0" r="7.0" fill="#9eb4c8"/><circle cx="880.0" cy="58.0" r="3.6" fill="#8b8d93"/><circle cx="1018.0" cy="58.0" r="6.2" fill="none" stroke="#9eb4c8" stroke-width="1.6"/><circle cx="1018.0" cy="58.0" r="2.1" fill="#9eb4c8"/><circle cx="1156.0" cy="58.0" r="3.6" fill="#8b8d93"/><circle cx="130.0" cy="161.0" r="3.6" fill="#8b8d93"/><circle cx="268.0" cy="161.0" r="3.6" fill="#8b8d93"/><circle cx="820.0" cy="161.0" r="3.6" fill="#8b8d93"/><circle cx="958.0" cy="161.0" r="3.6" fill="#8b8d93"/><circle cx="1096.0" cy="161.0" r="12.0" fill="#9eb4c8" fill-opacity="0.12"/><circle cx="1096.0" cy="161.0" r="7.0" fill="#9eb4c8"/><circle cx="52.0" cy="264.0" r="3.6" fill="#8b8d93"/><circle cx="190.0" cy="264.0" r="6.2" fill="none" stroke="#9eb4c8" stroke-width="1.6"/><circle cx="190.0" cy="264.0" r="2.1" fill="#9eb4c8"/><circle cx="1018.0" cy="264.0" r="3.6" fill="#8b8d93"/><circle cx="1156.0" cy="264.0" r="3.6" fill="#8b8d93"/><circle cx="130.0" cy="367.0" r="3.6" fill="#8b8d93"/><circle cx="958.0" cy="367.0" r="12.0" fill="#9eb4c8" fill-opacity="0.12"/><circle cx="958.0" cy="367.0" r="7.0" fill="#9eb4c8"/><circle cx="1096.0" cy="367.0" r="3.6" fill="#8b8d93"/><circle cx="52.0" cy="470.0" r="6.2" fill="none" stroke="#9eb4c8" stroke-width="1.6"/><circle cx="52.0" cy="470.0" r="2.1" fill="#9eb4c8"/><circle cx="190.0" cy="470.0" r="3.6" fill="#8b8d93"/><circle cx="328.0" cy="470.0" r="3.6" fill="#8b8d93"/><circle cx="880.0" cy="470.0" r="3.6" fill="#8b8d93"/><circle cx="1018.0" cy="470.0" r="3.6" fill="#8b8d93"/><circle cx="1156.0" cy="470.0" r="12.0" fill="#9eb4c8" fill-opacity="0.12"/><circle cx="1156.0" cy="470.0" r="7.0" fill="#9eb4c8"/><circle cx="130.0" cy="573.0" r="12.0" fill="#9eb4c8" fill-opacity="0.12"/><circle cx="130.0" cy="573.0" r="7.0" fill="#9eb4c8"/><circle cx="268.0" cy="573.0" r="3.6" fill="#8b8d93"/><circle cx="406.0" cy="573.0" r="6.2" fill="none" stroke="#9eb4c8" stroke-width="1.6"/><circle cx="406.0" cy="573.0" r="2.1" fill="#9eb4c8"/><circle cx="544.0" cy="573.0" r="3.6" fill="#8b8d93"/><circle cx="682.0" cy="573.0" r="3.6" fill="#8b8d93"/><circle cx="820.0" cy="573.0" r="12.0" fill="#9eb4c8" fill-opacity="0.12"/><circle cx="820.0" cy="573.0" r="7.0" fill="#9eb4c8"/><circle cx="958.0" cy="573.0" r="3.6" fill="#8b8d93"/><circle cx="1096.0" cy="573.0" r="6.2" fill="none" stroke="#9eb4c8" stroke-width="1.6"/><circle cx="1096.0" cy="573.0" r="2.1" fill="#9eb4c8"/>
+      </g>
+    </svg>
+    <div class="vignette"></div>
+    <div class="lockup">
+      <svg class="mark" width="40" height="40" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="1" y="1" width="30" height="30" rx="7" fill="none" stroke="#9eb4c8" stroke-width="1.4"/>
+        <circle cx="10" cy="10" r="2.1" fill="#e8e6e1"/>
+        <circle cx="22" cy="10" r="2.1" fill="#e8e6e1"/>
+        <circle cx="16" cy="22" r="2.1" fill="#e8e6e1"/>
+        <path d="M10 10h12M10 10l6 12M22 10l-6 12" fill="none" stroke="#9eb4c8" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <h1>Lattice</h1>
+      <div class="rule"></div>
+      <p>System design, taught like the interview.</p>
+    </div>
+  </div>
+</body>
+</html>

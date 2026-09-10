@@ -1,0 +1,1 @@
+import{c as e}from"./createLucideIcon-C20vfABw.js";import{r as t}from"./index-DcD_k1Cz.js";import{t as n}from"./ConceptView-C8RnY-Th.js";var r=e();function i(){let{concept:e}=t.useLoaderData();return(0,r.jsx)(n,{concept:e,kicker:`LLD`,id:`lld:${e.slug}`})}export{i as component};
