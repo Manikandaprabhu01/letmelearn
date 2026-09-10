@@ -1,12 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import { FlaskConical } from "lucide-react";
+import { ArchitectureBoard } from "@/components/content/ArchitectureBoard";
 import { PageHeader } from "@/components/content/PageHeader";
 import { RelatedList } from "@/components/content/RelatedList";
 import { SectionBlock } from "@/components/content/SectionBlock";
 import { Button } from "@/components/ui/button";
+import { getBoard } from "@/data/boards";
 import type { DesignExample } from "@/data/types";
 
 export function ExampleView({ example, id }: { example: DesignExample; id: string }) {
+  const board = getBoard(example.slug);
+
   return (
     <article>
       <PageHeader
@@ -28,9 +32,7 @@ export function ExampleView({ example, id }: { example: DesignExample; id: strin
         ) : null}
 
         {example.companies.length ? (
-          <p className="text-sm text-muted">
-            In the wild: {example.companies.join(" · ")}
-          </p>
+          <p className="text-sm text-muted">In the wild: {example.companies.join(" · ")}</p>
         ) : null}
 
         <section>
@@ -116,6 +118,8 @@ export function ExampleView({ example, id }: { example: DesignExample; id: strin
             </div>
           </section>
         ) : null}
+
+        {board ? <ArchitectureBoard board={board} /> : null}
 
         {example.architecture.map((s, i) => (
           <SectionBlock key={s.heading} section={s} index={i} />

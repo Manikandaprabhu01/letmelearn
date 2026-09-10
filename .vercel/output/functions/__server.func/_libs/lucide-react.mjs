@@ -82,6 +82,19 @@ var createLucideIcon = (iconName, iconNode) => {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var ArrowLeft = createLucideIcon("arrow-left", [["path", {
+	d: "m12 19-7-7 7-7",
+	key: "1l729n"
+}], ["path", {
+	d: "M19 12H5",
+	key: "x3x0zl"
+}]]);
+/**
+* @license lucide-react v0.510.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var ArrowRight = createLucideIcon("arrow-right", [["path", {
 	d: "M5 12h14",
 	key: "1ays0h"
@@ -201,4 +214,4 @@ var X = createLucideIcon("x", [["path", {
 	key: "d8bk6v"
 }]]);
 //#endregion
-export { FlaskConical as a, ArrowRight as c, Menu as i, TriangleAlert as n, Check as o, Search as r, ArrowUpRight as s, X as t };
+export { FlaskConical as a, ArrowRight as c, Menu as i, ArrowLeft as l, TriangleAlert as n, Check as o, Search as r, ArrowUpRight as s, X as t };

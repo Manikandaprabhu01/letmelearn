@@ -1,5 +1,5 @@
 {
-  "url": "http://127.0.0.1:8080/",
+  "url": "http://127.0.0.1:8080/examples/uber",
   "viewports": {
     "desktop": {
       "width": 1280,
@@ -7,13 +7,13 @@
       "status": 200,
       "title": "Lattice",
       "hasCanvas": false,
-      "bodyTextLen": 2493,
-      "bodyTextHash": "01b2985a72e34738270d598cc2d833d45debbabdd12a4de5e8d3b6628b40fa47",
+      "bodyTextLen": 3478,
+      "bodyTextHash": "a12273b0c4dd8205d17173ce9f761d3257658e4d6fe5075d76419aef0517a268",
       "bodyTextPrefix": "Lattice SYSTEM DESIGN Studio HLD Concepts LLD Concepts System De",
       "horizontalOverflow": false,
       "consoleErrors": [],
       "pageErrors": [],
-      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+      "screenshot": "/workspace/screenshots/arch-uber-page.png"
     },
     "mobile": {
       "width": 390,
@@ -21,16 +21,16 @@
       "status": 200,
       "title": "Lattice",
       "hasCanvas": false,
-      "bodyTextLen": 2391,
-      "bodyTextHash": "84204115e10806714a127cb79df392e1d643650b24730cf2c880d1cdf0127e4a",
-      "bodyTextPrefix": "Back Lattice SYSTEM DESIGN STUDIO Learn the map, then run the la",
+      "bodyTextLen": 3377,
+      "bodyTextHash": "6048919bf050be1c4cb7238f2cd74a4d50be0f5addcf7f019aba9d788c8c0a27",
+      "bodyTextPrefix": "Lattice SOURCE 6 Mark studied Design Uber Source 6, Hard. Live l",
       "horizontalOverflow": false,
       "consoleErrors": [],
       "pageErrors": [],
-      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+      "screenshot": "/workspace/screenshots/arch-uber-page-mobile.png"
     }
   },
   "brandWarnings": [],
   "authWarnings": [],
-  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+  "verdictFile": "/workspace/screenshots/arch-uber-page.json"
 }

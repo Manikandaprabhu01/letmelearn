@@ -1,6 +1,6 @@
 import { t as cva } from "../_libs/class-variance-authority+clsx.mjs";
 import { t as cn } from "./utils-C_uf36nf.mjs";
-import { z as require_jsx_runtime } from "../_libs/@tanstack/react-router+[...].mjs";
+import { B as require_jsx_runtime } from "../_libs/@tanstack/react-router+[...].mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/badge-af-ErNXo.js
 var import_jsx_runtime = require_jsx_runtime();
 var badgeVariants = cva("inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium tracking-wide", {

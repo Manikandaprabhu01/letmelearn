@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { BackButton } from "@/components/layout/BackButton";
 import { LogoMark } from "@/components/layout/Logo";
 import { CommandSearch } from "@/components/search/CommandSearch";
 import { Button } from "@/components/ui/button";
@@ -63,12 +64,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-dvh bg-bg text-fg">
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-bg/90 px-4 backdrop-blur-sm lg:hidden">
-        <Link to="/" className="flex items-center gap-2 text-fg">
-          <LogoMark className="size-6" />
-          <span className="font-display text-lg tracking-tight">{APP_NAME}</span>
-        </Link>
-        <div className="flex items-center gap-1">
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b border-border bg-bg/90 px-3 backdrop-blur-sm lg:hidden">
+        <div className="flex min-w-0 items-center gap-1">
+          <BackButton compact />
+          <Link to="/" className="flex min-w-0 items-center gap-2 text-fg">
+            <LogoMark className="size-6 shrink-0" />
+            <span className="font-display text-lg tracking-tight">{APP_NAME}</span>
+          </Link>
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
           <Button variant="ghost" size="icon-sm" onClick={() => setSearch(true)} aria-label="Search">
             <Search className="size-4" />
           </Button>
@@ -115,7 +119,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </button>
           </div>
         </aside>
-        <div className="min-w-0">{children}</div>
+        <div className="min-w-0">
+          <div className="sticky top-0 z-20 hidden h-12 items-center border-b border-border bg-bg/90 px-5 backdrop-blur-sm lg:flex">
+            <BackButton />
+          </div>
+          {children}
+        </div>
       </div>
 
       {search ? <CommandSearch onClose={() => setSearch(false)} /> : null}

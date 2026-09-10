@@ -27,7 +27,29 @@ export type BitDiagram = {
   fields: { label: string; bits: number; note?: string }[];
 };
 
-export type Diagram = FlowDiagram | LayerDiagram | BitDiagram;
+export type SystemColumn = {
+  title: string;
+  nodes: DiagramNode[];
+};
+
+export type SystemDiagram = {
+  kind: "system";
+  caption?: string;
+  columns: SystemColumn[];
+};
+
+export type Diagram = FlowDiagram | LayerDiagram | BitDiagram | SystemDiagram;
+
+export type WalkthroughStep = {
+  title: string;
+  text: string;
+};
+
+export type ArchitectureBoard = {
+  caption: string;
+  columns: SystemColumn[];
+  walkthrough: WalkthroughStep[];
+};
 
 export type Section = {
   heading: string;
