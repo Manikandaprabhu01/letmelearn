@@ -149,7 +149,12 @@ export const lldPrinciples: Concept[] = [
             { from: "StandardFare", to: "FarePolicy", kind: "implements" },
             { from: "SurgeFare", to: "FarePolicy", kind: "implements" },
             { from: "AirportFare", to: "FarePolicy", kind: "implements" },
-            { from: "PricingService", to: "FarePolicy", kind: "has", label: "injected, never constructed" },
+            {
+              from: "PricingService",
+              to: "FarePolicy",
+              kind: "has",
+              label: "injected, never constructed",
+            },
           ],
         },
         code: {
@@ -217,11 +222,17 @@ class PricingService {
         ],
         diagram: {
           kind: "flow",
-          caption: "DIP: the arrow that would have pointed out to the driver now points in at the interface.",
+          caption:
+            "DIP: the arrow that would have pointed out to the driver now points in at the interface.",
           rows: [
             [
               { id: "uc", label: "PlaceOrder", sub: "use case", tone: "accent" },
-              { id: "port", label: "OrderRepository", sub: "interface, owned by domain", tone: "accent" },
+              {
+                id: "port",
+                label: "OrderRepository",
+                sub: "interface, owned by domain",
+                tone: "accent",
+              },
             ],
             [
               { id: "pg", label: "PostgresOrderRepository", sub: "infrastructure" },
@@ -314,11 +325,31 @@ export class PostgresOrders implements OrderReader, OrderWriter {
         table: {
           headers: ["Diagram", "Answers", "Reach for it when"],
           rows: [
-            ["Class", "What types exist, what they own, what they implement", "Always, in an LLD round — it is the backbone"],
-            ["Sequence", "Who calls whom, in what order, and where the wait is", "A flow crosses 3+ objects, or concurrency matters"],
-            ["State", "Which transitions are legal", "Anything with a lifecycle: order, booking, elevator, job"],
-            ["Activity / flowchart", "Branching business logic", "A decision tree the interviewer keeps probing"],
-            ["Component / deployment", "Process and machine boundaries", "The LLD question is drifting into HLD"],
+            [
+              "Class",
+              "What types exist, what they own, what they implement",
+              "Always, in an LLD round — it is the backbone",
+            ],
+            [
+              "Sequence",
+              "Who calls whom, in what order, and where the wait is",
+              "A flow crosses 3+ objects, or concurrency matters",
+            ],
+            [
+              "State",
+              "Which transitions are legal",
+              "Anything with a lifecycle: order, booking, elevator, job",
+            ],
+            [
+              "Activity / flowchart",
+              "Branching business logic",
+              "A decision tree the interviewer keeps probing",
+            ],
+            [
+              "Component / deployment",
+              "Process and machine boundaries",
+              "The LLD question is drifting into HLD",
+            ],
           ],
         },
       },
@@ -335,7 +366,8 @@ export class PostgresOrders implements OrderReader, OrderWriter {
         ],
         diagram: {
           kind: "uml",
-          caption: "A parking-lot slice: composition for floors and spots, interface for the fee rule.",
+          caption:
+            "A parking-lot slice: composition for floors and spots, interface for the fee rule.",
           boxes: [
             {
               name: "ParkingLot",
@@ -398,7 +430,8 @@ export class PostgresOrders implements OrderReader, OrderWriter {
         ],
         diagram: {
           kind: "sequence",
-          caption: "Booking a spot — note the retry-safe idempotency check before any state change.",
+          caption:
+            "Booking a spot — note the retry-safe idempotency check before any state change.",
           actors: [
             { id: "c", label: "Client" },
             { id: "api", label: "ParkingAPI" },
@@ -407,12 +440,29 @@ export class PostgresOrders implements OrderReader, OrderWriter {
           ],
           messages: [
             { from: "c", to: "api", label: "POST /park {plate, requestId}", kind: "call" },
-            { from: "api", to: "repo", label: "findTicketByRequestId(requestId)", kind: "call", note: "idempotency check first" },
+            {
+              from: "api",
+              to: "repo",
+              label: "findTicketByRequestId(requestId)",
+              kind: "call",
+              note: "idempotency check first",
+            },
             { from: "repo", to: "api", label: "null", kind: "return" },
             { from: "api", to: "lot", label: "park(vehicle)", kind: "call" },
-            { from: "lot", to: "repo", label: "SELECT ... FOR UPDATE SKIP LOCKED", kind: "call", note: "claim a free spot atomically" },
+            {
+              from: "lot",
+              to: "repo",
+              label: "SELECT ... FOR UPDATE SKIP LOCKED",
+              kind: "call",
+              note: "claim a free spot atomically",
+            },
             { from: "repo", to: "lot", label: "spot#B12", kind: "return" },
-            { from: "lot", to: "repo", label: "UPDATE spot SET vehicle, INSERT ticket", kind: "call" },
+            {
+              from: "lot",
+              to: "repo",
+              label: "UPDATE spot SET vehicle, INSERT ticket",
+              kind: "call",
+            },
             { from: "lot", to: "api", label: "Ticket", kind: "return" },
             { from: "api", to: "c", label: "201 {ticketId, spot}", kind: "return", tone: "ok" },
           ],
@@ -435,9 +485,19 @@ export class PostgresOrders implements OrderReader, OrderWriter {
               { id: "delivered", label: "DELIVERED", tone: "ok" },
             ],
             [
-              { id: "cancelled", label: "CANCELLED", tone: "warn", sub: "from CREATED or PAID only" },
+              {
+                id: "cancelled",
+                label: "CANCELLED",
+                tone: "warn",
+                sub: "from CREATED or PAID only",
+              },
               { id: "refunded", label: "REFUNDED", tone: "warn", sub: "from PAID or DELIVERED" },
-              { id: "failed", label: "PAYMENT_FAILED", tone: "bad", sub: "retryable back to CREATED" },
+              {
+                id: "failed",
+                label: "PAYMENT_FAILED",
+                tone: "bad",
+                sub: "retryable back to CREATED",
+              },
             ],
           ],
         },
@@ -499,7 +559,9 @@ function transition(order: Order, next: State): Order {
       },
     ],
     related: ["/lld/parking-lot", "/lld/elevator", "/lld/solid", "/lld/concurrency"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -535,7 +597,8 @@ function transition(order: Order, next: State): Order {
                 "Fields can be readonly/final, which helps thread-safety",
               ],
               bad: ["A long parameter list is a real signal that the class does too much"],
-              verdict: "Almost always. Treat a 6-argument constructor as an SRP warning, not a DI problem.",
+              verdict:
+                "Almost always. Treat a 6-argument constructor as an SRP warning, not a DI problem.",
             },
             {
               title: "Setter / property injection",
@@ -638,12 +701,25 @@ expect(await svc.renew("alice")).toBe(false);`,
         },
         diagram: {
           kind: "layers",
-          caption: "Dependency arrows point inward; only the outermost layer names concrete technology.",
+          caption:
+            "Dependency arrows point inward; only the outermost layer names concrete technology.",
           layers: [
-            { title: "Composition root", items: ["buildApp()", "env parsing", "pool creation", "decorator stacking"] },
-            { title: "Infrastructure", items: ["PostgresUsers", "StripeGateway", "SesMailer", "RedisCache"] },
-            { title: "Ports (interfaces)", items: ["UserRepository", "PaymentGateway", "Mailer", "Clock"] },
-            { title: "Domain / use cases", items: ["SubscriptionService", "Plan", "Money", "RenewalPolicy"] },
+            {
+              title: "Composition root",
+              items: ["buildApp()", "env parsing", "pool creation", "decorator stacking"],
+            },
+            {
+              title: "Infrastructure",
+              items: ["PostgresUsers", "StripeGateway", "SesMailer", "RedisCache"],
+            },
+            {
+              title: "Ports (interfaces)",
+              items: ["UserRepository", "PaymentGateway", "Mailer", "Clock"],
+            },
+            {
+              title: "Domain / use cases",
+              items: ["SubscriptionService", "Plan", "Money", "RenewalPolicy"],
+            },
           ],
         },
       },
@@ -652,10 +728,22 @@ expect(await svc.renew("alice")).toBe(false);`,
         table: {
           headers: ["", "Dependency injection", "Service locator"],
           rows: [
-            ["Where the dependency appears", "Constructor signature", "Inside a method body: locator.get(Mailer)"],
-            ["Missing dependency shows up", "At construction, usually at startup", "At runtime, on the unlucky code path"],
+            [
+              "Where the dependency appears",
+              "Constructor signature",
+              "Inside a method body: locator.get(Mailer)",
+            ],
+            [
+              "Missing dependency shows up",
+              "At construction, usually at startup",
+              "At runtime, on the unlucky code path",
+            ],
             ["Test setup", "Pass a fake in", "Mutate global registry, remember to reset it"],
-            ["Reading the class", "Collaborators are listed at the top", "You must read every method to know what it needs"],
+            [
+              "Reading the class",
+              "Collaborators are listed at the top",
+              "You must read every method to know what it needs",
+            ],
             ["Parallel tests", "Fine — no shared state", "Race on the shared registry"],
           ],
         },
@@ -687,7 +775,9 @@ expect(await svc.renew("alice")).toBe(false);`,
       },
     ],
     related: ["/lld/singleton-di", "/lld/repository", "/lld/solid", "/lld/decorator"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -721,7 +811,10 @@ expect(await svc.renew("alice")).toBe(false);`,
               title: "Static singleton",
               sub: "Pool.getInstance()",
               tone: "warn",
-              good: ["Zero plumbing", "Reachable from anywhere, including legacy code you cannot change"],
+              good: [
+                "Zero plumbing",
+                "Reachable from anywhere, including legacy code you cannot change",
+              ],
               bad: [
                 "Dependency is invisible in the signature",
                 "Tests share state; ordering bugs appear under parallel runs",
@@ -740,7 +833,9 @@ expect(await svc.renew("alice")).toBe(false);`,
                 "Tests pass a fake; no global reset needed",
                 "Lifetime is explicit — you can see startup and shutdown",
               ],
-              bad: ["You have to pass it down, which makes over-wide sharing visible (that is a feature)"],
+              bad: [
+                "You have to pass it down, which makes over-wide sharing visible (that is a feature)",
+              ],
               verdict: "The default answer in an interview.",
             },
           ],
@@ -858,7 +953,9 @@ expect(await svc.renew("alice")).toBe(false);`,
       },
     ],
     related: ["/lld/dependency-injection", "/lld/concurrency", "/lld/factory", "/lld/lru-cache"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -944,8 +1041,18 @@ expect(await svc.renew("alice")).toBe(false);`,
             },
           ],
           relations: [
-            { from: "orders", to: "order_lines", label: "loaded together, saved together", cardinality: "1..*" },
-            { from: "orders", to: "customers", label: "reference by id, never a join into the aggregate", cardinality: "*..1" },
+            {
+              from: "orders",
+              to: "order_lines",
+              label: "loaded together, saved together",
+              cardinality: "1..*",
+            },
+            {
+              from: "orders",
+              to: "customers",
+              label: "reference by id, never a join into the aggregate",
+              cardinality: "*..1",
+            },
           ],
         },
       },
@@ -1035,8 +1142,20 @@ orderRepositoryContract(() => new PostgresOrders(testPool));`,
           messages: [
             { from: "uc", to: "uow", label: "run(scope => ...)", kind: "call" },
             { from: "uow", to: "db", label: "BEGIN", kind: "call" },
-            { from: "uc", to: "accs", label: "byId(from) / byId(to)", kind: "call", note: "repositories bound to this transaction" },
-            { from: "accs", to: "db", label: "SELECT ... FOR UPDATE", kind: "call", note: "lock both rows in a fixed order to avoid deadlock" },
+            {
+              from: "uc",
+              to: "accs",
+              label: "byId(from) / byId(to)",
+              kind: "call",
+              note: "repositories bound to this transaction",
+            },
+            {
+              from: "accs",
+              to: "db",
+              label: "SELECT ... FOR UPDATE",
+              kind: "call",
+              note: "lock both rows in a fixed order to avoid deadlock",
+            },
             { from: "uc", to: "accs", label: "save(debited) / save(credited)", kind: "call" },
             { from: "uow", to: "db", label: "COMMIT", kind: "call", tone: "ok" },
             { from: "uow", to: "uc", label: "result", kind: "return" },
@@ -1111,6 +1230,8 @@ orderRepositoryContract(() => new PostgresOrders(testPool));`,
       },
     ],
     related: ["/lld/dependency-injection", "/lld/solid", "/hld/sql-vs-nosql", "/lld/concurrency"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 ];

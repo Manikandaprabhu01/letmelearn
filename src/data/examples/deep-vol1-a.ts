@@ -82,10 +82,26 @@ export const vol1DeepA: DesignExample[] = [
       },
     ],
     apis: [
-      { method: "POST", path: "/v1/links", desc: "Create — body {longUrl, customAlias?, expiresAt?}, returns the short key" },
-      { method: "GET", path: "/{key}", desc: "Resolve and redirect — the hot path, cached everywhere" },
-      { method: "GET", path: "/v1/links/{key}", desc: "Metadata without redirecting (owner, clicks, expiry)" },
-      { method: "GET", path: "/v1/links/{alias}/available", desc: "Custom alias availability — Bloom filter first" },
+      {
+        method: "POST",
+        path: "/v1/links",
+        desc: "Create — body {longUrl, customAlias?, expiresAt?}, returns the short key",
+      },
+      {
+        method: "GET",
+        path: "/{key}",
+        desc: "Resolve and redirect — the hot path, cached everywhere",
+      },
+      {
+        method: "GET",
+        path: "/v1/links/{key}",
+        desc: "Metadata without redirecting (owner, clicks, expiry)",
+      },
+      {
+        method: "GET",
+        path: "/v1/links/{alias}/available",
+        desc: "Custom alias availability — Bloom filter first",
+      },
       { method: "DELETE", path: "/v1/links/{key}", desc: "Owner deletes; key is not reused" },
     ],
     dataModel: [
@@ -100,8 +116,26 @@ export const vol1DeepA: DesignExample[] = [
           "is_custom (bool)",
         ],
       },
-      { entity: "click_events", fields: ["key (idx)", "ts", "referrer", "country", "ua_family", "→ analytics store, not the primary DB"] },
-      { entity: "counters", fields: ["range_start (pk)", "range_end", "assigned_to", "→ id ranges handed to app servers"] },
+      {
+        entity: "click_events",
+        fields: [
+          "key (idx)",
+          "ts",
+          "referrer",
+          "country",
+          "ua_family",
+          "→ analytics store, not the primary DB",
+        ],
+      },
+      {
+        entity: "counters",
+        fields: [
+          "range_start (pk)",
+          "range_end",
+          "assigned_to",
+          "→ id ranges handed to app servers",
+        ],
+      },
     ],
     architecture: [
       {
@@ -114,7 +148,10 @@ export const vol1DeepA: DesignExample[] = [
             {
               title: "Hash the URL, take a prefix",
               sub: "MD5/SHA → first 43 bits → Base62",
-              good: ["Same URL always yields the same key — natural deduplication", "No coordination between servers"],
+              good: [
+                "Same URL always yields the same key — natural deduplication",
+                "No coordination between servers",
+              ],
               bad: [
                 "Collisions are certain at scale; every insert needs a check-and-retry",
                 "Keys are guessable from the URL if the hash is unsalted",
@@ -134,7 +171,8 @@ export const vol1DeepA: DesignExample[] = [
                 "Sequential keys are enumerable — someone can walk your entire link set",
                 "Needs a distributed counter (ranges, or Snowflake-style ids)",
               ],
-              verdict: "The default. Mitigate enumeration by shuffling bits or using a large random range.",
+              verdict:
+                "The default. Mitigate enumeration by shuffling bits or using a large random range.",
             },
             {
               title: "Random key with a uniqueness check",
@@ -205,19 +243,43 @@ const KEY = toBase62((id * 2654435761n) & 0xFFFFFFFFFFFn);`,
           ],
           messages: [
             { from: "u", to: "cdn", label: "GET /aB3xY9z", kind: "call" },
-            { from: "cdn", to: "u", label: "301 (cached at edge)", kind: "return", tone: "ok", note: "most hot links never reach the origin" },
+            {
+              from: "cdn",
+              to: "u",
+              label: "301 (cached at edge)",
+              kind: "return",
+              tone: "ok",
+              note: "most hot links never reach the origin",
+            },
             { from: "cdn", to: "svc", label: "miss → forward", kind: "call" },
             { from: "svc", to: "r", label: "GET link:aB3xY9z", kind: "call", note: "~0.3 ms" },
             { from: "r", to: "svc", label: "hit → longUrl", kind: "return", tone: "ok" },
-            { from: "svc", to: "db", label: "miss → SELECT ... WHERE key = $1", kind: "call", note: "~5 ms, then populate Redis" },
+            {
+              from: "svc",
+              to: "db",
+              label: "miss → SELECT ... WHERE key = $1",
+              kind: "call",
+              note: "~5 ms, then populate Redis",
+            },
             { from: "svc", to: "u", label: "301 Location: <longUrl>", kind: "return", tone: "ok" },
-            { from: "svc", to: "svc", label: "emit click event to the queue", kind: "self", note: "never a synchronous write on the redirect" },
+            {
+              from: "svc",
+              to: "svc",
+              label: "emit click event to the queue",
+              kind: "self",
+              note: "never a synchronous write on the redirect",
+            },
           ],
         },
         table: {
           headers: ["Layer", "Hit ratio", "Latency", "Notes"],
           rows: [
-            ["CDN / edge", "60-80% for viral links", "~10 ms", "Cache-Control from the link's expiry; purge on delete"],
+            [
+              "CDN / edge",
+              "60-80% for viral links",
+              "~10 ms",
+              "Cache-Control from the link's expiry; purge on delete",
+            ],
             ["Redis", "90%+ of the remainder", "~0.5 ms", "Key → long URL, TTL with jitter"],
             ["Database", "the rest", "~5 ms", "Primary key lookup only; no scans on this path"],
           ],
@@ -236,7 +298,11 @@ const KEY = toBase62((id * 2654435761n) & 0xFFFFFFFFFFFn);`,
           headers: ["", "301 Moved Permanently", "302 Found"],
           rows: [
             ["Browser caching", "Cached, often indefinitely", "Not cached by default"],
-            ["Load on your service", "Much lower — repeat visits skip you entirely", "Every click reaches you"],
+            [
+              "Load on your service",
+              "Much lower — repeat visits skip you entirely",
+              "Every click reaches you",
+            ],
             ["Analytics", "You miss repeat clicks from the same browser", "You see every click"],
             ["Changing the destination", "Effectively impossible for cached clients", "Immediate"],
             ["SEO", "Passes link equity to the destination", "Does not"],
@@ -316,9 +382,21 @@ taken.add(alias);
           headers: ["Concern", "Approach", "Why not the alternative"],
           rows: [
             ["Shard key", "hash(key)", "Range on key hotspots on the newest range"],
-            ["User's links", "Separate index table by user_id", "Scatter-gather across every shard otherwise"],
-            ["Expiry cleanup", "Partition by expiry month; drop partitions", "A DELETE scan across 180 TB is not viable"],
-            ["Global uniqueness", "Unique constraint within the shard, and the key determines the shard", "No cross-shard coordination needed"],
+            [
+              "User's links",
+              "Separate index table by user_id",
+              "Scatter-gather across every shard otherwise",
+            ],
+            [
+              "Expiry cleanup",
+              "Partition by expiry month; drop partitions",
+              "A DELETE scan across 180 TB is not viable",
+            ],
+            [
+              "Global uniqueness",
+              "Unique constraint within the shard, and the key determines the shard",
+              "No cross-shard coordination needed",
+            ],
           ],
         },
       },
@@ -379,7 +457,12 @@ taken.add(alias);
         a: "Check the destination against a reputation service at creation time and asynchronously re-check afterwards, since a benign URL can be repurposed later. On a match, serve an interstitial warning rather than redirecting, and give abuse reports a fast path to disable a key. Because the redirect layer is already cache-heavy, revocation needs the same eviction and purge path as deletion.",
       },
     ],
-    related: ["/hld/caching", "/hld/bloom-filters", "/examples/unique-id", "/playgrounds/url-shortener"],
+    related: [
+      "/hld/caching",
+      "/hld/bloom-filters",
+      "/examples/unique-id",
+      "/playgrounds/url-shortener",
+    ],
     furtherReading: [
       {
         label: "algomaster — design a URL shortener",
@@ -458,9 +541,21 @@ taken.add(alias);
       },
     ],
     apis: [
-      { method: "LOCAL", path: "nextId()", desc: "In-process call — no network, no lock contention beyond one atomic" },
-      { method: "GET", path: "/v1/ids?count=1000", desc: "Optional service for clients that cannot embed the library" },
-      { method: "GET", path: "/v1/ids/decode/{id}", desc: "Debugging — split an id back into timestamp, machine, sequence" },
+      {
+        method: "LOCAL",
+        path: "nextId()",
+        desc: "In-process call — no network, no lock contention beyond one atomic",
+      },
+      {
+        method: "GET",
+        path: "/v1/ids?count=1000",
+        desc: "Optional service for clients that cannot embed the library",
+      },
+      {
+        method: "GET",
+        path: "/v1/ids/decode/{id}",
+        desc: "Debugging — split an id back into timestamp, machine, sequence",
+      },
     ],
     architecture: [
       {
@@ -568,7 +663,11 @@ const machine = Number((id >> 12n) & 1023n);  // which node made it`,
           options: [
             {
               title: "UUIDv4 (random)",
-              good: ["Zero coordination; generate anywhere", "Unguessable", "Universally supported"],
+              good: [
+                "Zero coordination; generate anywhere",
+                "Unguessable",
+                "Universally supported",
+              ],
               bad: [
                 "128 bits — twice the storage, in every index",
                 "Random order destroys B-tree locality: page splits and poor cache behaviour on insert",
@@ -586,7 +685,8 @@ const machine = Number((id >> 12n) & 1023n);  // which node made it`,
                 "Standardised (UUIDv7) and widely supported now",
               ],
               bad: ["128 bits", "Leaks creation time, like Snowflake"],
-              verdict: "Often the best modern default — Snowflake's ordering without the machine-id problem.",
+              verdict:
+                "Often the best modern default — Snowflake's ordering without the machine-id problem.",
             },
             {
               title: "Snowflake (64-bit)",
@@ -607,8 +707,20 @@ const machine = Number((id >> 12n) & 1023n);  // which node made it`,
         table: {
           headers: ["Scheme", "Bits", "Sortable", "Coordination", "Notes"],
           rows: [
-            ["Database auto-increment", "64", "Yes", "A single writer", "Simple and correct until you shard"],
-            ["Ticket server (Flickr)", "64", "Yes", "One central service", "Single point of failure; run two with odd/even offsets"],
+            [
+              "Database auto-increment",
+              "64",
+              "Yes",
+              "A single writer",
+              "Simple and correct until you shard",
+            ],
+            [
+              "Ticket server (Flickr)",
+              "64",
+              "Yes",
+              "One central service",
+              "Single point of failure; run two with odd/even offsets",
+            ],
             ["UUIDv4", "128", "No", "None", "Poor index locality"],
             ["UUIDv7 / ULID", "128", "Yes", "None", "The pragmatic modern choice"],
             ["Snowflake", "64", "Yes", "Machine id only", "Compact and decodable"],
@@ -626,12 +738,14 @@ const machine = Number((id >> 12n) & 1023n);  // which node made it`,
           {
             title: "Clock moves backwards",
             text: "NTP correction, a VM migration, or a manual change. Generating during that window can repeat an id that was already issued.",
-            detail: "Handle: wait out drift under a few milliseconds, refuse and alert beyond that. Never generate optimistically.",
+            detail:
+              "Handle: wait out drift under a few milliseconds, refuse and alert beyond that. Never generate optimistically.",
           },
           {
             title: "Sequence exhaustion within a millisecond",
             text: "More than 4,096 ids in one millisecond on one node. Correct behaviour is to spin until the next millisecond, which caps throughput rather than producing duplicates.",
-            detail: "If this happens regularly, rebalance bits — take from the machine id — or add nodes.",
+            detail:
+              "If this happens regularly, rebalance bits — take from the machine id — or add nodes.",
           },
           {
             title: "Duplicate machine ids",
@@ -641,12 +755,14 @@ const machine = Number((id >> 12n) & 1023n);  // which node made it`,
           {
             title: "Epoch exhaustion",
             text: "41 bits of milliseconds runs out 69 years after your epoch. Distant, but the fix — changing the layout — invalidates every existing id's ordering.",
-            detail: "Document the epoch and layout somewhere the next generation of engineers will find it.",
+            detail:
+              "Document the epoch and layout somewhere the next generation of engineers will find it.",
           },
           {
             title: "Ids leaking information",
             text: "A Snowflake id tells anyone the creation time and roughly your volume. For public-facing ids this is a real disclosure.",
-            detail: "Handle: use a separate opaque external id, or encrypt the internal one for display.",
+            detail:
+              "Handle: use a separate opaque external id, or encrypt the internal one for display.",
           },
         ],
       },
@@ -703,7 +819,12 @@ const machine = Number((id >> 12n) & 1023n);  // which node made it`,
         a: "Not with that layout — the generator spins until the next millisecond, which is the correct behaviour because it bounds throughput instead of producing duplicates. If a node genuinely needs more, I would rebalance the bits, taking some from the machine id, or add nodes. Four million ids per second per node is already far beyond most workloads, so hitting it usually means something is looping.",
       },
     ],
-    related: ["/examples/url-shortener", "/hld/sharding", "/playgrounds/snowflake", "/hld/consistency"],
+    related: [
+      "/examples/url-shortener",
+      "/hld/sharding",
+      "/playgrounds/snowflake",
+      "/hld/consistency",
+    ],
     furtherReading: [
       {
         label: "awesome-system-design-resources",

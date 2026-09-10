@@ -27,15 +27,29 @@ export const hldResilience: Concept[] = [
           layers: [
             {
               title: "Edge / CDN",
-              items: ["Volumetric DDoS", "Per-IP caps", "Bot detection", "Cheapest place to drop traffic"],
+              items: [
+                "Volumetric DDoS",
+                "Per-IP caps",
+                "Bot detection",
+                "Cheapest place to drop traffic",
+              ],
             },
             {
               title: "API gateway",
-              items: ["Per-API-key quotas", "Per-tenant fairness", "Endpoint-specific limits", "429 with headers"],
+              items: [
+                "Per-API-key quotas",
+                "Per-tenant fairness",
+                "Endpoint-specific limits",
+                "429 with headers",
+              ],
             },
             {
               title: "Service",
-              items: ["Expensive operations (export, search)", "Concurrency limits, not just rate", "Per-user business quotas"],
+              items: [
+                "Expensive operations (export, search)",
+                "Concurrency limits, not just rate",
+                "Per-user business quotas",
+              ],
             },
             {
               title: "Datastore",
@@ -66,7 +80,8 @@ export const hldResilience: Concept[] = [
           {
             title: "Exact: shared counter per request",
             text: "Every gateway consults Redis with an atomic script. Accurate, simple, and it adds ~0.3-1 ms plus a hard dependency to every request.",
-            detail: "Fine up to tens of thousands of rps. Shard keys across Redis nodes so one hot tenant does not saturate one node.",
+            detail:
+              "Fine up to tens of thousands of rps. Shard keys across Redis nodes so one hot tenant does not saturate one node.",
           },
           {
             title: "Local approximation with periodic sync",
@@ -76,7 +91,8 @@ export const hldResilience: Concept[] = [
           {
             title: "Budget distribution",
             text: "Divide the global limit across N gateways — each gets limit/N — and redistribute periodically based on observed demand, so idle gateways donate to busy ones.",
-            detail: "Simple and effective when traffic is roughly evenly balanced; poor when routing is skewed.",
+            detail:
+              "Simple and effective when traffic is roughly evenly balanced; poor when routing is skewed.",
           },
           {
             title: "Two-tier: local filter, shared check for hot keys",
@@ -151,8 +167,14 @@ Content-Type: application/json
           options: [
             {
               title: "Fail open",
-              good: ["Limiter outage does not become a service outage", "Users are unaffected by an internal problem"],
-              bad: ["Abuse flows through unchecked", "The backend the limiter protects may then fall over"],
+              good: [
+                "Limiter outage does not become a service outage",
+                "Users are unaffected by an internal problem",
+              ],
+              bad: [
+                "Abuse flows through unchecked",
+                "The backend the limiter protects may then fall over",
+              ],
               verdict: "Read endpoints where the backend can absorb a surge.",
             },
             {
@@ -186,8 +208,15 @@ Content-Type: application/json
         ],
       },
     ],
-    related: ["/lld/rate-limiter", "/hld/api-gateway", "/examples/rate-limiter", "/hld/circuit-breaker"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    related: [
+      "/lld/rate-limiter",
+      "/hld/api-gateway",
+      "/examples/rate-limiter",
+      "/hld/circuit-breaker",
+    ],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
     playground: "rate-limiter",
   },
 
@@ -241,7 +270,8 @@ Content-Type: application/json
         heading: "The breaker state machine",
         diagram: {
           kind: "flow",
-          caption: "Closed → open on error rate; open → half-open after a cooldown; half-open decides.",
+          caption:
+            "Closed → open on error rate; open → half-open after a cooldown; half-open decides.",
           rows: [
             [
               { id: "c", label: "CLOSED", sub: "calls pass through, failures counted", tone: "ok" },
@@ -249,9 +279,17 @@ Content-Type: application/json
               { id: "h", label: "HALF-OPEN", sub: "a few probe calls", tone: "warn" },
             ],
             [
-              { id: "t1", label: "error rate > 50% over 10s (min 20 requests)", sub: "closed → open" },
+              {
+                id: "t1",
+                label: "error rate > 50% over 10s (min 20 requests)",
+                sub: "closed → open",
+              },
               { id: "t2", label: "cooldown 30s elapsed", sub: "open → half-open" },
-              { id: "t3", label: "probes succeed → closed · any fails → open", sub: "half-open resolves" },
+              {
+                id: "t3",
+                label: "probes succeed → closed · any fails → open",
+                sub: "half-open resolves",
+              },
             ],
           ],
         },
@@ -364,12 +402,36 @@ async function withRetry<T>(fn: () => Promise<T>, deadline: number) {
         table: {
           headers: ["Rule", "Why", "Typical value"],
           rows: [
-            ["Every remote call has a timeout", "An untimed call can hold a thread indefinitely", "p99 of the dependency × 2-3"],
-            ["Inner timeouts < outer budget", "Otherwise the caller gives up while you wait", "Propagate a deadline, do not set independently"],
-            ["Retry only transient failures", "Retrying a 400 will never succeed", "Timeouts, 502/503/504, connection reset"],
-            ["Retry budget across the fleet", "Per-request limits still allow fleet-wide amplification", "≤ 10% of total requests may be retries"],
-            ["Full jitter on backoff", "Synchronised retries recreate the spike", "sleep = rand(0, base × 2^n)"],
-            ["Retries must be idempotent", "Otherwise you double-charge on a timeout", "Idempotency key on every mutating call"],
+            [
+              "Every remote call has a timeout",
+              "An untimed call can hold a thread indefinitely",
+              "p99 of the dependency × 2-3",
+            ],
+            [
+              "Inner timeouts < outer budget",
+              "Otherwise the caller gives up while you wait",
+              "Propagate a deadline, do not set independently",
+            ],
+            [
+              "Retry only transient failures",
+              "Retrying a 400 will never succeed",
+              "Timeouts, 502/503/504, connection reset",
+            ],
+            [
+              "Retry budget across the fleet",
+              "Per-request limits still allow fleet-wide amplification",
+              "≤ 10% of total requests may be retries",
+            ],
+            [
+              "Full jitter on backoff",
+              "Synchronised retries recreate the spike",
+              "sleep = rand(0, base × 2^n)",
+            ],
+            [
+              "Retries must be idempotent",
+              "Otherwise you double-charge on a timeout",
+              "Idempotency key on every mutating call",
+            ],
           ],
         },
         callout: {
@@ -406,8 +468,18 @@ async function withRetry<T>(fn: () => Promise<T>, deadline: number) {
               title: "On failure",
               nodes: [
                 { id: "f1", label: "catalog fails → 503", sub: "no meaningful page" },
-                { id: "f2", label: "recs fail → best sellers", sub: "breaker open, fallback", tone: "ok" },
-                { id: "f3", label: "reviews fail → hide section", sub: "page still renders", tone: "ok" },
+                {
+                  id: "f2",
+                  label: "recs fail → best sellers",
+                  sub: "breaker open, fallback",
+                  tone: "ok",
+                },
+                {
+                  id: "f3",
+                  label: "reviews fail → hide section",
+                  sub: "page still renders",
+                  tone: "ok",
+                },
               ],
             },
           ],
@@ -436,7 +508,9 @@ async function withRetry<T>(fn: () => Promise<T>, deadline: number) {
       },
     ],
     related: ["/hld/availability", "/lld/decorator", "/hld/rate-limiting", "/hld/observability"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -460,7 +534,8 @@ async function withRetry<T>(fn: () => Promise<T>, deadline: number) {
         heading: "Why it is unavoidable",
         diagram: {
           kind: "sequence",
-          caption: "The client cannot distinguish these two cases, so it must assume the worst and retry.",
+          caption:
+            "The client cannot distinguish these two cases, so it must assume the worst and retry.",
           actors: [
             { id: "c", label: "Client" },
             { id: "s", label: "Payment service" },
@@ -470,9 +545,23 @@ async function withRetry<T>(fn: () => Promise<T>, deadline: number) {
             { from: "c", to: "s", label: "POST /charges {amount: 5000}", kind: "call" },
             { from: "s", to: "db", label: "INSERT charge", kind: "call" },
             { from: "db", to: "s", label: "committed", kind: "return", tone: "ok" },
-            { from: "s", to: "c", label: "200 — response lost in the network", kind: "return", tone: "bad", note: "✗ never arrives" },
+            {
+              from: "s",
+              to: "c",
+              label: "200 — response lost in the network",
+              kind: "return",
+              tone: "bad",
+              note: "✗ never arrives",
+            },
             { from: "c", to: "c", label: "timeout → retry", kind: "self", tone: "warn" },
-            { from: "c", to: "s", label: "POST /charges {amount: 5000} — again", kind: "call", tone: "warn", note: "without an idempotency key: customer charged twice" },
+            {
+              from: "c",
+              to: "s",
+              label: "POST /charges {amount: 5000} — again",
+              kind: "call",
+              tone: "warn",
+              note: "without an idempotency key: customer charged twice",
+            },
           ],
         },
         bullets: [
@@ -487,13 +576,41 @@ async function withRetry<T>(fn: () => Promise<T>, deadline: number) {
           headers: ["Operation", "Idempotent?", "Why"],
           rows: [
             ["GET /orders/42", "Yes", "No side effect"],
-            ["PUT /users/42 {name: 'Ada'}", "Yes", "Sets an absolute value — applying twice gives the same state"],
-            ["DELETE /orders/42", "Yes", "Second delete is a no-op; return 204 either way, not 404"],
-            ["POST /orders", "No", "Creates a new resource each time — this is the one that needs a key"],
-            ["UPDATE balance SET amount = amount - 50", "No", "Relative change; applying twice subtracts 100"],
-            ["UPDATE balance SET amount = 950 WHERE version = 7", "Yes", "Absolute value plus a version guard"],
-            ["INSERT ... ON CONFLICT DO NOTHING", "Yes", "Second insert is absorbed by the unique constraint"],
-            ["queue.publish(event)", "No", "Two publishes, two messages — dedupe on the consumer side"],
+            [
+              "PUT /users/42 {name: 'Ada'}",
+              "Yes",
+              "Sets an absolute value — applying twice gives the same state",
+            ],
+            [
+              "DELETE /orders/42",
+              "Yes",
+              "Second delete is a no-op; return 204 either way, not 404",
+            ],
+            [
+              "POST /orders",
+              "No",
+              "Creates a new resource each time — this is the one that needs a key",
+            ],
+            [
+              "UPDATE balance SET amount = amount - 50",
+              "No",
+              "Relative change; applying twice subtracts 100",
+            ],
+            [
+              "UPDATE balance SET amount = 950 WHERE version = 7",
+              "Yes",
+              "Absolute value plus a version guard",
+            ],
+            [
+              "INSERT ... ON CONFLICT DO NOTHING",
+              "Yes",
+              "Second insert is absorbed by the unique constraint",
+            ],
+            [
+              "queue.publish(event)",
+              "No",
+              "Two publishes, two messages — dedupe on the consumer side",
+            ],
           ],
         },
         callout: {
@@ -604,7 +721,12 @@ await stripe.paymentIntents.create(params, { idempotencyKey: stripeKey });
         ],
       },
     ],
-    related: ["/hld/message-queues", "/examples/payment", "/hld/rest-vs-graphql", "/lld/concurrency"],
+    related: [
+      "/hld/message-queues",
+      "/examples/payment",
+      "/hld/rest-vs-graphql",
+      "/lld/concurrency",
+    ],
     furtherReading: [
       {
         label: "awesome-system-design-resources",
@@ -660,8 +782,18 @@ await stripe.paymentIntents.create(params, { idempotencyKey: stripeKey });
               { id: "b", label: "insert('bob')", sub: "sets bits 7, 11, 30", tone: "accent" },
             ],
             [
-              { id: "q1", label: "query('carol')", sub: "bit 5 is 0 → definitely absent", tone: "ok" },
-              { id: "q2", label: "query('dave')", sub: "bits 3, 7, 30 all 1 → false positive", tone: "warn" },
+              {
+                id: "q1",
+                label: "query('carol')",
+                sub: "bit 5 is 0 → definitely absent",
+                tone: "ok",
+              },
+              {
+                id: "q2",
+                label: "query('dave')",
+                sub: "bits 3, 7, 30 all 1 → false positive",
+                tone: "warn",
+              },
             ],
           ],
         },
@@ -759,13 +891,43 @@ async function getUser(id: string) {
         table: {
           headers: ["Structure", "Answers", "Space", "Notes"],
           rows: [
-            ["Bloom filter", "Membership, no deletion", "~10 bits/item at 1%", "The baseline; simple and fast"],
-            ["Counting Bloom", "Membership with deletion", "4× a Bloom filter", "Counters instead of bits; can overflow"],
-            ["Cuckoo filter", "Membership with deletion", "Comparable, often better at low p", "Deletes cleanly; supports lookups of fingerprints"],
+            [
+              "Bloom filter",
+              "Membership, no deletion",
+              "~10 bits/item at 1%",
+              "The baseline; simple and fast",
+            ],
+            [
+              "Counting Bloom",
+              "Membership with deletion",
+              "4× a Bloom filter",
+              "Counters instead of bits; can overflow",
+            ],
+            [
+              "Cuckoo filter",
+              "Membership with deletion",
+              "Comparable, often better at low p",
+              "Deletes cleanly; supports lookups of fingerprints",
+            ],
             ["Quotient filter", "Membership, mergeable", "Similar", "Cache-friendly, resizable"],
-            ["HyperLogLog", "Approximate cardinality", "~12 KB for ±2% on billions", "Unique visitors without storing ids; merges across shards"],
-            ["Count-min sketch", "Approximate frequency", "Configurable", "Heavy hitters, hot-key detection"],
-            ["Top-K / Space-Saving", "The k most frequent items", "O(k)", "Trending topics, hot tenants"],
+            [
+              "HyperLogLog",
+              "Approximate cardinality",
+              "~12 KB for ±2% on billions",
+              "Unique visitors without storing ids; merges across shards",
+            ],
+            [
+              "Count-min sketch",
+              "Approximate frequency",
+              "Configurable",
+              "Heavy hitters, hot-key detection",
+            ],
+            [
+              "Top-K / Space-Saving",
+              "The k most frequent items",
+              "O(k)",
+              "Trending topics, hot tenants",
+            ],
           ],
         },
         bullets: [
@@ -797,7 +959,12 @@ async function getUser(id: string) {
         ],
       },
     ],
-    related: ["/hld/caching", "/examples/url-shortener", "/examples/web-crawler", "/hld/estimation"],
+    related: [
+      "/hld/caching",
+      "/examples/url-shortener",
+      "/examples/web-crawler",
+      "/hld/estimation",
+    ],
     furtherReading: [
       {
         label: "awesome-system-design-resources",
@@ -884,7 +1051,8 @@ async function getUser(id: string) {
           {
             title: "Detect failure by probing",
             text: "Send a direct ping. If it does not answer within the timeout, do not declare it dead — ask k other nodes to probe it on your behalf. This distinguishes 'the node is dead' from 'my path to it is broken'.",
-            detail: "This indirect probe is SWIM's central idea, and it removes most false positives.",
+            detail:
+              "This indirect probe is SWIM's central idea, and it removes most false positives.",
           },
           {
             title: "Suspect before declaring dead",
@@ -907,13 +1075,26 @@ async function getUser(id: string) {
           messages: [
             { from: "a", to: "b", label: "ping", kind: "call" },
             { from: "a", to: "a", label: "no ack within timeout", kind: "self", tone: "warn" },
-            { from: "a", to: "c", label: "ping-req(B)", kind: "call", note: "ask others to try — maybe it is my network" },
+            {
+              from: "a",
+              to: "c",
+              label: "ping-req(B)",
+              kind: "call",
+              note: "ask others to try — maybe it is my network",
+            },
             { from: "a", to: "d", label: "ping-req(B)", kind: "call" },
             { from: "c", to: "b", label: "ping", kind: "call" },
             { from: "d", to: "b", label: "ping", kind: "call" },
             { from: "c", to: "a", label: "no ack", kind: "return", tone: "warn" },
             { from: "d", to: "a", label: "no ack", kind: "return", tone: "warn" },
-            { from: "a", to: "a", label: "mark B suspect, gossip it", kind: "self", tone: "bad", note: "B can still refute with a higher incarnation number" },
+            {
+              from: "a",
+              to: "a",
+              label: "mark B suspect, gossip it",
+              kind: "self",
+              tone: "bad",
+              note: "B can still refute with a higher incarnation number",
+            },
           ],
         },
       },
@@ -953,10 +1134,7 @@ async function getUser(id: string) {
             },
             {
               title: "Consensus — immediate agreement",
-              good: [
-                "One authoritative answer; linearizable",
-                "Correct leader election and locks",
-              ],
+              good: ["One authoritative answer; linearizable", "Correct leader election and locks"],
               bad: [
                 "Majority round trip per decision",
                 "Cluster size practically limited to 5-7 voting members",
@@ -993,7 +1171,12 @@ async function getUser(id: string) {
         ],
       },
     ],
-    related: ["/hld/consensus", "/hld/availability", "/hld/consistent-hashing", "/hld/observability"],
+    related: [
+      "/hld/consensus",
+      "/hld/availability",
+      "/hld/consistent-hashing",
+      "/hld/observability",
+    ],
     furtherReading: [
       {
         label: "awesome-system-design-resources",

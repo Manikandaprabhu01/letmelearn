@@ -43,7 +43,10 @@ export const hldData: Concept[] = [
             {
               title: "Multi leader",
               sub: "Multi-region actives, CRDT stores",
-              good: ["Writes accepted in every region — low write latency worldwide", "Survives a region loss for writes"],
+              good: [
+                "Writes accepted in every region — low write latency worldwide",
+                "Survives a region loss for writes",
+              ],
               bad: [
                 "Write conflicts are guaranteed and must be resolved",
                 "Auto-increment ids and uniqueness constraints break",
@@ -84,9 +87,28 @@ export const hldData: Concept[] = [
             { from: "c", to: "l", label: "INSERT ...", kind: "call" },
             { from: "l", to: "l", label: "write to WAL, fsync", kind: "self" },
             { from: "l", to: "f1", label: "stream WAL record", kind: "call", tone: "accent" },
-            { from: "f1", to: "l", label: "ack (durable on 2 machines)", kind: "return", tone: "ok" },
-            { from: "l", to: "c", label: "COMMIT ok", kind: "return", tone: "ok", note: "latency = leader fsync + 1 RTT" },
-            { from: "l", to: "f2", label: "stream WAL record", kind: "async", note: "does not block the client" },
+            {
+              from: "f1",
+              to: "l",
+              label: "ack (durable on 2 machines)",
+              kind: "return",
+              tone: "ok",
+            },
+            {
+              from: "l",
+              to: "c",
+              label: "COMMIT ok",
+              kind: "return",
+              tone: "ok",
+              note: "latency = leader fsync + 1 RTT",
+            },
+            {
+              from: "l",
+              to: "f2",
+              label: "stream WAL record",
+              kind: "async",
+              note: "does not block the client",
+            },
           ],
         },
         table: {
@@ -130,17 +152,20 @@ export const hldData: Concept[] = [
           {
             title: "Read-your-writes violated",
             text: "A user updates their profile, the write goes to the leader, and their next read hits a follower that has not caught up. They see the old value and assume it did not save.",
-            detail: "Fix: route a user's reads to the leader for a few seconds after their own write, or pin them to a replica whose log position is at least their write's.",
+            detail:
+              "Fix: route a user's reads to the leader for a few seconds after their own write, or pin them to a replica whose log position is at least their write's.",
           },
           {
             title: "Monotonic reads violated",
             text: "Two consecutive reads land on different followers with different lag, so a comment appears and then vanishes — time appears to run backwards.",
-            detail: "Fix: pin a session to one replica (hash the user id), so within a session the data only moves forward.",
+            detail:
+              "Fix: pin a session to one replica (hash the user id), so within a session the data only moves forward.",
           },
           {
             title: "Consistent prefix violated",
             text: "In a sharded or partitioned system, causally related writes replicate at different speeds — an answer arrives before the question it replies to.",
-            detail: "Fix: keep causally related data in the same partition, or attach causal metadata (version vectors, Lamport timestamps).",
+            detail:
+              "Fix: keep causally related data in the same partition, or attach causal metadata (version vectors, Lamport timestamps).",
           },
         ],
         code: {
@@ -186,9 +211,21 @@ function pickReplica(session: Session): Db {
         table: {
           headers: ["Mechanism", "What is shipped", "Notes"],
           rows: [
-            ["Statement-based", "The SQL text", "Breaks on NOW(), RAND(), and triggers; largely abandoned"],
-            ["Write-ahead log (physical)", "Byte-level changes to pages", "Fast and exact; replica must run the same version"],
-            ["Logical / row-based", "Row before and after images", "Version- and schema-flexible; enables CDC into Kafka or a warehouse"],
+            [
+              "Statement-based",
+              "The SQL text",
+              "Breaks on NOW(), RAND(), and triggers; largely abandoned",
+            ],
+            [
+              "Write-ahead log (physical)",
+              "Byte-level changes to pages",
+              "Fast and exact; replica must run the same version",
+            ],
+            [
+              "Logical / row-based",
+              "Row before and after images",
+              "Version- and schema-flexible; enables CDC into Kafka or a warehouse",
+            ],
             ["Trigger-based", "Application-level capture", "Flexible, slow, and easy to get wrong"],
           ],
         },
@@ -221,7 +258,9 @@ function pickReplica(session: Session): Db {
       },
     ],
     related: ["/hld/sharding", "/hld/consistency", "/hld/quorum", "/hld/cap-theorem"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -291,12 +330,14 @@ function pickReplica(session: Session): Db {
           {
             title: "List your top queries first",
             text: "Write out the five queries that carry your traffic. The shard key must appear in most of them, or those queries become scatter-gather across every shard.",
-            detail: "Example: 'messages for a conversation' → shard by conversation_id, not by message_id.",
+            detail:
+              "Example: 'messages for a conversation' → shard by conversation_id, not by message_id.",
           },
           {
             title: "Check the cardinality and the distribution",
             text: "High cardinality spreads well; low cardinality (country, status, plan) creates a handful of huge shards. Then check the distribution: even high-cardinality keys can be Zipfian.",
-            detail: "user_id is high cardinality, but if 1% of users generate 50% of writes it is still skewed.",
+            detail:
+              "user_id is high cardinality, but if 1% of users generate 50% of writes it is still skewed.",
           },
           {
             title: "Decide what must stay together",
@@ -305,7 +346,8 @@ function pickReplica(session: Session): Db {
           {
             title: "Plan for the outliers",
             text: "There will be a tenant a thousand times larger than the median. Decide now: give them a dedicated shard, or sub-shard their key with a suffix.",
-            detail: "key = tenant_id + ':' + (hot ? random(0..15) : 0) — spreads a hot tenant across 16 partitions.",
+            detail:
+              "key = tenant_id + ':' + (hot ? random(0..15) : 0) — spreads a hot tenant across 16 partitions.",
           },
           {
             title: "Verify you can reshard",
@@ -351,7 +393,12 @@ function nodeFor(key: string): PhysicalNode {
             {
               title: "Scatter-gather",
               nodes: [
-                { id: "c", label: "WHERE created_at > ...", sub: "hits all N shards", tone: "warn" },
+                {
+                  id: "c",
+                  label: "WHERE created_at > ...",
+                  sub: "hits all N shards",
+                  tone: "warn",
+                },
                 { id: "d", label: "Latency = slowest shard", tone: "warn" },
                 { id: "e", label: "Merge + sort in the app" },
               ],
@@ -461,8 +508,15 @@ function nodeFor(key: string): PhysicalNode {
         ],
       },
     ],
-    related: ["/hld/consistent-hashing", "/hld/replication", "/hld/sql-vs-nosql", "/examples/kv-store"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    related: [
+      "/hld/consistent-hashing",
+      "/hld/replication",
+      "/hld/sql-vs-nosql",
+      "/examples/kv-store",
+    ],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
     playground: "consistent-hashing",
   },
 
@@ -582,7 +636,12 @@ function nodeFor(key: string): PhysicalNode {
       {
         heading: "Why virtual nodes are mandatory",
         table: {
-          headers: ["Virtual nodes per physical node", "Load standard deviation", "Ring size (10 nodes)", "Verdict"],
+          headers: [
+            "Virtual nodes per physical node",
+            "Load standard deviation",
+            "Ring size (10 nodes)",
+            "Verdict",
+          ],
           rows: [
             ["1", "~30-40% — some nodes get 2× others", "10 points", "Unusable"],
             ["10", "~10%", "100 points", "Still lumpy"],
@@ -631,7 +690,10 @@ function nodeFor(key: string): PhysicalNode {
                 "Naturally even distribution",
                 "Trivially correct, ~10 lines",
               ],
-              bad: ["O(N) per lookup unless you optimise", "Less common vocabulary; may need explaining"],
+              bad: [
+                "O(N) per lookup unless you optimise",
+                "Less common vocabulary; may need explaining",
+              ],
               verdict: "Small node counts, or when you want simplicity over convention.",
             },
           ],
@@ -673,8 +735,15 @@ function nodeFor(key: string): PhysicalNode {
         ],
       },
     ],
-    related: ["/hld/sharding", "/hld/caching", "/examples/consistent-hashing", "/playgrounds/consistent-hashing"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    related: [
+      "/hld/sharding",
+      "/hld/caching",
+      "/examples/consistent-hashing",
+      "/playgrounds/consistent-hashing",
+    ],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
     playground: "consistent-hashing",
   },
 
@@ -816,27 +885,27 @@ CREATE TABLE orders_by_customer (
           headers: ["Claim", "Reality"],
           rows: [
             [
-              "\"NoSQL scales, SQL doesn't\"",
+              '"NoSQL scales, SQL doesn\'t"',
               "A tuned Postgres handles tens of thousands of writes/sec and terabytes. Most systems never reach the point where the engine is the limit.",
             ],
             [
-              "\"NoSQL is schemaless\"",
+              '"NoSQL is schemaless"',
               "The schema moved into the application, where it is enforced by nobody. You still have one — it is just implicit and versioned across live documents.",
             ],
             [
-              "\"NoSQL is faster\"",
+              '"NoSQL is faster"',
               "For its designed access pattern, yes. For a query it was not designed for, it is dramatically slower or impossible.",
             ],
             [
-              "\"SQL can't do JSON\"",
+              '"SQL can\'t do JSON"',
               "Postgres has jsonb with indexes; you can keep an aggregate in a column and still join and transact around it.",
             ],
             [
-              "\"NoSQL means no transactions\"",
+              '"NoSQL means no transactions"',
               "Increasingly untrue — MongoDB and DynamoDB both offer multi-item transactions, with limits. Read the limits.",
             ],
             [
-              "\"We'll migrate later if needed\"",
+              '"We\'ll migrate later if needed"',
               "Data migrations at scale are the hardest engineering work there is. Choosing is cheap now and expensive later.",
             ],
           ],
@@ -894,15 +963,11 @@ CREATE TABLE orders_by_customer (
           columns: [
             {
               title: "Source of truth",
-              nodes: [
-                { id: "pg", label: "Postgres", sub: "orders, users, money", tone: "accent" },
-              ],
+              nodes: [{ id: "pg", label: "Postgres", sub: "orders, users, money", tone: "accent" }],
             },
             {
               title: "Change stream",
-              nodes: [
-                { id: "cdc", label: "CDC / outbox", sub: "logical replication → Kafka" },
-              ],
+              nodes: [{ id: "cdc", label: "CDC / outbox", sub: "logical replication → Kafka" }],
             },
             {
               title: "Derived stores",
@@ -944,6 +1009,8 @@ CREATE TABLE orders_by_customer (
       },
     ],
     related: ["/hld/sharding", "/hld/consistency", "/hld/replication", "/lld/repository"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 ];

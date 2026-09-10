@@ -73,12 +73,36 @@ export const hldPlatform: Concept[] = [
           ],
           messages: [
             { from: "c", to: "g", label: "POST /v1/orders + Bearer token", kind: "call" },
-            { from: "g", to: "g", label: "TLS terminate · size limit · CORS", kind: "self", note: "cheapest checks first" },
-            { from: "g", to: "a", label: "verify signature (public key cached)", kind: "call", note: "local verification — no network call in the common case" },
-            { from: "a", to: "g", label: "claims: sub, scopes, tenant", kind: "return", tone: "ok" },
+            {
+              from: "g",
+              to: "g",
+              label: "TLS terminate · size limit · CORS",
+              kind: "self",
+              note: "cheapest checks first",
+            },
+            {
+              from: "g",
+              to: "a",
+              label: "verify signature (public key cached)",
+              kind: "call",
+              note: "local verification — no network call in the common case",
+            },
+            {
+              from: "a",
+              to: "g",
+              label: "claims: sub, scopes, tenant",
+              kind: "return",
+              tone: "ok",
+            },
             { from: "g", to: "r", label: "allow(tenant, /v1/orders)?", kind: "call" },
             { from: "r", to: "g", label: "ok, remaining 842", kind: "return" },
-            { from: "g", to: "s", label: "forward + X-Request-Id, X-User-Id, traceparent", kind: "call", note: "identity is trusted here because the network is not reachable from outside" },
+            {
+              from: "g",
+              to: "s",
+              label: "forward + X-Request-Id, X-User-Id, traceparent",
+              kind: "call",
+              note: "identity is trusted here because the network is not reachable from outside",
+            },
             { from: "s", to: "g", label: "201", kind: "return" },
             { from: "g", to: "c", label: "201 + RateLimit-* headers", kind: "return", tone: "ok" },
           ],
@@ -192,8 +216,15 @@ app.get("/bff/home", async (req, res) => {
         ],
       },
     ],
-    related: ["/hld/load-balancing", "/hld/rate-limiting", "/hld/rest-vs-graphql", "/hld/observability"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    related: [
+      "/hld/load-balancing",
+      "/hld/rate-limiting",
+      "/hld/rest-vs-graphql",
+      "/hld/observability",
+    ],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -292,10 +323,22 @@ app.get("/bff/home", async (req, res) => {
             { id: "p", label: "Payments", sub: "span: 760ms" },
           ],
           messages: [
-            { from: "g", to: "o", label: "POST /orders  [traceparent: 00-4bf92f...]", kind: "call" },
+            {
+              from: "g",
+              to: "o",
+              label: "POST /orders  [traceparent: 00-4bf92f...]",
+              kind: "call",
+            },
             { from: "o", to: "i", label: "check stock — 30ms", kind: "call", tone: "ok" },
             { from: "i", to: "o", label: "ok", kind: "return" },
-            { from: "o", to: "p", label: "capture — 760ms", kind: "call", tone: "bad", note: "here is the latency, and it is retrying twice" },
+            {
+              from: "o",
+              to: "p",
+              label: "capture — 760ms",
+              kind: "call",
+              tone: "bad",
+              note: "here is the latency, and it is retrying twice",
+            },
             { from: "p", to: "o", label: "ok (attempt 3)", kind: "return", tone: "warn" },
             { from: "o", to: "g", label: "201", kind: "return" },
           ],
@@ -344,11 +387,31 @@ metrics.histogram("payment.duration_ms", 760, { provider: "stripe", outcome: "ok
         table: {
           headers: ["Symptom", "Likely first check", "Signal to use"],
           rows: [
-            ["p99 latency up, p50 flat", "One slow dependency or a hot shard", "Traces — find the slow span"],
-            ["Error rate up across all endpoints", "Shared dependency or a deploy", "Deploy timeline, then metrics by version"],
-            ["Latency up, all percentiles", "Saturation — CPU, connections, queue depth", "Metrics: USE on the resource"],
-            ["Errors for one tenant only", "Rate limit, data shape, or a hot key", "Logs and traces filtered by tenant"],
-            ["Slow creep over days", "Leak, unbounded growth, index bloat", "Long-window metrics, profiles"],
+            [
+              "p99 latency up, p50 flat",
+              "One slow dependency or a hot shard",
+              "Traces — find the slow span",
+            ],
+            [
+              "Error rate up across all endpoints",
+              "Shared dependency or a deploy",
+              "Deploy timeline, then metrics by version",
+            ],
+            [
+              "Latency up, all percentiles",
+              "Saturation — CPU, connections, queue depth",
+              "Metrics: USE on the resource",
+            ],
+            [
+              "Errors for one tenant only",
+              "Rate limit, data shape, or a hot key",
+              "Logs and traces filtered by tenant",
+            ],
+            [
+              "Slow creep over days",
+              "Leak, unbounded growth, index bloat",
+              "Long-window metrics, profiles",
+            ],
           ],
         },
       },
@@ -375,7 +438,9 @@ metrics.histogram("payment.duration_ms", 760, { provider: "stripe", outcome: "ok
       },
     ],
     related: ["/hld/availability", "/lld/logging", "/hld/circuit-breaker", "/examples/metrics"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -441,10 +506,26 @@ metrics.histogram("payment.duration_ms", 760, { provider: "stripe", outcome: "ok
         table: {
           headers: ["Type", "Maps to", "Notes"],
           rows: [
-            ["A / AAAA", "IPv4 / IPv6 address", "The endpoint. Multiple records give crude round-robin"],
-            ["CNAME", "Another name", "Cannot coexist with other records; not allowed at the zone apex"],
-            ["ALIAS / ANAME", "Another name, resolved server-side", "Provider-specific way to get CNAME behaviour at the apex"],
-            ["NS", "Authoritative nameservers", "Delegation; changing these is the slowest change of all"],
+            [
+              "A / AAAA",
+              "IPv4 / IPv6 address",
+              "The endpoint. Multiple records give crude round-robin",
+            ],
+            [
+              "CNAME",
+              "Another name",
+              "Cannot coexist with other records; not allowed at the zone apex",
+            ],
+            [
+              "ALIAS / ANAME",
+              "Another name, resolved server-side",
+              "Provider-specific way to get CNAME behaviour at the apex",
+            ],
+            [
+              "NS",
+              "Authoritative nameservers",
+              "Delegation; changing these is the slowest change of all",
+            ],
             ["MX", "Mail servers", "With priorities"],
             ["TXT", "Arbitrary text", "SPF, DKIM, domain verification"],
             ["SRV", "Service host and port", "Service discovery in some stacks"],
@@ -490,11 +571,36 @@ metrics.histogram("payment.duration_ms", 760, { provider: "stripe", outcome: "ok
           headers: ["Policy", "Chooses by", "Use for", "Caveat"],
           rows: [
             ["Simple", "One record", "Single endpoint", "No failover at all"],
-            ["Weighted", "Configured proportions", "Canary and gradual rollouts, blue-green", "Coarse — caching makes real proportions drift"],
-            ["Latency-based", "Measured latency to each region", "Global apps wanting the fastest region", "Based on the resolver's location, not the user's"],
-            ["Geolocation", "The resolver's country/region", "Data residency, localised content", "Users on VPNs or corporate resolvers land wrong"],
-            ["Failover", "Primary unless a health check fails", "Disaster recovery", "Propagation is bounded by TTL — minutes, not seconds"],
-            ["Multivalue / round robin", "Several A records returned", "Crude spreading", "No health awareness in the client"],
+            [
+              "Weighted",
+              "Configured proportions",
+              "Canary and gradual rollouts, blue-green",
+              "Coarse — caching makes real proportions drift",
+            ],
+            [
+              "Latency-based",
+              "Measured latency to each region",
+              "Global apps wanting the fastest region",
+              "Based on the resolver's location, not the user's",
+            ],
+            [
+              "Geolocation",
+              "The resolver's country/region",
+              "Data residency, localised content",
+              "Users on VPNs or corporate resolvers land wrong",
+            ],
+            [
+              "Failover",
+              "Primary unless a health check fails",
+              "Disaster recovery",
+              "Propagation is bounded by TTL — minutes, not seconds",
+            ],
+            [
+              "Multivalue / round robin",
+              "Several A records returned",
+              "Crude spreading",
+              "No health awareness in the client",
+            ],
           ],
         },
         callout: {
@@ -536,7 +642,9 @@ metrics.histogram("payment.duration_ms", 760, { provider: "stripe", outcome: "ok
       },
     ],
     related: ["/hld/cdn", "/hld/load-balancing", "/hld/availability", "/hld/scaling"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -732,7 +840,14 @@ metrics.histogram("payment.duration_ms", 760, { provider: "stripe", outcome: "ok
         ],
       },
     ],
-    related: ["/hld/scaling", "/examples/scale-to-millions", "/examples/interview-framework", "/hld/caching"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    related: [
+      "/hld/scaling",
+      "/examples/scale-to-millions",
+      "/examples/interview-framework",
+      "/hld/caching",
+    ],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 ];

@@ -153,10 +153,18 @@ const handler = withTiming("orders.create")(withAuth(createOrder));`,
           headers: ["Pattern", "Interface", "Intent"],
           rows: [
             ["Decorator", "Same as wrapped", "Add behaviour; designed to stack"],
-            ["Proxy", "Same as wrapped", "Control access: lazy load, remote call, permission check"],
+            [
+              "Proxy",
+              "Same as wrapped",
+              "Control access: lazy load, remote call, permission check",
+            ],
             ["Adapter", "Different from wrapped", "Make an incompatible interface fit"],
             ["Facade", "New, simpler", "Hide a subsystem behind one entry point"],
-            ["Middleware", "Same as wrapped (a handler)", "Decorator applied to a request pipeline"],
+            [
+              "Middleware",
+              "Same as wrapped (a handler)",
+              "Decorator applied to a request pipeline",
+            ],
           ],
         },
       },
@@ -179,7 +187,9 @@ const handler = withTiming("orders.create")(withAuth(createOrder));`,
       },
     ],
     related: ["/lld/proxy", "/lld/adapter", "/hld/circuit-breaker", "/lld/dependency-injection"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -218,19 +228,29 @@ const handler = withTiming("orders.create")(withAuth(createOrder));`,
               name: "StripeAdapter",
               members: [
                 { name: "sdk: Stripe", kind: "field", vis: "-" },
-                { name: "charge(...)", kind: "method", note: "maps Money → cents, errors → domain errors" },
+                {
+                  name: "charge(...)",
+                  kind: "method",
+                  note: "maps Money → cents, errors → domain errors",
+                },
               ],
             },
             {
               name: "AdyenAdapter",
-              members: [{ name: "charge(...)", kind: "method", note: "different SDK, same contract" }],
+              members: [
+                { name: "charge(...)", kind: "method", note: "different SDK, same contract" },
+              ],
             },
             {
               name: "Stripe SDK",
               stereotype: "class",
               tone: "warn",
               members: [
-                { name: "paymentIntents.create(...)", kind: "method", note: "amount in minor units, throws StripeError" },
+                {
+                  name: "paymentIntents.create(...)",
+                  kind: "method",
+                  note: "amount in minor units, throws StripeError",
+                },
               ],
             },
           ],
@@ -291,12 +311,36 @@ function toDomainError(err: unknown): DomainError {
         table: {
           headers: ["Mismatch", "Example", "Adapter's job"],
           rows: [
-            ["Units", "Money vs integer cents vs float dollars", "Convert once, at the boundary, with tests"],
-            ["Time", "Unix seconds, ISO strings, local time", "Normalise to one type in one time zone (UTC)"],
-            ["Errors", "Exceptions vs error codes vs null returns", "Map to typed domain errors, preserving transient/permanent"],
-            ["Iteration", "Cursor pagination vs page numbers vs streams", "Expose one async iterator; hide the paging"],
-            ["Nullability", "Missing vs null vs empty string", "Decide the domain meaning and make it explicit"],
-            ["Identity", "Their id format vs yours", "Keep both; store the external id for reconciliation"],
+            [
+              "Units",
+              "Money vs integer cents vs float dollars",
+              "Convert once, at the boundary, with tests",
+            ],
+            [
+              "Time",
+              "Unix seconds, ISO strings, local time",
+              "Normalise to one type in one time zone (UTC)",
+            ],
+            [
+              "Errors",
+              "Exceptions vs error codes vs null returns",
+              "Map to typed domain errors, preserving transient/permanent",
+            ],
+            [
+              "Iteration",
+              "Cursor pagination vs page numbers vs streams",
+              "Expose one async iterator; hide the paging",
+            ],
+            [
+              "Nullability",
+              "Missing vs null vs empty string",
+              "Decide the domain meaning and make it explicit",
+            ],
+            [
+              "Identity",
+              "Their id format vs yours",
+              "Keep both; store the external id for reconciliation",
+            ],
           ],
         },
       },
@@ -310,9 +354,23 @@ function toDomainError(err: unknown): DomainError {
           kind: "layers",
           caption: "Anti-corruption layer: the only place that speaks both dialects.",
           layers: [
-            { title: "New domain", items: ["Subscription", "Plan", "BillingCycle", "SubscriptionRepository (port)"] },
-            { title: "Anti-corruption layer", items: ["LegacyBillingAdapter", "SUB_REC → Subscription", "status char → enum", "COBOL date → Instant"] },
-            { title: "Legacy system", items: ["SOAP endpoint", "SUB_REC fixed-width record", "status: 'A' | 'S' | 'X'"] },
+            {
+              title: "New domain",
+              items: ["Subscription", "Plan", "BillingCycle", "SubscriptionRepository (port)"],
+            },
+            {
+              title: "Anti-corruption layer",
+              items: [
+                "LegacyBillingAdapter",
+                "SUB_REC → Subscription",
+                "status char → enum",
+                "COBOL date → Instant",
+              ],
+            },
+            {
+              title: "Legacy system",
+              items: ["SOAP endpoint", "SUB_REC fixed-width record", "status: 'A' | 'S' | 'X'"],
+            },
           ],
         },
         code: {
@@ -354,7 +412,9 @@ class LegacyBillingAdapter implements SubscriptionGateway {
       },
     ],
     related: ["/lld/decorator", "/lld/proxy", "/lld/repository", "/lld/solid"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -443,9 +503,22 @@ class LegacyBillingAdapter implements SubscriptionGateway {
             { id: "db", label: "Database" },
           ],
           messages: [
-            { from: "v", to: "p", label: "order[1..50].lines.all()", kind: "call", note: "50 proxies, 50 calls" },
+            {
+              from: "v",
+              to: "p",
+              label: "order[1..50].lines.all()",
+              kind: "call",
+              note: "50 proxies, 50 calls",
+            },
             { from: "p", to: "dl", label: "load(orderId) × 50", kind: "call" },
-            { from: "dl", to: "db", label: "SELECT * FROM lines WHERE order_id = ANY($1)", kind: "call", tone: "ok", note: "one query, not fifty" },
+            {
+              from: "dl",
+              to: "db",
+              label: "SELECT * FROM lines WHERE order_id = ANY($1)",
+              kind: "call",
+              tone: "ok",
+              note: "one query, not fifty",
+            },
             { from: "db", to: "dl", label: "rows", kind: "return" },
             { from: "dl", to: "p", label: "resolve each promise", kind: "return" },
           ],
@@ -510,6 +583,8 @@ class LegacyBillingAdapter implements SubscriptionGateway {
       },
     ],
     related: ["/lld/decorator", "/lld/lru-cache", "/hld/caching", "/hld/api-gateway"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 ];

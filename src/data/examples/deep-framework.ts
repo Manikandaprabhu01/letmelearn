@@ -68,10 +68,26 @@ export const frameworkExamples: DesignExample[] = [
       },
     ],
     apis: [
-      { method: "STEP 1", path: "Understand and scope", desc: "Ask, estimate, agree. Nothing is drawn yet." },
-      { method: "STEP 2", path: "High-level design", desc: "APIs, data model, boxes and arrows. Get buy-in before going deeper." },
-      { method: "STEP 3", path: "Deep dive", desc: "Two or three hard parts, in the interviewer's order of interest." },
-      { method: "STEP 4", path: "Wrap up", desc: "Bottlenecks, failure modes, what you would do next." },
+      {
+        method: "STEP 1",
+        path: "Understand and scope",
+        desc: "Ask, estimate, agree. Nothing is drawn yet.",
+      },
+      {
+        method: "STEP 2",
+        path: "High-level design",
+        desc: "APIs, data model, boxes and arrows. Get buy-in before going deeper.",
+      },
+      {
+        method: "STEP 3",
+        path: "Deep dive",
+        desc: "Two or three hard parts, in the interviewer's order of interest.",
+      },
+      {
+        method: "STEP 4",
+        path: "Wrap up",
+        desc: "Bottlenecks, failure modes, what you would do next.",
+      },
     ],
     architecture: [
       {
@@ -85,7 +101,8 @@ export const frameworkExamples: DesignExample[] = [
           {
             title: "Clarify the core use cases",
             text: "Two or three, in the form 'a user can X'. Write them down. Everything you build must serve one of them.",
-            detail: "'Users post 280-character messages' · 'Users see a timeline of people they follow' · 'Users follow and unfollow'",
+            detail:
+              "'Users post 280-character messages' · 'Users see a timeline of people they follow' · 'Users follow and unfollow'",
           },
           {
             title: "Get the numbers",
@@ -117,7 +134,8 @@ export const frameworkExamples: DesignExample[] = [
           {
             title: "API surface first",
             text: "Two or three endpoints with real signatures. This is where you decide what the system does; the boxes are how.",
-            detail: "POST /v1/posts {text} → 201 {postId}   ·   GET /v1/timeline?cursor= → 200 {posts[], nextCursor}",
+            detail:
+              "POST /v1/posts {text} → 201 {postId}   ·   GET /v1/timeline?cursor= → 200 {posts[], nextCursor}",
           },
           {
             title: "Data model second",
@@ -184,13 +202,25 @@ export const frameworkExamples: DesignExample[] = [
         table: {
           headers: ["System type", "The hard part they want", "What a shallow answer sounds like"],
           rows: [
-            ["Feed / timeline", "Fan-out on write vs read, and the celebrity problem", "'We use a cache'"],
+            [
+              "Feed / timeline",
+              "Fan-out on write vs read, and the celebrity problem",
+              "'We use a cache'",
+            ],
             ["Chat", "Delivery guarantees, ordering, presence at scale", "'WebSockets'"],
             ["Payments", "Idempotency, ledger integrity, reconciliation", "'A payments table'"],
             ["Search / autocomplete", "Index structure, update path, ranking", "'Elasticsearch'"],
             ["Video", "Chunked upload, transcoding pipeline, CDN strategy", "'Store it in S3'"],
-            ["Rate limiter", "Distributed counter state without a round trip per request", "'Redis'"],
-            ["Storage / KV", "Partitioning, replication, conflict resolution", "'Consistent hashing'"],
+            [
+              "Rate limiter",
+              "Distributed counter state without a round trip per request",
+              "'Redis'",
+            ],
+            [
+              "Storage / KV",
+              "Partitioning, replication, conflict resolution",
+              "'Consistent hashing'",
+            ],
           ],
         },
         callout: {
@@ -233,13 +263,41 @@ export const frameworkExamples: DesignExample[] = [
         table: {
           headers: ["Signal", "What earns it", "What loses it"],
           rows: [
-            ["Scoping", "Questions that change the design; explicit assumptions", "Starting to draw within the first minute"],
-            ["Estimation", "Converting to peak QPS and storage out loud", "'It'll be a lot of traffic'"],
-            ["Depth", "One subsystem specified concretely, with numbers", "Naming technologies without saying how they are used"],
-            ["Trade-offs", "'I chose X, which costs me Y'", "Presenting a design as having no downsides"],
-            ["Failure thinking", "Volunteering what breaks and what users see", "Only discussing the happy path"],
-            ["Communication", "Narrating, pausing, checking in", "Silence, or twenty minutes of monologue"],
-            ["Correcting course", "Taking a hint and adjusting quickly", "Defending a design after they signalled a problem"],
+            [
+              "Scoping",
+              "Questions that change the design; explicit assumptions",
+              "Starting to draw within the first minute",
+            ],
+            [
+              "Estimation",
+              "Converting to peak QPS and storage out loud",
+              "'It'll be a lot of traffic'",
+            ],
+            [
+              "Depth",
+              "One subsystem specified concretely, with numbers",
+              "Naming technologies without saying how they are used",
+            ],
+            [
+              "Trade-offs",
+              "'I chose X, which costs me Y'",
+              "Presenting a design as having no downsides",
+            ],
+            [
+              "Failure thinking",
+              "Volunteering what breaks and what users see",
+              "Only discussing the happy path",
+            ],
+            [
+              "Communication",
+              "Narrating, pausing, checking in",
+              "Silence, or twenty minutes of monologue",
+            ],
+            [
+              "Correcting course",
+              "Taking a hint and adjusting quickly",
+              "Defending a design after they signalled a problem",
+            ],
           ],
         },
         callout: {
@@ -305,9 +363,17 @@ export const frameworkExamples: DesignExample[] = [
         a: "Yes, but as an illustration rather than as the answer — 'a partitioned log, Kafka for example' rather than 'Kafka'. Naming the property I need shows I understand why, and it protects me if the interviewer knows a technology better than I do. Claiming deep expertise in something I have not run is a bad trade.",
       },
     ],
-    related: ["/hld/estimation", "/examples/scale-to-millions", "/examples/url-shortener", "/examples/news-feed"],
+    related: [
+      "/hld/estimation",
+      "/examples/scale-to-millions",
+      "/examples/url-shortener",
+      "/examples/news-feed",
+    ],
     furtherReading: [
-      { label: "roadmap.sh — system design questions", href: "https://roadmap.sh/questions/system-design" },
+      {
+        label: "roadmap.sh — system design questions",
+        href: "https://roadmap.sh/questions/system-design",
+      },
       {
         label: "awesome-system-design-resources",
         href: "https://github.com/ashishps1/awesome-system-design-resources",
@@ -385,16 +451,33 @@ export const frameworkExamples: DesignExample[] = [
       },
     ],
     apis: [
-      { method: "GET", path: "/v1/items?cursor=", desc: "Read path — cacheable, served from replicas" },
+      {
+        method: "GET",
+        path: "/v1/items?cursor=",
+        desc: "Read path — cacheable, served from replicas",
+      },
       { method: "POST", path: "/v1/items", desc: "Write path — primary only, idempotency key" },
       { method: "GET", path: "/healthz", desc: "Liveness — shallow, no dependency checks" },
-      { method: "GET", path: "/readyz", desc: "Readiness — gates load-balancer traffic during deploy and drain" },
+      {
+        method: "GET",
+        path: "/readyz",
+        desc: "Readiness — gates load-balancer traffic during deploy and drain",
+      },
     ],
     dataModel: [
       { entity: "users", fields: ["id (pk)", "email (unique)", "created_at", "region"] },
-      { entity: "items", fields: ["id (pk)", "user_id (fk, idx)", "body", "created_at (idx)", "version"] },
-      { entity: "sessions", fields: ["token (pk)", "user_id", "expires_at", "→ Redis, not the primary DB"] },
-      { entity: "media", fields: ["id (pk)", "user_id", "object_key", "→ bytes live in object storage"] },
+      {
+        entity: "items",
+        fields: ["id (pk)", "user_id (fk, idx)", "body", "created_at (idx)", "version"],
+      },
+      {
+        entity: "sessions",
+        fields: ["token (pk)", "user_id", "expires_at", "→ Redis, not the primary DB"],
+      },
+      {
+        entity: "media",
+        fields: ["id (pk)", "user_id", "object_key", "→ bytes live in object storage"],
+      },
     ],
     architecture: [
       {
@@ -419,12 +502,14 @@ export const frameworkExamples: DesignExample[] = [
           {
             title: "Cache the hot reads",
             text: "Cache-aside in Redis. Typically removes 80-95% of read load for a fraction of the cost of another database machine.",
-            detail: "Introduces: invalidation, staleness, and the stampede/penetration/avalanche failure modes.",
+            detail:
+              "Introduces: invalidation, staleness, and the stampede/penetration/avalanche failure modes.",
           },
           {
             title: "Read replicas",
             text: "Writes to the primary, reads to followers. Multiplies read capacity and introduces replication lag.",
-            detail: "Introduces: read-your-writes anomalies. Route a user's reads to the primary briefly after their write.",
+            detail:
+              "Introduces: read-your-writes anomalies. Route a user's reads to the primary briefly after their write.",
           },
           {
             title: "CDN and object storage",
@@ -433,7 +518,8 @@ export const frameworkExamples: DesignExample[] = [
           {
             title: "Queue plus workers",
             text: "Email, thumbnails, exports, fan-out and webhooks move off the request path. The user's request returns in milliseconds and the work survives a crash.",
-            detail: "Introduces: eventual consistency, at-least-once delivery, and a backlog to monitor.",
+            detail:
+              "Introduces: eventual consistency, at-least-once delivery, and a backlog to monitor.",
           },
           {
             title: "Multiple availability zones",
@@ -496,13 +582,43 @@ export const frameworkExamples: DesignExample[] = [
         table: {
           headers: ["Component", "Added at roughly", "Solves", "Costs"],
           rows: [
-            ["Separate DB host", "First real users", "Independent sizing and failure", "A network hop"],
-            ["Load balancer + fleet", "~100 rps or first uptime requirement", "Server loss, zero-downtime deploys", "Statelessness discipline"],
+            [
+              "Separate DB host",
+              "First real users",
+              "Independent sizing and failure",
+              "A network hop",
+            ],
+            [
+              "Load balancer + fleet",
+              "~100 rps or first uptime requirement",
+              "Server loss, zero-downtime deploys",
+              "Statelessness discipline",
+            ],
             ["Cache", "~500 rps reads", "Most read load", "Invalidation and staleness"],
-            ["Read replicas", "~2,000 rps reads", "Read capacity beyond the cache", "Replication lag anomalies"],
-            ["CDN", "Any media, any global user", "Latency and origin bandwidth", "Cache-control discipline"],
-            ["Queue", "First slow request", "Latency and coupling", "Eventual consistency, idempotency"],
-            ["Sharding", "Writes or storage exceed one machine", "Write scale", "Joins, transactions, rebalancing"],
+            [
+              "Read replicas",
+              "~2,000 rps reads",
+              "Read capacity beyond the cache",
+              "Replication lag anomalies",
+            ],
+            [
+              "CDN",
+              "Any media, any global user",
+              "Latency and origin bandwidth",
+              "Cache-control discipline",
+            ],
+            [
+              "Queue",
+              "First slow request",
+              "Latency and coupling",
+              "Eventual consistency, idempotency",
+            ],
+            [
+              "Sharding",
+              "Writes or storage exceed one machine",
+              "Write scale",
+              "Joins, transactions, rebalancing",
+            ],
           ],
         },
       },
@@ -517,10 +633,26 @@ export const frameworkExamples: DesignExample[] = [
         table: {
           headers: ["State that blocks scaling", "Symptom", "Fix"],
           rows: [
-            ["In-memory sessions", "Users randomly logged out", "Redis session store, or a signed stateless token"],
-            ["Local file uploads", "Image 404s on some page loads", "Object storage with signed URLs"],
-            ["In-process cache used for correctness", "Two servers disagree", "Shared cache, or accept it as an optimisation only"],
-            ["Per-instance cron", "Nightly job runs five times", "A scheduler with leader election, or a job queue"],
+            [
+              "In-memory sessions",
+              "Users randomly logged out",
+              "Redis session store, or a signed stateless token",
+            ],
+            [
+              "Local file uploads",
+              "Image 404s on some page loads",
+              "Object storage with signed URLs",
+            ],
+            [
+              "In-process cache used for correctness",
+              "Two servers disagree",
+              "Shared cache, or accept it as an optimisation only",
+            ],
+            [
+              "Per-instance cron",
+              "Nightly job runs five times",
+              "A scheduler with leader election, or a job queue",
+            ],
           ],
         },
         code: {
@@ -585,14 +717,25 @@ process.on("SIGTERM", async () => {
             {
               title: "Single region, multi-AZ",
               tone: "ok",
-              good: ["Simple; one source of truth", "Survives a zone failure", "No conflict resolution ever"],
+              good: [
+                "Simple; one source of truth",
+                "Survives a zone failure",
+                "No conflict resolution ever",
+              ],
               bad: ["Region outage is a full outage", "Far-away users pay the latency"],
               verdict: "Almost everyone, for a long time.",
             },
             {
               title: "Multi-region, single write region",
-              good: ["Fast reads worldwide", "Warm standby for disaster recovery", "Still one write leader — no conflicts"],
-              bad: ["Cross-region write latency for distant users", "Failover is a practised procedure, not automatic"],
+              good: [
+                "Fast reads worldwide",
+                "Warm standby for disaster recovery",
+                "Still one write leader — no conflicts",
+              ],
+              bad: [
+                "Cross-region write latency for distant users",
+                "Failover is a practised procedure, not automatic",
+              ],
               verdict: "Read-heavy global products.",
             },
             {
@@ -661,7 +804,12 @@ process.on("SIGTERM", async () => {
         a: "The operational things: backups nobody has restored, a deploy process without a fast rollback, no distributed tracing so a latency spike takes hours to localise, and a single hot tenant that no amount of horizontal scaling fixes. Those cause more real outages than capacity does, and none of them are on the architecture diagram.",
       },
     ],
-    related: ["/hld/scaling", "/hld/caching", "/hld/load-balancing", "/examples/interview-framework"],
+    related: [
+      "/hld/scaling",
+      "/hld/caching",
+      "/hld/load-balancing",
+      "/examples/interview-framework",
+    ],
     furtherReading: [
       { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
       {

@@ -35,7 +35,8 @@ export const hldFundamentals: Concept[] = [
           {
             title: "Add a load balancer and more app servers",
             text: "Requires the app to be stateless. Now you can lose a server without losing the service, and deploys become rolling rather than downtime.",
-            detail: "Prerequisite: sessions in Redis or a signed cookie, uploads in S3, no in-process caches you depend on for correctness.",
+            detail:
+              "Prerequisite: sessions in Redis or a signed cookie, uploads in S3, no in-process caches you depend on for correctness.",
           },
           {
             title: "Add a cache",
@@ -45,7 +46,8 @@ export const hldFundamentals: Concept[] = [
           {
             title: "Add read replicas",
             text: "Send reads to followers, writes to the leader. Multiplies read capacity, and introduces replication lag — the first place users see 'I saved it and it disappeared'.",
-            detail: "Route a user's reads to the leader for a few seconds after their own write (read-your-writes).",
+            detail:
+              "Route a user's reads to the leader for a few seconds after their own write (read-your-writes).",
           },
           {
             title: "Push static and media to a CDN",
@@ -54,7 +56,8 @@ export const hldFundamentals: Concept[] = [
           {
             title: "Shard the write path",
             text: "When a single write leader cannot keep up, or the dataset no longer fits one machine, partition by key. This is the expensive step: cross-shard joins, transactions and rebalancing all become your problem.",
-            detail: "Delay it as long as honestly possible. Then pick a shard key you can live with for years.",
+            detail:
+              "Delay it as long as honestly possible. Then pick a shard key you can live with for years.",
           },
           {
             title: "Split by service and by region",
@@ -85,7 +88,8 @@ export const hldFundamentals: Concept[] = [
                 "Cost grows super-linearly at the top end",
                 "Resize usually means a restart",
               ],
-              verdict: "Databases, and buying time. Do it first; it is nearly free engineering-wise.",
+              verdict:
+                "Databases, and buying time. Do it first; it is nearly free engineering-wise.",
             },
             {
               title: "Horizontal (more machines)",
@@ -108,10 +112,30 @@ export const hldFundamentals: Concept[] = [
           headers: ["Tier", "Scales by", "Limiting resource", "First thing to try"],
           rows: [
             ["Web / app", "Horizontal, easily", "CPU", "Add instances behind the load balancer"],
-            ["Cache", "Horizontal with consistent hashing", "Memory", "Bigger instance, then shard"],
-            ["Database reads", "Replicas + cache", "IOPS, CPU", "Cache the hot keys before adding replicas"],
-            ["Database writes", "Sharding, or a different engine", "Write throughput, disk", "Batch, queue and denormalise before sharding"],
-            ["Object storage", "Effectively unlimited (managed)", "Bandwidth, cost", "Nothing — this is why it exists"],
+            [
+              "Cache",
+              "Horizontal with consistent hashing",
+              "Memory",
+              "Bigger instance, then shard",
+            ],
+            [
+              "Database reads",
+              "Replicas + cache",
+              "IOPS, CPU",
+              "Cache the hot keys before adding replicas",
+            ],
+            [
+              "Database writes",
+              "Sharding, or a different engine",
+              "Write throughput, disk",
+              "Batch, queue and denormalise before sharding",
+            ],
+            [
+              "Object storage",
+              "Effectively unlimited (managed)",
+              "Bandwidth, cost",
+              "Nothing — this is why it exists",
+            ],
           ],
         },
       },
@@ -221,7 +245,9 @@ export const hldFundamentals: Concept[] = [
       },
     ],
     related: ["/hld/load-balancing", "/hld/caching", "/hld/sharding", "/hld/estimation"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -290,13 +316,48 @@ export const hldFundamentals: Concept[] = [
         table: {
           headers: ["Algorithm", "How it picks", "Good for", "Fails when"],
           rows: [
-            ["Round robin", "Next in the list", "Uniform requests, identical servers", "Request cost varies — slow requests pile up"],
-            ["Weighted round robin", "Proportional to capacity", "Mixed instance sizes, gradual rollouts", "Weights go stale as workloads change"],
-            ["Least connections", "Fewest in-flight", "Variable request duration — the usual default", "Long-polling or streaming skews the count"],
-            ["Least response time", "Lowest latency × connections", "Heterogeneous backends", "Reacts to noise; needs smoothing"],
-            ["IP hash", "hash(client IP)", "Crude stickiness without cookies", "NAT puts thousands of users on one backend"],
-            ["Consistent hashing", "hash(key) on a ring", "Cache affinity — same key to same node", "Hot keys still concentrate"],
-            ["Power of two choices", "Pick 2 at random, take the emptier", "Large pools; near-optimal with almost no state", "Rarely — this is the quiet default at scale"],
+            [
+              "Round robin",
+              "Next in the list",
+              "Uniform requests, identical servers",
+              "Request cost varies — slow requests pile up",
+            ],
+            [
+              "Weighted round robin",
+              "Proportional to capacity",
+              "Mixed instance sizes, gradual rollouts",
+              "Weights go stale as workloads change",
+            ],
+            [
+              "Least connections",
+              "Fewest in-flight",
+              "Variable request duration — the usual default",
+              "Long-polling or streaming skews the count",
+            ],
+            [
+              "Least response time",
+              "Lowest latency × connections",
+              "Heterogeneous backends",
+              "Reacts to noise; needs smoothing",
+            ],
+            [
+              "IP hash",
+              "hash(client IP)",
+              "Crude stickiness without cookies",
+              "NAT puts thousands of users on one backend",
+            ],
+            [
+              "Consistent hashing",
+              "hash(key) on a ring",
+              "Cache affinity — same key to same node",
+              "Hot keys still concentrate",
+            ],
+            [
+              "Power of two choices",
+              "Pick 2 at random, take the emptier",
+              "Large pools; near-optimal with almost no state",
+              "Rarely — this is the quiet default at scale",
+            ],
           ],
         },
         callout: {
@@ -357,8 +418,18 @@ process.on("SIGTERM", async () => {
               { id: "s1", label: "Server dies", sub: "its users log out", tone: "bad" },
             ],
             [
-              { id: "good", label: "Shared session store", sub: "Redis, or a signed token", tone: "ok" },
-              { id: "s2", label: "Any server can serve", sub: "deploys and failures are invisible", tone: "ok" },
+              {
+                id: "good",
+                label: "Shared session store",
+                sub: "Redis, or a signed token",
+                tone: "ok",
+              },
+              {
+                id: "s2",
+                label: "Any server can serve",
+                sub: "deploys and failures are invisible",
+                tone: "ok",
+              },
             ],
           ],
         },
@@ -380,11 +451,31 @@ process.on("SIGTERM", async () => {
         table: {
           headers: ["Failure", "What the user sees", "Mitigation"],
           rows: [
-            ["One backend dies", "Nothing, if health checks are fast", "Active + passive checks, retry idempotent requests"],
-            ["All backends unhealthy", "Total outage", "Panic mode: send to all rather than none; alert loudly"],
-            ["Balancer dies", "Total outage until failover", "HA pair with floating IP, or a managed balancer"],
-            ["Deploy without draining", "Dropped requests, 502s", "Readiness flip, then drain with a timeout"],
-            ["One slow backend", "p99 latency spike", "Outlier ejection, timeouts, least-connections"],
+            [
+              "One backend dies",
+              "Nothing, if health checks are fast",
+              "Active + passive checks, retry idempotent requests",
+            ],
+            [
+              "All backends unhealthy",
+              "Total outage",
+              "Panic mode: send to all rather than none; alert loudly",
+            ],
+            [
+              "Balancer dies",
+              "Total outage until failover",
+              "HA pair with floating IP, or a managed balancer",
+            ],
+            [
+              "Deploy without draining",
+              "Dropped requests, 502s",
+              "Readiness flip, then drain with a timeout",
+            ],
+            [
+              "One slow backend",
+              "p99 latency spike",
+              "Outlier ejection, timeouts, least-connections",
+            ],
             ["Retry storm", "Cascading overload", "Budgeted retries, jitter, circuit breaking"],
           ],
         },
@@ -412,7 +503,9 @@ process.on("SIGTERM", async () => {
       },
     ],
     related: ["/hld/scaling", "/hld/dns", "/hld/api-gateway", "/playgrounds/load-balancer"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
     playground: "load-balancer",
   },
 
@@ -439,11 +532,32 @@ process.on("SIGTERM", async () => {
           kind: "layers",
           caption: "Every layer is a cache; each is faster and less consistent than the one below.",
           layers: [
-            { title: "Client", items: ["Browser HTTP cache", "Service worker", "App-local store", "~0 ms, hardest to invalidate"] },
+            {
+              title: "Client",
+              items: [
+                "Browser HTTP cache",
+                "Service worker",
+                "App-local store",
+                "~0 ms, hardest to invalidate",
+              ],
+            },
             { title: "Edge", items: ["CDN PoP", "Edge KV", "10–50 ms, purge API"] },
-            { title: "Service", items: ["In-process (LRU)", "Per-instance, no coordination", "~100 ns, inconsistent across instances"] },
-            { title: "Shared", items: ["Redis / Memcached", "Consistent across instances", "~0.5 ms, network hop"] },
-            { title: "Data", items: ["Database buffer pool", "Materialised views", "Query plan cache"] },
+            {
+              title: "Service",
+              items: [
+                "In-process (LRU)",
+                "Per-instance, no coordination",
+                "~100 ns, inconsistent across instances",
+              ],
+            },
+            {
+              title: "Shared",
+              items: ["Redis / Memcached", "Consistent across instances", "~0.5 ms, network hop"],
+            },
+            {
+              title: "Data",
+              items: ["Database buffer pool", "Materialised views", "Query plan cache"],
+            },
           ],
         },
         table: {
@@ -451,7 +565,12 @@ process.on("SIGTERM", async () => {
           rows: [
             ["Browser", "0 ms", "No — per user", "Nearly impossible; use content hashes in URLs"],
             ["CDN", "10–50 ms", "Yes — per region", "Purge API, seconds to propagate"],
-            ["In-process", "~100 ns", "No — per instance", "Short TTL, or a pub/sub invalidation channel"],
+            [
+              "In-process",
+              "~100 ns",
+              "No — per instance",
+              "Short TTL, or a pub/sub invalidation channel",
+            ],
             ["Redis", "0.3–1 ms", "Yes", "Delete the key; immediate and reliable"],
             ["DB buffer pool", "~0.1 ms", "Per node", "Automatic"],
           ],
@@ -472,8 +591,21 @@ process.on("SIGTERM", async () => {
             { from: "c", to: "app", label: "miss", kind: "return", tone: "warn" },
             { from: "app", to: "db", label: "SELECT * FROM users WHERE id = 42", kind: "call" },
             { from: "db", to: "app", label: "row", kind: "return" },
-            { from: "app", to: "c", label: "SET user:42 <row> EX 300", kind: "call", note: "TTL bounds staleness even if invalidation is missed" },
-            { from: "app", to: "app", label: "on write: UPDATE db, then DEL user:42", kind: "self", tone: "accent", note: "delete, do not update — avoids a stale write racing a read" },
+            {
+              from: "app",
+              to: "c",
+              label: "SET user:42 <row> EX 300",
+              kind: "call",
+              note: "TTL bounds staleness even if invalidation is missed",
+            },
+            {
+              from: "app",
+              to: "app",
+              label: "on write: UPDATE db, then DEL user:42",
+              kind: "self",
+              tone: "accent",
+              note: "delete, do not update — avoids a stale write racing a read",
+            },
           ],
         },
         table: {
@@ -516,17 +648,20 @@ process.on("SIGTERM", async () => {
           {
             title: "Stampede (thundering herd)",
             text: "A hot key expires and a thousand concurrent requests all miss and all hit the database at once. The database, sized for the cached load, falls over — and every retry makes it worse.",
-            detail: "Fix: single-flight (one loader per key, others await it), or a probabilistic early refresh before expiry, or serve stale while one request refreshes.",
+            detail:
+              "Fix: single-flight (one loader per key, others await it), or a probabilistic early refresh before expiry, or serve stale while one request refreshes.",
           },
           {
             title: "Penetration",
             text: "Requests for keys that do not exist in the database either. Nothing is ever cached, so every request reaches storage — and this is trivially weaponised by an attacker generating random ids.",
-            detail: "Fix: cache the negative result with a short TTL, and/or put a Bloom filter in front to answer 'definitely not present' without a lookup.",
+            detail:
+              "Fix: cache the negative result with a short TTL, and/or put a Bloom filter in front to answer 'definitely not present' without a lookup.",
           },
           {
             title: "Avalanche",
             text: "A large set of keys written together expires together — after a deploy, a bulk import, or a cache restart — and the whole read load lands on the database in one second.",
-            detail: "Fix: jitter every TTL by ±10%, warm the cache before taking traffic, and stagger any bulk population.",
+            detail:
+              "Fix: jitter every TTL by ±10%, warm the cache before taking traffic, and stagger any bulk population.",
           },
         ],
         code: {
@@ -636,7 +771,9 @@ async function load(key: string) {
       },
     ],
     related: ["/hld/cdn", "/lld/lru-cache", "/hld/consistency", "/hld/bloom-filters"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
     playground: "lru-cache",
   },
 
@@ -709,13 +846,42 @@ async function load(key: string) {
           ],
           messages: [
             { from: "u", to: "dns", label: "resolve cdn.example.com", kind: "call" },
-            { from: "dns", to: "u", label: "nearest PoP address", kind: "return", note: "anycast or geo-DNS" },
-            { from: "u", to: "pop", label: "GET /static/app.a3f9c1.js", kind: "call", note: "~5 ms away" },
+            {
+              from: "dns",
+              to: "u",
+              label: "nearest PoP address",
+              kind: "return",
+              note: "anycast or geo-DNS",
+            },
+            {
+              from: "u",
+              to: "pop",
+              label: "GET /static/app.a3f9c1.js",
+              kind: "call",
+              note: "~5 ms away",
+            },
             { from: "pop", to: "shield", label: "miss → fetch", kind: "call" },
-            { from: "shield", to: "org", label: "miss → fetch", kind: "call", note: "shield collapses many PoP misses into one origin request" },
-            { from: "org", to: "shield", label: "200 + Cache-Control: max-age=31536000, immutable", kind: "return" },
+            {
+              from: "shield",
+              to: "org",
+              label: "miss → fetch",
+              kind: "call",
+              note: "shield collapses many PoP misses into one origin request",
+            },
+            {
+              from: "org",
+              to: "shield",
+              label: "200 + Cache-Control: max-age=31536000, immutable",
+              kind: "return",
+            },
             { from: "shield", to: "pop", label: "store + forward", kind: "return" },
-            { from: "pop", to: "u", label: "200 (and cached for everyone next)", kind: "return", tone: "ok" },
+            {
+              from: "pop",
+              to: "u",
+              label: "200 (and cached for everyone next)",
+              kind: "return",
+              tone: "ok",
+            },
           ],
         },
         bullets: [
@@ -751,13 +917,37 @@ Last-Modified: Tue, 09 Sep 2026 12:00:00 GMT`,
         table: {
           headers: ["Directive", "Means", "Watch out"],
           rows: [
-            ["max-age=N", "Fresh for N seconds in any cache", "Applies to browsers too — you cannot recall it"],
-            ["s-maxage=N", "Freshness for shared caches only", "Lets you cache at the CDN but not in browsers"],
-            ["public / private", "May / may not be stored by shared caches", "Missing 'private' on a personalised page is a data leak"],
-            ["no-cache", "Store, but revalidate before use", "Does not mean 'do not cache' — that is no-store"],
+            [
+              "max-age=N",
+              "Fresh for N seconds in any cache",
+              "Applies to browsers too — you cannot recall it",
+            ],
+            [
+              "s-maxage=N",
+              "Freshness for shared caches only",
+              "Lets you cache at the CDN but not in browsers",
+            ],
+            [
+              "public / private",
+              "May / may not be stored by shared caches",
+              "Missing 'private' on a personalised page is a data leak",
+            ],
+            [
+              "no-cache",
+              "Store, but revalidate before use",
+              "Does not mean 'do not cache' — that is no-store",
+            ],
             ["immutable", "Do not revalidate even on reload", "Only safe with content-hashed URLs"],
-            ["stale-while-revalidate", "Serve stale, refresh in background", "The single best directive for perceived performance"],
-            ["stale-if-error", "Serve stale when the origin errors", "Free availability during an origin outage"],
+            [
+              "stale-while-revalidate",
+              "Serve stale, refresh in background",
+              "The single best directive for perceived performance",
+            ],
+            [
+              "stale-if-error",
+              "Serve stale when the origin errors",
+              "Free availability during an origin outage",
+            ],
           ],
         },
         callout: {
@@ -780,8 +970,15 @@ Last-Modified: Tue, 09 Sep 2026 12:00:00 GMT`,
             {
               title: "Versioned URL",
               tone: "ok",
-              good: ["Instant, atomic, no coordination", "Old clients keep working", "Cache can be immutable for a year"],
-              bad: ["Requires a build step that rewrites references", "Not applicable to a stable URL like /api/products"],
+              good: [
+                "Instant, atomic, no coordination",
+                "Old clients keep working",
+                "Cache can be immutable for a year",
+              ],
+              bad: [
+                "Requires a build step that rewrites references",
+                "Not applicable to a stable URL like /api/products",
+              ],
               verdict: "All static assets. Always.",
             },
             {
@@ -830,6 +1027,8 @@ Last-Modified: Tue, 09 Sep 2026 12:00:00 GMT`,
       },
     ],
     related: ["/hld/caching", "/hld/dns", "/hld/load-balancing", "/examples/youtube"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 ];

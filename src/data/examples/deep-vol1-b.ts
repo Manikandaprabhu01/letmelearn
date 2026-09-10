@@ -82,19 +82,56 @@ export const vol1DeepB: DesignExample[] = [
       },
     ],
     apis: [
-      { method: "POST", path: "/v1/posts", desc: "Publish — returns immediately; fan-out is asynchronous" },
-      { method: "GET", path: "/v1/feed?cursor=&limit=20", desc: "The hot read — cursor pagination, never offset" },
-      { method: "POST", path: "/v1/follows/{userId}", desc: "Follow — may trigger a partial backfill of the follower's feed" },
-      { method: "DELETE", path: "/v1/posts/{id}", desc: "Delete — tombstone; feeds filter at hydration rather than rewriting" },
+      {
+        method: "POST",
+        path: "/v1/posts",
+        desc: "Publish — returns immediately; fan-out is asynchronous",
+      },
+      {
+        method: "GET",
+        path: "/v1/feed?cursor=&limit=20",
+        desc: "The hot read — cursor pagination, never offset",
+      },
+      {
+        method: "POST",
+        path: "/v1/follows/{userId}",
+        desc: "Follow — may trigger a partial backfill of the follower's feed",
+      },
+      {
+        method: "DELETE",
+        path: "/v1/posts/{id}",
+        desc: "Delete — tombstone; feeds filter at hydration rather than rewriting",
+      },
     ],
     dataModel: [
       {
         entity: "posts",
-        fields: ["id (pk, snowflake — time-sortable)", "author_id (idx)", "body", "media_ids[]", "created_at", "deleted_at"],
+        fields: [
+          "id (pk, snowflake — time-sortable)",
+          "author_id (idx)",
+          "body",
+          "media_ids[]",
+          "created_at",
+          "deleted_at",
+        ],
       },
-      { entity: "follows", fields: ["follower_id (pk part)", "followee_id (pk part)", "created_at", "→ also stored reversed for fan-out"] },
-      { entity: "feed:{userId}", fields: ["Redis list or sorted set", "post_id + score", "capped at ~800 entries"] },
-      { entity: "celebrity_posts", fields: ["author_id (idx)", "post_id", "created_at", "→ pulled at read time, not pushed"] },
+      {
+        entity: "follows",
+        fields: [
+          "follower_id (pk part)",
+          "followee_id (pk part)",
+          "created_at",
+          "→ also stored reversed for fan-out",
+        ],
+      },
+      {
+        entity: "feed:{userId}",
+        fields: ["Redis list or sorted set", "post_id + score", "capped at ~800 entries"],
+      },
+      {
+        entity: "celebrity_posts",
+        fields: ["author_id (idx)", "post_id", "created_at", "→ pulled at read time, not pushed"],
+      },
     ],
     architecture: [
       {
@@ -141,7 +178,8 @@ export const vol1DeepB: DesignExample[] = [
           {
             title: "Push for normal users",
             text: "When a user with a follower count below the threshold posts, enqueue a fan-out job that writes the post id into each follower's feed list.",
-            detail: "Threshold is typically 10k-100k followers, tuned by measuring the fan-out queue.",
+            detail:
+              "Threshold is typically 10k-100k followers, tuned by measuring the fan-out queue.",
           },
           {
             title: "Pull for celebrities",
@@ -150,7 +188,8 @@ export const vol1DeepB: DesignExample[] = [
           {
             title: "Merge at read time",
             text: "A feed read takes the precomputed list, plus recent posts from the handful of celebrities this user follows, merges by score, and returns the top N.",
-            detail: "The celebrity set per user is small — typically single digits — so this merge is cheap and bounded.",
+            detail:
+              "The celebrity set per user is small — typically single digits — so this merge is cheap and bounded.",
           },
           {
             title: "Hydrate",
@@ -177,12 +216,38 @@ export const vol1DeepB: DesignExample[] = [
           ],
           messages: [
             { from: "u", to: "api", label: "POST /v1/posts", kind: "call" },
-            { from: "api", to: "db", label: "INSERT post + outbox row (one tx)", kind: "call", note: "durable before we promise anything" },
-            { from: "api", to: "u", label: "201 {postId}", kind: "return", tone: "ok", note: "~50 ms — user is done" },
+            {
+              from: "api",
+              to: "db",
+              label: "INSERT post + outbox row (one tx)",
+              kind: "call",
+              note: "durable before we promise anything",
+            },
+            {
+              from: "api",
+              to: "u",
+              label: "201 {postId}",
+              kind: "return",
+              tone: "ok",
+              note: "~50 ms — user is done",
+            },
             { from: "db", to: "q", label: "relay publishes PostCreated", kind: "async" },
             { from: "q", to: "w", label: "consume", kind: "async" },
-            { from: "w", to: "w", label: "load follower ids in batches of 1,000", kind: "self", note: "celebrities short-circuit here" },
-            { from: "w", to: "r", label: "pipeline ZADD feed:{follower} score postId", kind: "async", tone: "accent", note: "batched; capped list trims the tail" },
+            {
+              from: "w",
+              to: "w",
+              label: "load follower ids in batches of 1,000",
+              kind: "self",
+              note: "celebrities short-circuit here",
+            },
+            {
+              from: "w",
+              to: "r",
+              label: "pipeline ZADD feed:{follower} score postId",
+              kind: "async",
+              tone: "accent",
+              note: "batched; capped list trims the tail",
+            },
           ],
         },
         code: {
@@ -513,11 +578,31 @@ async function fanOut(post: Post) {
       },
     ],
     apis: [
-      { method: "WS", path: "/v1/connect?since={lastEventId}", desc: "Persistent socket; the cursor is what makes reconnect lossless" },
-      { method: "SEND", path: "ws: {type: 'send', convId, clientMsgId, text}", desc: "clientMsgId makes retries idempotent" },
-      { method: "GET", path: "/v1/conversations/{id}/messages?before=", desc: "History paging — plain HTTP, cursor-based" },
-      { method: "POST", path: "/v1/conversations/{id}/read", desc: "Advance the read cursor to a message id" },
-      { method: "GET", path: "/v1/presence?userIds=", desc: "Pull presence for a visible set, rather than subscribing to everything" },
+      {
+        method: "WS",
+        path: "/v1/connect?since={lastEventId}",
+        desc: "Persistent socket; the cursor is what makes reconnect lossless",
+      },
+      {
+        method: "SEND",
+        path: "ws: {type: 'send', convId, clientMsgId, text}",
+        desc: "clientMsgId makes retries idempotent",
+      },
+      {
+        method: "GET",
+        path: "/v1/conversations/{id}/messages?before=",
+        desc: "History paging — plain HTTP, cursor-based",
+      },
+      {
+        method: "POST",
+        path: "/v1/conversations/{id}/read",
+        desc: "Advance the read cursor to a message id",
+      },
+      {
+        method: "GET",
+        path: "/v1/presence?userIds=",
+        desc: "Pull presence for a visible set, rather than subscribing to everything",
+      },
     ],
     dataModel: [
       {
@@ -531,10 +616,27 @@ async function fanOut(post: Post) {
           "created_at",
         ],
       },
-      { entity: "conversation_members", fields: ["conversation_id", "user_id", "joined_at", "last_read_seq", "muted"] },
-      { entity: "user_conversations", fields: ["user_id (partition key)", "last_activity_at (clustering, desc)", "conversation_id", "→ the inbox list"] },
-      { entity: "presence:{userId}", fields: ["Redis, TTL ~40 s", "gateway_id", "devices[]", "last_seen"] },
-      { entity: "delivery_state", fields: ["conversation_id", "message_id", "user_id", "delivered_at", "read_at"] },
+      {
+        entity: "conversation_members",
+        fields: ["conversation_id", "user_id", "joined_at", "last_read_seq", "muted"],
+      },
+      {
+        entity: "user_conversations",
+        fields: [
+          "user_id (partition key)",
+          "last_activity_at (clustering, desc)",
+          "conversation_id",
+          "→ the inbox list",
+        ],
+      },
+      {
+        entity: "presence:{userId}",
+        fields: ["Redis, TTL ~40 s", "gateway_id", "devices[]", "last_seen"],
+      },
+      {
+        entity: "delivery_state",
+        fields: ["conversation_id", "message_id", "user_id", "delivered_at", "read_at"],
+      },
     ],
     architecture: [
       {
@@ -542,7 +644,8 @@ async function fanOut(post: Post) {
         lede: "A thin stateful connection tier in front of stateless services.",
         diagram: {
           kind: "system",
-          caption: "Sockets are held by a tier that does nothing else, so business logic can deploy freely.",
+          caption:
+            "Sockets are held by a tier that does nothing else, so business logic can deploy freely.",
           columns: [
             {
               title: "Clients",
@@ -561,7 +664,12 @@ async function fanOut(post: Post) {
             {
               title: "Services",
               nodes: [
-                { id: "svc", label: "Message service", sub: "persist, sequence, route", tone: "ok" },
+                {
+                  id: "svc",
+                  label: "Message service",
+                  sub: "persist, sequence, route",
+                  tone: "ok",
+                },
                 { id: "not", label: "Notification service", sub: "APNs / FCM" },
               ],
             },
@@ -596,12 +704,38 @@ async function fanOut(post: Post) {
           messages: [
             { from: "a", to: "g1", label: "send {convId, clientMsgId, text}", kind: "call" },
             { from: "g1", to: "svc", label: "persist", kind: "call" },
-            { from: "svc", to: "db", label: "assign seq, INSERT (idempotent on clientMsgId)", kind: "call", tone: "accent", note: "sequence assigned per conversation — this is what fixes ordering" },
+            {
+              from: "svc",
+              to: "db",
+              label: "assign seq, INSERT (idempotent on clientMsgId)",
+              kind: "call",
+              tone: "accent",
+              note: "sequence assigned per conversation — this is what fixes ordering",
+            },
             { from: "db", to: "svc", label: "seq = 8241", kind: "return" },
-            { from: "svc", to: "g1", label: "ack {messageId, seq}", kind: "return", tone: "ok", note: "Alice's client marks it 'sent'" },
-            { from: "svc", to: "g2", label: "route to Bob's gateway", kind: "async", note: "presence lookup → gateway 2" },
+            {
+              from: "svc",
+              to: "g1",
+              label: "ack {messageId, seq}",
+              kind: "return",
+              tone: "ok",
+              note: "Alice's client marks it 'sent'",
+            },
+            {
+              from: "svc",
+              to: "g2",
+              label: "route to Bob's gateway",
+              kind: "async",
+              note: "presence lookup → gateway 2",
+            },
             { from: "g2", to: "g2", label: "push over Bob's socket", kind: "self", tone: "ok" },
-            { from: "g2", to: "svc", label: "delivered receipt", kind: "async", note: "if Bob is offline: push notification, deliver on reconnect" },
+            {
+              from: "g2",
+              to: "svc",
+              label: "delivered receipt",
+              kind: "async",
+              note: "if Bob is offline: push notification, deliver on reconnect",
+            },
           ],
         },
         code: {
@@ -663,7 +797,8 @@ async function fanOut(post: Post) {
           {
             title: "On connect, send the cursor",
             text: "The gateway pulls everything after that sequence from the message store and streams it before switching to live push.",
-            detail: "Bound the catch-up: past some number of missed messages, tell the client to page through history instead of streaming it all.",
+            detail:
+              "Bound the catch-up: past some number of missed messages, tell the client to page through history instead of streaming it all.",
           },
           {
             title: "Deliver receipts on the same channel",

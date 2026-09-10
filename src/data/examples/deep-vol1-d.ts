@@ -81,16 +81,41 @@ export const vol1DeepD: DesignExample[] = [
       },
     ],
     apis: [
-      { method: "GET", path: "get(key, {consistency})", desc: "Read from R replicas, reconcile versions, read-repair stale ones" },
-      { method: "PUT", path: "put(key, value, {consistency, context})", desc: "Write to W replicas; context carries the version read" },
-      { method: "DELETE", path: "delete(key)", desc: "Writes a tombstone — deletion is a write in a replicated store" },
-      { method: "ADMIN", path: "addNode / removeNode", desc: "Ring membership change, triggering range transfer" },
+      {
+        method: "GET",
+        path: "get(key, {consistency})",
+        desc: "Read from R replicas, reconcile versions, read-repair stale ones",
+      },
+      {
+        method: "PUT",
+        path: "put(key, value, {consistency, context})",
+        desc: "Write to W replicas; context carries the version read",
+      },
+      {
+        method: "DELETE",
+        path: "delete(key)",
+        desc: "Writes a tombstone — deletion is a write in a replicated store",
+      },
+      {
+        method: "ADMIN",
+        path: "addNode / removeNode",
+        desc: "Ring membership change, triggering range transfer",
+      },
     ],
     dataModel: [
-      { entity: "ring", fields: ["position (hash)", "physical_node", "→ 150 vnodes per node, gossiped"] },
-      { entity: "record", fields: ["key", "value", "version_vector", "timestamp", "tombstone (bool)"] },
+      {
+        entity: "ring",
+        fields: ["position (hash)", "physical_node", "→ 150 vnodes per node, gossiped"],
+      },
+      {
+        entity: "record",
+        fields: ["key", "value", "version_vector", "timestamp", "tombstone (bool)"],
+      },
       { entity: "memtable", fields: ["in-memory sorted map", "flushed to an SSTable when full"] },
-      { entity: "sstable", fields: ["immutable sorted file", "sparse index", "bloom filter", "→ merged by compaction"] },
+      {
+        entity: "sstable",
+        fields: ["immutable sorted file", "sparse index", "bloom filter", "→ merged by compaction"],
+      },
     ],
     architecture: [
       {
@@ -100,16 +125,20 @@ export const vol1DeepD: DesignExample[] = [
         ],
         diagram: {
           kind: "flow",
-          caption: "Coordinator for a key is the first vnode clockwise; replicas are the next distinct machines.",
+          caption:
+            "Coordinator for a key is the first vnode clockwise; replicas are the next distinct machines.",
           rows: [
-            [
-              { id: "k", label: "hash('user:42')", sub: "ring position 0x3F1A", tone: "accent" },
-            ],
+            [{ id: "k", label: "hash('user:42')", sub: "ring position 0x3F1A", tone: "accent" }],
             [
               { id: "n1", label: "Node B", sub: "coordinator", tone: "ok" },
               { id: "n2", label: "Node D", sub: "replica 2", tone: "ok" },
               { id: "n3", label: "Node A", sub: "replica 3", tone: "ok" },
-              { id: "skip", label: "(skip B's other vnodes)", sub: "must be distinct machines", tone: "warn" },
+              {
+                id: "skip",
+                label: "(skip B's other vnodes)",
+                sub: "must be distinct machines",
+                tone: "warn",
+              },
             ],
           ],
         },
@@ -155,9 +184,23 @@ export const vol1DeepD: DesignExample[] = [
             { from: "c", to: "co", label: "put(k, v)", kind: "call" },
             { from: "co", to: "r1", label: "write v7", kind: "call" },
             { from: "co", to: "r2", label: "write v7", kind: "call" },
-            { from: "co", to: "r3", label: "write v7", kind: "async", tone: "warn", note: "no ack needed — W=2 already satisfied" },
+            {
+              from: "co",
+              to: "r3",
+              label: "write v7",
+              kind: "async",
+              tone: "warn",
+              note: "no ack needed — W=2 already satisfied",
+            },
             { from: "r2", to: "co", label: "ack (2 of 3)", kind: "return", tone: "ok" },
-            { from: "co", to: "c", label: "ok", kind: "return", tone: "ok", note: "latency = 2nd fastest replica" },
+            {
+              from: "co",
+              to: "c",
+              label: "ok",
+              kind: "return",
+              tone: "ok",
+              note: "latency = 2nd fastest replica",
+            },
             { from: "c", to: "co", label: "get(k)", kind: "call" },
             { from: "co", to: "r3", label: "returns stale v6", kind: "call", tone: "warn" },
             { from: "co", to: "c", label: "v7 wins by version", kind: "return", tone: "ok" },
@@ -167,10 +210,30 @@ export const vol1DeepD: DesignExample[] = [
         table: {
           headers: ["Setting", "Guarantee", "Latency", "Use"],
           rows: [
-            ["N=3, W=2, R=2", "Overlap; survives 1 node down", "Median of 2", "The balanced default"],
-            ["N=3, W=3, R=1", "Fastest reads", "Writes wait for the slowest", "Read-mostly config data"],
-            ["N=3, W=1, R=1", "No overlap — eventual only", "Fastest both ways", "Metrics, counters, telemetry"],
-            ["N=5, W=3, R=3", "Survives 2 nodes down", "Median of 3", "Higher durability across three AZs"],
+            [
+              "N=3, W=2, R=2",
+              "Overlap; survives 1 node down",
+              "Median of 2",
+              "The balanced default",
+            ],
+            [
+              "N=3, W=3, R=1",
+              "Fastest reads",
+              "Writes wait for the slowest",
+              "Read-mostly config data",
+            ],
+            [
+              "N=3, W=1, R=1",
+              "No overlap — eventual only",
+              "Fastest both ways",
+              "Metrics, counters, telemetry",
+            ],
+            [
+              "N=5, W=3, R=3",
+              "Survives 2 nodes down",
+              "Median of 3",
+              "Higher durability across three AZs",
+            ],
           ],
         },
         callout: {
@@ -216,10 +279,30 @@ function compare(a: VV, b: VV): "before" | "after" | "concurrent" | "equal" {
         table: {
           headers: ["Strategy", "Data loss?", "Complexity", "When"],
           rows: [
-            ["Last-write-wins (wall clock)", "Yes, silently", "Trivial", "Only when overwrites are idempotent and loss is acceptable"],
-            ["Version vectors + siblings", "No", "High — the app must merge", "Carts, sets, anything unionable"],
-            ["CRDTs", "No", "Moderate; constrains the data type", "Counters, sets, collaborative text"],
-            ["Single-key linearizability via consensus", "No", "Highest latency", "Counters that must be exact, locks"],
+            [
+              "Last-write-wins (wall clock)",
+              "Yes, silently",
+              "Trivial",
+              "Only when overwrites are idempotent and loss is acceptable",
+            ],
+            [
+              "Version vectors + siblings",
+              "No",
+              "High — the app must merge",
+              "Carts, sets, anything unionable",
+            ],
+            [
+              "CRDTs",
+              "No",
+              "Moderate; constrains the data type",
+              "Counters, sets, collaborative text",
+            ],
+            [
+              "Single-key linearizability via consensus",
+              "No",
+              "Highest latency",
+              "Counters that must be exact, locks",
+            ],
           ],
         },
       },
@@ -237,7 +320,8 @@ function compare(a: VV, b: VV): "before" | "after" | "concurrent" | "equal" {
           {
             title: "Read: memtable, then SSTables newest first",
             text: "The Bloom filter on each SSTable answers 'definitely not here' without touching the disk, which is what keeps reads from degrading as files accumulate.",
-            detail: "Without Bloom filters, a read for a missing key would touch every SSTable on disk.",
+            detail:
+              "Without Bloom filters, a read for a missing key would touch every SSTable on disk.",
           },
           {
             title: "Compact in the background",
@@ -248,10 +332,19 @@ function compare(a: VV, b: VV): "before" | "after" | "concurrent" | "equal" {
           kind: "layers",
           caption: "Sequential writes, sorted files, Bloom filters to skip them.",
           layers: [
-            { title: "Write path", items: ["commit log (append, fsync)", "memtable (sorted, in memory)"] },
+            {
+              title: "Write path",
+              items: ["commit log (append, fsync)", "memtable (sorted, in memory)"],
+            },
             { title: "Flush", items: ["SSTable L0", "sparse index", "bloom filter"] },
-            { title: "Compaction", items: ["L0 → L1 → L2 …", "merge, drop tombstones", "background IO"] },
-            { title: "Read path", items: ["memtable", "bloom filter per SSTable", "sparse index → block", "row cache"] },
+            {
+              title: "Compaction",
+              items: ["L0 → L1 → L2 …", "merge, drop tombstones", "background IO"],
+            },
+            {
+              title: "Read path",
+              items: ["memtable", "bloom filter per SSTable", "sparse index → block", "row cache"],
+            },
           ],
         },
         bullets: [
@@ -441,18 +534,55 @@ streaming the whole range — which is what makes background repair viable.`,
       },
     ],
     apis: [
-      { method: "INTERNAL", path: "frontier.next() → URL", desc: "Returns a URL whose host is due, or blocks" },
-      { method: "INTERNAL", path: "frontier.add(url, priority)", desc: "Enqueue after dedupe and robots check" },
-      { method: "INTERNAL", path: "fetcher.get(url) → Response", desc: "With timeouts, size caps and redirect limits" },
-      { method: "INTERNAL", path: "parser.extract(html) → {links, text, canonical}", desc: "Link extraction and content fingerprinting" },
+      {
+        method: "INTERNAL",
+        path: "frontier.next() → URL",
+        desc: "Returns a URL whose host is due, or blocks",
+      },
+      {
+        method: "INTERNAL",
+        path: "frontier.add(url, priority)",
+        desc: "Enqueue after dedupe and robots check",
+      },
+      {
+        method: "INTERNAL",
+        path: "fetcher.get(url) → Response",
+        desc: "With timeouts, size caps and redirect limits",
+      },
+      {
+        method: "INTERNAL",
+        path: "parser.extract(html) → {links, text, canonical}",
+        desc: "Link extraction and content fingerprinting",
+      },
       { method: "ADMIN", path: "POST /v1/seeds", desc: "Inject seed URLs and priority overrides" },
     ],
     dataModel: [
-      { entity: "frontier", fields: ["host_queue_id", "url", "priority", "scheduled_at", "→ queue per host, sorted by priority"] },
-      { entity: "seen_urls", fields: ["Bloom filter (memory)", "+ exact set in a KV store for confirmation"] },
-      { entity: "content_hashes", fields: ["simhash (64-bit)", "url", "first_seen", "→ near-duplicate detection"] },
-      { entity: "robots_cache", fields: ["host (pk)", "rules", "crawl_delay", "fetched_at", "ttl ≈ 24 h"] },
-      { entity: "pages", fields: ["url_hash (pk)", "object_key", "http_status", "fetched_at", "etag", "change_rate"] },
+      {
+        entity: "frontier",
+        fields: [
+          "host_queue_id",
+          "url",
+          "priority",
+          "scheduled_at",
+          "→ queue per host, sorted by priority",
+        ],
+      },
+      {
+        entity: "seen_urls",
+        fields: ["Bloom filter (memory)", "+ exact set in a KV store for confirmation"],
+      },
+      {
+        entity: "content_hashes",
+        fields: ["simhash (64-bit)", "url", "first_seen", "→ near-duplicate detection"],
+      },
+      {
+        entity: "robots_cache",
+        fields: ["host (pk)", "rules", "crawl_delay", "fetched_at", "ttl ≈ 24 h"],
+      },
+      {
+        entity: "pages",
+        fields: ["url_hash (pk)", "object_key", "http_status", "fetched_at", "etag", "change_rate"],
+      },
     ],
     architecture: [
       {
@@ -464,8 +594,18 @@ streaming the whole range — which is what makes background repair viable.`,
             {
               title: "Frontier",
               nodes: [
-                { id: "pri", label: "Priority queues", sub: "importance, freshness", tone: "accent" },
-                { id: "host", label: "Per-host queues", sub: "politeness: one worker per host", tone: "accent" },
+                {
+                  id: "pri",
+                  label: "Priority queues",
+                  sub: "importance, freshness",
+                  tone: "accent",
+                },
+                {
+                  id: "host",
+                  label: "Per-host queues",
+                  sub: "politeness: one worker per host",
+                  tone: "accent",
+                },
               ],
             },
             {
@@ -621,11 +761,7 @@ function shouldCrawl(raw: string): boolean {
               "Every URL returns 200 with generated content",
               "Content dedupe by simhash; drop hosts with high duplicate rates",
             ],
-            [
-              "Redirect loop",
-              "A → B → A",
-              "Cap redirects at ~5 and record the chain",
-            ],
+            ["Redirect loop", "A → B → A", "Cap redirects at ~5 and record the chain"],
             [
               "Huge response",
               "A 10 GB file streamed to your fetcher",
@@ -703,12 +839,30 @@ function shouldCrawl(raw: string): boolean {
           messages: [
             { from: "w", to: "fr", label: "next() — a host that is due", kind: "call" },
             { from: "fr", to: "w", label: "https://example.com/page", kind: "return" },
-            { from: "w", to: "rb", label: "allowed? crawl-delay?", kind: "call", note: "cached 24 h; fetch robots.txt on miss" },
-            { from: "w", to: "web", label: "GET + If-None-Match", kind: "call", note: "timeout, size cap, redirect cap" },
+            {
+              from: "w",
+              to: "rb",
+              label: "allowed? crawl-delay?",
+              kind: "call",
+              note: "cached 24 h; fetch robots.txt on miss",
+            },
+            {
+              from: "w",
+              to: "web",
+              label: "GET + If-None-Match",
+              kind: "call",
+              note: "timeout, size cap, redirect cap",
+            },
             { from: "web", to: "w", label: "200 + body (or 304)", kind: "return" },
             { from: "w", to: "st", label: "store raw HTML by url_hash", kind: "async" },
             { from: "w", to: "w", label: "parse → links, simhash", kind: "self" },
-            { from: "w", to: "fr", label: "add(new links) after normalise + bloom", kind: "call", tone: "ok" },
+            {
+              from: "w",
+              to: "fr",
+              label: "add(new links) after normalise + bloom",
+              kind: "call",
+              tone: "ok",
+            },
             { from: "w", to: "fr", label: "reschedule this URL by change rate", kind: "call" },
           ],
         },
@@ -770,7 +924,12 @@ function shouldCrawl(raw: string): boolean {
         a: "Priority, from a combination of estimated importance — inbound links, host reputation, depth from a seed — and freshness need. Then per-host budgets so no single site can consume the crawl. The important structural point is that priority decides what and politeness decides when; keeping them separate is what stops a high-priority host from being crawled rudely.",
       },
     ],
-    related: ["/hld/bloom-filters", "/hld/message-queues", "/examples/google-search", "/hld/consistent-hashing"],
+    related: [
+      "/hld/bloom-filters",
+      "/hld/message-queues",
+      "/examples/google-search",
+      "/hld/consistent-hashing",
+    ],
     furtherReading: [
       {
         label: "awesome-system-design-resources",

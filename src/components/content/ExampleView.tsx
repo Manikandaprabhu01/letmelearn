@@ -16,14 +16,19 @@ function StepLabel({ n, title }: { n: number; title: string }) {
       <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-accent/40 bg-accent/10 font-mono text-[11px] tabular-nums text-accent">
         {n}
       </span>
-      <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-faint">{title}</span>
+      <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-faint">
+        {title}
+      </span>
     </div>
   );
 }
 
 function H2({ children, id }: { children: React.ReactNode; id?: string }) {
   return (
-    <h2 id={id} className="scroll-mt-24 font-display text-xl font-medium tracking-tight sm:text-2xl">
+    <h2
+      id={id}
+      className="scroll-mt-24 font-display text-xl font-medium tracking-tight sm:text-2xl"
+    >
       {children}
     </h2>
   );
@@ -37,11 +42,15 @@ export function ExampleView({ example, id }: { example: DesignExample; id: strin
     ...(example.estimation?.length || example.math?.length
       ? [{ id: "estimation", label: "Back of the envelope", group: "1 · Scope" }]
       : []),
-    ...(example.apis?.length ? [{ id: "apis", label: "API design", group: "2 · High-level design" }] : []),
+    ...(example.apis?.length
+      ? [{ id: "apis", label: "API design", group: "2 · High-level design" }]
+      : []),
     ...(example.dataModel?.length
       ? [{ id: "data-model", label: "Data model", group: "2 · High-level design" }]
       : []),
-    ...(board ? [{ id: "architecture-board", label: "Architecture", group: "2 · High-level design" }] : []),
+    ...(board
+      ? [{ id: "architecture-board", label: "Architecture", group: "2 · High-level design" }]
+      : []),
     ...example.architecture.map((s, i) => ({
       id: headingId(s.heading, i),
       label: s.heading,
@@ -52,9 +61,15 @@ export function ExampleView({ example, id }: { example: DesignExample; id: strin
       label: s.heading,
       group: "3 · Deep dive",
     })),
-    ...(example.tradeoffs.length ? [{ id: "tradeoffs", label: "Trade-offs", group: "4 · Wrap up" }] : []),
-    ...(example.wrapUp?.length ? [{ id: "wrap-up", label: "What to say at the end", group: "4 · Wrap up" }] : []),
-    ...(example.followUps?.length ? [{ id: "follow-ups", label: "Follow-up questions", group: "4 · Wrap up" }] : []),
+    ...(example.tradeoffs.length
+      ? [{ id: "tradeoffs", label: "Trade-offs", group: "4 · Wrap up" }]
+      : []),
+    ...(example.wrapUp?.length
+      ? [{ id: "wrap-up", label: "What to say at the end", group: "4 · Wrap up" }]
+      : []),
+    ...(example.followUps?.length
+      ? [{ id: "follow-ups", label: "Follow-up questions", group: "4 · Wrap up" }]
+      : []),
   ];
 
   return (
@@ -89,8 +104,8 @@ export function ExampleView({ example, id }: { example: DesignExample; id: strin
               <section>
                 <H2>Questions to ask first</H2>
                 <p className="mt-2 max-w-prose text-[14px] leading-6 text-faint">
-                  The first five minutes decide what you build. These are the questions worth spending them on, and
-                  the answers this design assumes.
+                  The first five minutes decide what you build. These are the questions worth
+                  spending them on, and the answers this design assumes.
                 </p>
                 <dl className="mt-4 space-y-3">
                   {example.clarifying.map((c) => (
@@ -113,7 +128,9 @@ export function ExampleView({ example, id }: { example: DesignExample; id: strin
               <H2 id="requirements">Requirements</H2>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <div className="rounded-lg border border-border bg-surface p-4">
-                  <h3 className="text-[11px] uppercase tracking-[0.14em] text-accent">Functional</h3>
+                  <h3 className="text-[11px] uppercase tracking-[0.14em] text-accent">
+                    Functional
+                  </h3>
                   <ul className="mt-2 space-y-2 text-sm leading-6 text-muted">
                     {example.requirements.functional.map((r) => (
                       <li key={r} className="flex gap-2">
@@ -124,7 +141,9 @@ export function ExampleView({ example, id }: { example: DesignExample; id: strin
                   </ul>
                 </div>
                 <div className="rounded-lg border border-border bg-surface p-4">
-                  <h3 className="text-[11px] uppercase tracking-[0.14em] text-accent">Non-functional</h3>
+                  <h3 className="text-[11px] uppercase tracking-[0.14em] text-accent">
+                    Non-functional
+                  </h3>
                   <ul className="mt-2 space-y-2 text-sm leading-6 text-muted">
                     {example.requirements.nonFunctional.map((r) => (
                       <li key={r} className="flex gap-2">
@@ -146,11 +165,15 @@ export function ExampleView({ example, id }: { example: DesignExample; id: strin
                       <tbody>
                         {example.math.map((m) => (
                           <tr key={m.label} className="border-t border-border first:border-t-0">
-                            <th className="w-[28%] px-3 py-2 align-top font-medium text-fg">{m.label}</th>
+                            <th className="w-[28%] px-3 py-2 align-top font-medium text-fg">
+                              {m.label}
+                            </th>
                             <td className="px-3 py-2 align-top font-mono text-[12px] text-muted">
                               {m.expr}
                               {m.note ? (
-                                <div className="mt-0.5 font-sans text-[11.5px] text-faint">{m.note}</div>
+                                <div className="mt-0.5 font-sans text-[11.5px] text-faint">
+                                  {m.note}
+                                </div>
                               ) : null}
                             </td>
                             <td className="w-[22%] whitespace-nowrap px-3 py-2 text-right align-top font-mono text-[12.5px] font-medium text-accent">
@@ -308,11 +331,18 @@ export function ExampleView({ example, id }: { example: DesignExample; id: strin
 
             {example.furtherReading.length ? (
               <div>
-                <h2 className="text-[11px] font-medium uppercase tracking-[0.16em] text-faint">Sources</h2>
+                <h2 className="text-[11px] font-medium uppercase tracking-[0.16em] text-faint">
+                  Sources
+                </h2>
                 <ul className="mt-3 space-y-2">
                   {example.furtherReading.map((l) => (
                     <li key={l.href}>
-                      <a href={l.href} target="_blank" rel="noreferrer" className="text-sm text-accent hover:underline">
+                      <a
+                        href={l.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm text-accent hover:underline"
+                      >
                         {l.label}
                       </a>
                     </li>

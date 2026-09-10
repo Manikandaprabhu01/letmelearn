@@ -27,11 +27,10 @@ export const lldProblems: Concept[] = [
         ],
         diagram: {
           kind: "flow",
-          caption: "Map values are list nodes, so a hit can splice in O(1) without walking anything.",
+          caption:
+            "Map values are list nodes, so a hit can splice in O(1) without walking anything.",
           rows: [
-            [
-              { id: "map", label: "HashMap<K, Node>", sub: "O(1) lookup", tone: "accent" },
-            ],
+            [{ id: "map", label: "HashMap<K, Node>", sub: "O(1) lookup", tone: "accent" }],
             [
               { id: "h", label: "HEAD", sub: "sentinel", tone: "warn" },
               { id: "a", label: "k=A", sub: "most recent" },
@@ -49,7 +48,11 @@ export const lldProblems: Concept[] = [
             ["put(k,v) existing", "map lookup → update value → move to front", "O(1)"],
             ["put(k,v) new, not full", "new node → insert after head → map put", "O(1)"],
             ["put(k,v) new, full", "unlink tail.prev → map delete → insert new at front", "O(1)"],
-            ["Memory", "map entry + node (2 pointers + key + value) per item", "~O(n), 50-80 bytes overhead each"],
+            [
+              "Memory",
+              "map entry + node (2 pointers + key + value) per item",
+              "~O(n), 50-80 bytes overhead each",
+            ],
           ],
         },
       },
@@ -137,17 +140,20 @@ export class LruCache<K, V> {
           {
             title: "One mutex around everything",
             text: "Correct, trivially reviewable, and it serialises every read. Fine for a cache behind a single-threaded event loop or with low contention; the first answer to give.",
-            detail: "throughput ≈ 1 / (lock acquire + splice) — a few million ops/sec, but no parallel scaling",
+            detail:
+              "throughput ≈ 1 / (lock acquire + splice) — a few million ops/sec, but no parallel scaling",
           },
           {
             title: "Sharded (striped) cache",
             text: "N independent caches, shard = hash(key) % N, each with its own lock and its own capacity. Contention drops ~N-fold and eviction becomes per-shard, which is a slight accuracy loss for a large throughput gain. This is what most production caches do.",
-            detail: "N = 16–256 shards; capacity per shard = total / N, so hot shards can evict earlier than a global LRU would",
+            detail:
+              "N = 16–256 shards; capacity per shard = total / N, so hot shards can evict earlier than a global LRU would",
           },
           {
             title: "Amortise the reordering",
             text: "Do not splice on every read. Record hits into a small per-thread ring buffer and drain it into the LRU list under the lock only when it fills. Reads become almost lock-free, and the ordering becomes approximate — which is fine, because LRU is a heuristic anyway.",
-            detail: "This is roughly what Caffeine (Java) and Ristretto (Go) do; recency accuracy is traded for read throughput",
+            detail:
+              "This is roughly what Caffeine (Java) and Ristretto (Go) do; recency accuracy is traded for read throughput",
           },
           {
             title: "Give up strict LRU",
@@ -227,7 +233,11 @@ private sweep(budget = 200) {
           options: [
             {
               title: "LRU — recency",
-              good: ["O(1), simple, well understood", "Great for workloads with temporal locality", "Adapts instantly to a shifting working set"],
+              good: [
+                "O(1), simple, well understood",
+                "Great for workloads with temporal locality",
+                "Adapts instantly to a shifting working set",
+              ],
               bad: [
                 "A single scan of cold data evicts the entire hot set",
                 "One-hit-wonder keys are admitted at full cost",
@@ -250,18 +260,34 @@ private sweep(budget = 200) {
                 "Frequency sketch decides admission, LRU segments decide eviction",
                 "Scan-resistant, near-optimal hit ratio for a few bits per key",
               ],
-              bad: ["More moving parts to explain", "Approximate counts, so pathological cases exist"],
-              verdict: "What Caffeine and Ristretto ship; the right answer to 'can you do better than LRU?'",
+              bad: [
+                "More moving parts to explain",
+                "Approximate counts, so pathological cases exist",
+              ],
+              verdict:
+                "What Caffeine and Ristretto ship; the right answer to 'can you do better than LRU?'",
             },
           ],
         },
         table: {
           headers: ["Workload", "LRU behaviour", "Better choice"],
           rows: [
-            ["Full-table scan through a warm cache", "Evicts everything hot; hit rate falls off a cliff", "LFU admission, or a scan-resistant segment (ARC, SLRU)"],
-            ["Zipfian popularity, stable over days", "Fine, but wastes space on one-hit keys", "TinyLFU admission filter in front of LRU"],
+            [
+              "Full-table scan through a warm cache",
+              "Evicts everything hot; hit rate falls off a cliff",
+              "LFU admission, or a scan-resistant segment (ARC, SLRU)",
+            ],
+            [
+              "Zipfian popularity, stable over days",
+              "Fine, but wastes space on one-hit keys",
+              "TinyLFU admission filter in front of LRU",
+            ],
             ["Strict working set, changes hourly", "Ideal", "Keep LRU"],
-            ["Large values, variable size", "Entry-count capacity misrepresents memory", "Weigh entries by bytes; evict by weight"],
+            [
+              "Large values, variable size",
+              "Entry-count capacity misrepresents memory",
+              "Weigh entries by bytes; evict by weight",
+            ],
           ],
         },
       },
@@ -397,7 +423,11 @@ interface LimiterStrategy {
             {
               title: "Fixed window counter",
               sub: "count per aligned minute",
-              good: ["Cheapest: one integer per key", "Trivial in Redis: INCR + EXPIRE", "Easy to explain to users"],
+              good: [
+                "Cheapest: one integer per key",
+                "Trivial in Redis: INCR + EXPIRE",
+                "Easy to explain to users",
+              ],
               bad: [
                 "Boundary flaw: 100 at 11:59:59 plus 100 at 12:00:00 is 200 in one second",
                 "Synchronised clients hammer the top of each window",
@@ -407,7 +437,10 @@ interface LimiterStrategy {
             {
               title: "Sliding window log",
               sub: "timestamps in a sorted set",
-              good: ["Exact — no boundary artefact at all", "Naturally supports 'N in any rolling T'"],
+              good: [
+                "Exact — no boundary artefact at all",
+                "Naturally supports 'N in any rolling T'",
+              ],
               bad: [
                 "Memory is O(limit) per key: 20k timestamps for a 20k/min limit",
                 "Every call trims the set; expensive at high limits",
@@ -480,8 +513,18 @@ class LeakyBucket {
         table: {
           headers: ["Algorithm", "Memory per key", "Burst behaviour", "Exact?"],
           rows: [
-            ["Token bucket", "2 numbers", "Allows a burst up to capacity", "Yes, for its own definition"],
-            ["Leaky bucket", "Queue up to capacity", "Absorbs bursts, emits smoothly", "Yes, output rate is guaranteed"],
+            [
+              "Token bucket",
+              "2 numbers",
+              "Allows a burst up to capacity",
+              "Yes, for its own definition",
+            ],
+            [
+              "Leaky bucket",
+              "Queue up to capacity",
+              "Absorbs bursts, emits smoothly",
+              "Yes, output rate is guaranteed",
+            ],
             ["Fixed window", "1 counter", "Up to 2x limit across a boundary", "No"],
             ["Sliding log", "O(limit) timestamps", "None — hard cap in any window", "Yes"],
             ["Sliding counter", "3 numbers", "Small overshoot, no cliff", "Approximate (±small %)"],
@@ -528,10 +571,23 @@ return { allowed and 1 or 0, math.floor(tokens) }`,
           ],
           messages: [
             { from: "c", to: "gw", label: "GET /v1/search", kind: "call" },
-            { from: "gw", to: "r", label: "EVALSHA rate_limit(key, now)", kind: "call", note: "atomic; ~0.3ms same-AZ" },
+            {
+              from: "gw",
+              to: "r",
+              label: "EVALSHA rate_limit(key, now)",
+              kind: "call",
+              note: "atomic; ~0.3ms same-AZ",
+            },
             { from: "r", to: "gw", label: "[allowed, remaining]", kind: "return" },
             { from: "gw", to: "svc", label: "forward (allowed)", kind: "call", tone: "ok" },
-            { from: "gw", to: "c", label: "429 + Retry-After + X-RateLimit-*", kind: "return", tone: "warn", note: "when denied" },
+            {
+              from: "gw",
+              to: "c",
+              label: "429 + Retry-After + X-RateLimit-*",
+              kind: "return",
+              tone: "warn",
+              note: "when denied",
+            },
           ],
         },
         bullets: [
@@ -601,7 +657,12 @@ return { allowed and 1 or 0, math.floor(tokens) }`,
         ],
       },
     ],
-    related: ["/hld/rate-limiting", "/examples/rate-limiter", "/lld/strategy", "/playgrounds/rate-limiter"],
+    related: [
+      "/hld/rate-limiting",
+      "/examples/rate-limiter",
+      "/lld/strategy",
+      "/playgrounds/rate-limiter",
+    ],
     furtherReading: [
       {
         label: "Rate limiter playground",

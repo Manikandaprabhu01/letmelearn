@@ -35,7 +35,9 @@ export function Toc({ entries }: { entries: TocEntry[] }) {
 
   return (
     <nav aria-label="On this page" className="text-sm">
-      <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-faint">On this page</div>
+      <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-faint">
+        On this page
+      </div>
       <ul className="mt-3 space-y-1 border-l border-border">
         {entries.map((e) => {
           const showGroup = e.group && e.group !== lastGroup;

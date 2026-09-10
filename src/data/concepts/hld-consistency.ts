@@ -4,7 +4,8 @@ export const hldConsistency: Concept[] = [
   {
     slug: "cap-theorem",
     title: "CAP Theorem (and PACELC)",
-    subtitle: "During a partition you choose; the rest of the time you are choosing something else.",
+    subtitle:
+      "During a partition you choose; the rest of the time you are choosing something else.",
     level: "intermediate",
     minutes: 13,
     tags: ["distributed", "theory", "trade-offs"],
@@ -36,10 +37,29 @@ export const hldConsistency: Concept[] = [
           messages: [
             { from: "w", to: "n1", label: "SET x = 2", kind: "call" },
             { from: "n1", to: "w", label: "ok", kind: "return", tone: "ok" },
-            { from: "n1", to: "n2", label: "replicate x = 2", kind: "async", tone: "bad", note: "✗ network partition — never arrives" },
+            {
+              from: "n1",
+              to: "n2",
+              label: "replicate x = 2",
+              kind: "async",
+              tone: "bad",
+              note: "✗ network partition — never arrives",
+            },
             { from: "r", to: "n2", label: "GET x", kind: "call" },
-            { from: "n2", to: "r", label: "CP: error / timeout — refuse to answer", kind: "return", tone: "warn" },
-            { from: "n2", to: "r", label: "AP: 1 — stale but available", kind: "return", tone: "warn" },
+            {
+              from: "n2",
+              to: "r",
+              label: "CP: error / timeout — refuse to answer",
+              kind: "return",
+              tone: "warn",
+            },
+            {
+              from: "n2",
+              to: "r",
+              label: "AP: 1 — stale but available",
+              kind: "return",
+              tone: "warn",
+            },
           ],
         },
         callout: {
@@ -86,12 +106,32 @@ export const hldConsistency: Concept[] = [
         table: {
           headers: ["Feature", "Choice", "Why"],
           rows: [
-            ["Account balance / transfer", "CP", "Double-spend is unacceptable; a delay is annoying"],
+            [
+              "Account balance / transfer",
+              "CP",
+              "Double-spend is unacceptable; a delay is annoying",
+            ],
             ["Social feed", "AP", "A post appearing a second late is invisible to the user"],
-            ["Distributed lock / leader election", "CP", "Two leaders is the exact failure the lock exists to prevent"],
-            ["Shopping cart", "AP with merge", "Amazon's original case: a re-added item beats a failed add"],
-            ["Inventory 'in stock' badge", "AP", "It is an estimate — reconcile at checkout, which is CP"],
-            ["Service discovery", "AP", "Stale endpoint plus health checks beats no endpoints at all"],
+            [
+              "Distributed lock / leader election",
+              "CP",
+              "Two leaders is the exact failure the lock exists to prevent",
+            ],
+            [
+              "Shopping cart",
+              "AP with merge",
+              "Amazon's original case: a re-added item beats a failed add",
+            ],
+            [
+              "Inventory 'in stock' badge",
+              "AP",
+              "It is an estimate — reconcile at checkout, which is CP",
+            ],
+            [
+              "Service discovery",
+              "AP",
+              "Stale endpoint plus health checks beats no endpoints at all",
+            ],
           ],
         },
       },
@@ -107,8 +147,18 @@ export const hldConsistency: Concept[] = [
             ["Postgres (single leader, sync replica)", "Consistency", "Consistency", "PC/EC"],
             ["Cassandra (default tunables)", "Availability", "Latency", "PA/EL"],
             ["DynamoDB (eventual reads)", "Availability", "Latency", "PA/EL"],
-            ["DynamoDB (strongly consistent reads)", "Consistency", "Consistency", "PC/EC — and you pay double"],
-            ["Spanner", "Consistency", "Consistency", "PC/EC — bought with TrueTime and hardware clocks"],
+            [
+              "DynamoDB (strongly consistent reads)",
+              "Consistency",
+              "Consistency",
+              "PC/EC — and you pay double",
+            ],
+            [
+              "Spanner",
+              "Consistency",
+              "Consistency",
+              "PC/EC — bought with TrueTime and hardware clocks",
+            ],
             ["MongoDB (majority write, primary read)", "Consistency", "Consistency", "PC/EC"],
           ],
         },
@@ -150,7 +200,9 @@ export const hldConsistency: Concept[] = [
       },
     ],
     related: ["/hld/consistency", "/hld/quorum", "/hld/replication", "/playgrounds/cap-theorem"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
     playground: "cap-theorem",
   },
 
@@ -232,7 +284,8 @@ export const hldConsistency: Concept[] = [
           {
             title: "'I saved it and it disappeared'",
             text: "A write went to the leader, the next read hit a lagging replica. This is a read-your-writes violation, not a database bug.",
-            detail: "Fix: route this user's reads to the leader briefly after their write, or to a replica past that log position.",
+            detail:
+              "Fix: route this user's reads to the leader briefly after their write, or to a replica past that log position.",
           },
           {
             title: "'A comment appeared, then vanished'",
@@ -242,17 +295,20 @@ export const hldConsistency: Concept[] = [
           {
             title: "'The reply shows before the question'",
             text: "Causally related writes replicated out of order, often across partitions. Causal consistency violated.",
-            detail: "Fix: keep causally related data in one partition, or carry causal metadata and buffer until dependencies arrive.",
+            detail:
+              "Fix: keep causally related data in one partition, or carry causal metadata and buffer until dependencies arrive.",
           },
           {
             title: "'Two people booked the same seat'",
             text: "A read-then-write across replicas with no serialisation. This one needs real linearizability, or an atomic conditional write.",
-            detail: "Fix: compare-and-set on the row, or a quorum write with w + r > n on that key.",
+            detail:
+              "Fix: compare-and-set on the row, or a quorum write with w + r > n on that key.",
           },
           {
             title: "'The balance was briefly negative'",
             text: "An invariant spanning multiple items, checked without isolation. This is a transaction/isolation problem, not a replication one.",
-            detail: "Fix: serializable transaction on one node, or a single-partition design that keeps the invariant local.",
+            detail:
+              "Fix: serializable transaction on one node, or a single-partition design that keeps the invariant local.",
           },
         ],
       },
@@ -266,9 +322,24 @@ export const hldConsistency: Concept[] = [
           headers: ["Isolation level", "Prevents", "Still allows", "Cost"],
           rows: [
             ["Read uncommitted", "Nothing much", "Dirty reads", "None"],
-            ["Read committed", "Dirty reads", "Non-repeatable reads, phantoms", "Low — the common default"],
-            ["Repeatable read / snapshot", "Non-repeatable reads", "Write skew, phantoms (engine-dependent)", "Moderate; MVCC makes it cheap"],
-            ["Serializable", "Everything — as if run one at a time", "Nothing", "Conflict aborts and retries; contention hurts"],
+            [
+              "Read committed",
+              "Dirty reads",
+              "Non-repeatable reads, phantoms",
+              "Low — the common default",
+            ],
+            [
+              "Repeatable read / snapshot",
+              "Non-repeatable reads",
+              "Write skew, phantoms (engine-dependent)",
+              "Moderate; MVCC makes it cheap",
+            ],
+            [
+              "Serializable",
+              "Everything — as if run one at a time",
+              "Nothing",
+              "Conflict aborts and retries; contention hurts",
+            ],
           ],
         },
         code: {
@@ -342,7 +413,9 @@ COMMIT;                                COMMIT;
       },
     ],
     related: ["/hld/cap-theorem", "/hld/quorum", "/hld/replication", "/hld/consensus"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -394,7 +467,8 @@ COMMIT;                                COMMIT;
         ],
         diagram: {
           kind: "sequence",
-          caption: "N=3, W=2, R=2 — the read set is guaranteed to touch a replica with the new value.",
+          caption:
+            "N=3, W=2, R=2 — the read set is guaranteed to touch a replica with the new value.",
           actors: [
             { id: "c", label: "Client" },
             { id: "r1", label: "Replica 1" },
@@ -404,12 +478,37 @@ COMMIT;                                COMMIT;
           messages: [
             { from: "c", to: "r1", label: "write x=2 (v7)", kind: "call" },
             { from: "c", to: "r2", label: "write x=2 (v7)", kind: "call" },
-            { from: "c", to: "r3", label: "write x=2 (v7)", kind: "async", tone: "warn", note: "no ack — that is fine, W=2 satisfied" },
-            { from: "r2", to: "c", label: "ack (2 of 3) → write succeeds", kind: "return", tone: "ok" },
+            {
+              from: "c",
+              to: "r3",
+              label: "write x=2 (v7)",
+              kind: "async",
+              tone: "warn",
+              note: "no ack — that is fine, W=2 satisfied",
+            },
+            {
+              from: "r2",
+              to: "c",
+              label: "ack (2 of 3) → write succeeds",
+              kind: "return",
+              tone: "ok",
+            },
             { from: "c", to: "r2", label: "read x", kind: "call" },
             { from: "c", to: "r3", label: "read x", kind: "call", note: "returns stale v6" },
-            { from: "r2", to: "c", label: "v7 = 2 · r3 says v6 = 1 → take v7", kind: "return", tone: "ok" },
-            { from: "c", to: "r3", label: "read repair: write v7 back", kind: "async", note: "the stale replica is fixed as a side effect" },
+            {
+              from: "r2",
+              to: "c",
+              label: "v7 = 2 · r3 says v6 = 1 → take v7",
+              kind: "return",
+              tone: "ok",
+            },
+            {
+              from: "c",
+              to: "r3",
+              label: "read repair: write v7 back",
+              kind: "async",
+              note: "the stale replica is fixed as a side effect",
+            },
           ],
         },
       },
@@ -419,10 +518,34 @@ COMMIT;                                COMMIT;
           headers: ["Configuration", "Read latency", "Write latency", "Tolerates", "Use for"],
           rows: [
             ["N=3, W=2, R=2", "Median of 2", "Median of 2", "1 node down", "The balanced default"],
-            ["N=3, W=3, R=1", "Fastest replica", "Slowest replica", "0 down for writes", "Read-heavy, rarely written config"],
-            ["N=3, W=1, R=3", "Slowest replica", "Fastest replica", "0 down for reads", "Write-heavy logging; reads are rare"],
-            ["N=3, W=1, R=1", "Fastest", "Fastest", "2 down", "No overlap — eventual only; metrics, counters"],
-            ["N=5, W=3, R=3", "Median of 3", "Median of 3", "2 nodes down", "Higher durability across 3 AZs"],
+            [
+              "N=3, W=3, R=1",
+              "Fastest replica",
+              "Slowest replica",
+              "0 down for writes",
+              "Read-heavy, rarely written config",
+            ],
+            [
+              "N=3, W=1, R=3",
+              "Slowest replica",
+              "Fastest replica",
+              "0 down for reads",
+              "Write-heavy logging; reads are rare",
+            ],
+            [
+              "N=3, W=1, R=1",
+              "Fastest",
+              "Fastest",
+              "2 down",
+              "No overlap — eventual only; metrics, counters",
+            ],
+            [
+              "N=5, W=3, R=3",
+              "Median of 3",
+              "Median of 3",
+              "2 nodes down",
+              "Higher durability across 3 AZs",
+            ],
           ],
         },
         callout: {
@@ -483,7 +606,10 @@ function compare(a: VV, b: VV): "before" | "after" | "concurrent" | "equal" {
             },
             {
               title: "Sloppy quorum + hinted handoff",
-              good: ["Writes keep succeeding through node and zone failures", "Data reaches its home automatically on recovery"],
+              good: [
+                "Writes keep succeeding through node and zone failures",
+                "Data reaches its home automatically on recovery",
+              ],
               bad: [
                 "Reads may miss recent writes until handoff completes",
                 "Hints accumulate on healthy nodes; a long outage is a memory problem",
@@ -516,7 +642,9 @@ function compare(a: VV, b: VV): "before" | "after" | "concurrent" | "equal" {
       },
     ],
     related: ["/hld/replication", "/hld/consistency", "/hld/cap-theorem", "/playgrounds/quorum"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
     playground: "quorum",
   },
 
@@ -546,11 +674,19 @@ function compare(a: VV, b: VV): "before" | "after" | "concurrent" | "equal" {
         table: {
           headers: ["Used for", "What is agreed", "Typical system"],
           rows: [
-            ["Leader election", "Which node is the primary right now", "Raft in etcd, Kafka's controller"],
+            [
+              "Leader election",
+              "Which node is the primary right now",
+              "Raft in etcd, Kafka's controller",
+            ],
             ["Configuration", "The current cluster membership and settings", "ZooKeeper, etcd"],
             ["Distributed locks", "Who holds the lease", "etcd leases, ZooKeeper ephemeral nodes"],
             ["Replicated log", "The order of writes", "Raft in CockroachDB, TiKV, Consul"],
-            ["Atomic commit across shards", "Whether a transaction commits", "Paxos Commit, Spanner"],
+            [
+              "Atomic commit across shards",
+              "Whether a transaction commits",
+              "Paxos Commit, Spanner",
+            ],
           ],
         },
       },
@@ -560,17 +696,20 @@ function compare(a: VV, b: VV): "before" | "after" | "concurrent" | "equal" {
           {
             title: "Terms and roles",
             text: "Time is divided into terms, each with at most one leader. Every node is a follower, a candidate, or the leader. Terms are the logical clock that makes stale leaders detectable.",
-            detail: "Any message carrying a higher term forces the receiver to step down and become a follower.",
+            detail:
+              "Any message carrying a higher term forces the receiver to step down and become a follower.",
           },
           {
             title: "Leader election",
             text: "A follower that hears nothing from a leader for its election timeout becomes a candidate, increments the term, and asks everyone to vote. It becomes leader on receiving a majority. Timeouts are randomised (say 150-300 ms) so simultaneous candidacies are rare.",
-            detail: "A node votes at most once per term, which is why two leaders in one term are impossible.",
+            detail:
+              "A node votes at most once per term, which is why two leaders in one term are impossible.",
           },
           {
             title: "Log replication",
             text: "Clients send commands to the leader, which appends to its log and sends AppendEntries to followers. Once a majority has stored the entry, it is committed; the leader applies it to its state machine and answers the client.",
-            detail: "AppendEntries doubles as the heartbeat, so an idle leader still holds its position.",
+            detail:
+              "AppendEntries doubles as the heartbeat, so an idle leader still holds its position.",
           },
           {
             title: "Safety: the election restriction",
@@ -595,7 +734,14 @@ function compare(a: VV, b: VV): "before" | "after" | "concurrent" | "equal" {
             { from: "l", to: "l", label: "append to local log (index 42)", kind: "self" },
             { from: "l", to: "f1", label: "AppendEntries(term=7, prev=41, entry)", kind: "call" },
             { from: "l", to: "f2", label: "AppendEntries(term=7, prev=41, entry)", kind: "call" },
-            { from: "f1", to: "l", label: "ok", kind: "return", tone: "ok", note: "2 of 3 have it → committed" },
+            {
+              from: "f1",
+              to: "l",
+              label: "ok",
+              kind: "return",
+              tone: "ok",
+              note: "2 of 3 have it → committed",
+            },
             { from: "l", to: "l", label: "apply to state machine", kind: "self", tone: "accent" },
             { from: "l", to: "c", label: "ok", kind: "return", tone: "ok" },
             { from: "f2", to: "l", label: "ok (late — already committed)", kind: "return" },
@@ -625,7 +771,10 @@ function compare(a: VV, b: VV): "before" | "after" | "concurrent" | "equal" {
             },
             {
               title: "Paxos / Multi-Paxos",
-              good: ["Older, deeply studied, very flexible", "Variants (Flexible, EPaxos) relax the leader bottleneck"],
+              good: [
+                "Older, deeply studied, very flexible",
+                "Variants (Flexible, EPaxos) relax the leader bottleneck",
+              ],
               bad: [
                 "Famously hard to specify completely; implementations diverge",
                 "Basic Paxos agrees on one value — real use needs Multi-Paxos, which the paper does not fully describe",
@@ -757,7 +906,8 @@ await storage.write(data, { fencingToken: lease.token });
         ],
         diagram: {
           kind: "compare",
-          caption: "Two architectures with the same component count and very different blast radii.",
+          caption:
+            "Two architectures with the same component count and very different blast radii.",
           options: [
             {
               title: "Shared everything",
@@ -778,7 +928,10 @@ await storage.write(data, { fencingToken: lease.token });
                 "Deploys roll cell by cell, so a bad one is caught small",
                 "Recovery is bounded and repeatable",
               ],
-              bad: ["More infrastructure and routing complexity", "Cross-cell operations become awkward"],
+              bad: [
+                "More infrastructure and routing complexity",
+                "Cross-cell operations become awkward",
+              ],
               verdict: "Large multi-tenant systems where a total outage is unacceptable.",
             },
           ],
@@ -790,11 +943,23 @@ await storage.write(data, { fencingToken: lease.token });
           headers: ["Dependency fails", "Total failure", "Graceful degradation"],
           rows: [
             ["Recommendations service", "Product page 500s", "Show a static best-sellers list"],
-            ["Cache tier", "Every request errors", "Fall through to the database with a rate limit"],
+            [
+              "Cache tier",
+              "Every request errors",
+              "Fall through to the database with a rate limit",
+            ],
             ["Search index", "Search page down", "Fall back to a simple database prefix query"],
-            ["Payment provider", "Checkout down", "Queue the order, capture later, tell the user honestly"],
+            [
+              "Payment provider",
+              "Checkout down",
+              "Queue the order, capture later, tell the user honestly",
+            ],
             ["A read replica", "Reads fail", "Route to another replica or to the leader"],
-            ["Metrics pipeline", "Requests block on the emit", "Drop metrics; never block a request on telemetry"],
+            [
+              "Metrics pipeline",
+              "Requests block on the emit",
+              "Drop metrics; never block a request on telemetry",
+            ],
           ],
         },
         bullets: [
@@ -874,7 +1039,12 @@ async function withFallback<T>(primary: () => Promise<T>, fallback: () => T): Pr
         ],
       },
     ],
-    related: ["/hld/circuit-breaker", "/hld/load-balancing", "/hld/observability", "/hld/replication"],
+    related: [
+      "/hld/circuit-breaker",
+      "/hld/load-balancing",
+      "/hld/observability",
+      "/hld/replication",
+    ],
     furtherReading: [
       {
         label: "awesome-system-design-resources",

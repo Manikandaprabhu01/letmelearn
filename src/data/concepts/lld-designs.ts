@@ -79,7 +79,8 @@ type UnparkFailure = "unknown_ticket" | "already_paid" | "ticket_lost";`,
         heading: "Step 3 — The model",
         diagram: {
           kind: "uml",
-          caption: "Composition down the physical hierarchy; strategies at the two decision points.",
+          caption:
+            "Composition down the physical hierarchy; strategies at the two decision points.",
           boxes: [
             {
               name: "ParkingLot",
@@ -105,7 +106,12 @@ type UnparkFailure = "unknown_ticket" | "already_paid" | "ticket_lost";`,
               members: [
                 { name: "id: SpotId", kind: "field", vis: "-" },
                 { name: "type: SpotType", kind: "field", vis: "-" },
-                { name: "features: Set<Feature>", kind: "field", vis: "-", note: "EV, HANDICAPPED" },
+                {
+                  name: "features: Set<Feature>",
+                  kind: "field",
+                  vis: "-",
+                  note: "EV, HANDICAPPED",
+                },
                 { name: "state: FREE | HELD | OCCUPIED", kind: "field", vis: "-" },
                 { name: "distanceTo(gate): int", kind: "method" },
               ],
@@ -200,10 +206,30 @@ class ReserveLargeForVans implements SpotAllocator {
         table: {
           headers: ["Free-spot index", "pick() cost", "Memory", "Notes"],
           rows: [
-            ["Scan all spots", "O(n) — 2,000 checks per car", "None", "Fine on a whiteboard; state that you would not ship it"],
-            ["Set per (type, level)", "O(1) for 'any free', no distance", "Small", "Good default if allocation is arbitrary"],
-            ["Min-heap per (type, gate) by distance", "O(log n) push/pop", "One heap per gate per type", "The right structure for nearest-first"],
-            ["Bitset per level", "O(n/64) word scan, very cache-friendly", "Tiny", "Excellent for 'first free of type' at real sizes"],
+            [
+              "Scan all spots",
+              "O(n) — 2,000 checks per car",
+              "None",
+              "Fine on a whiteboard; state that you would not ship it",
+            ],
+            [
+              "Set per (type, level)",
+              "O(1) for 'any free', no distance",
+              "Small",
+              "Good default if allocation is arbitrary",
+            ],
+            [
+              "Min-heap per (type, gate) by distance",
+              "O(log n) push/pop",
+              "One heap per gate per type",
+              "The right structure for nearest-first",
+            ],
+            [
+              "Bitset per level",
+              "O(n/64) word scan, very cache-friendly",
+              "Tiny",
+              "Excellent for 'first free of type' at real sizes",
+            ],
           ],
         },
         callout: {
@@ -219,7 +245,8 @@ class ReserveLargeForVans implements SpotAllocator {
         ],
         diagram: {
           kind: "sequence",
-          caption: "Idempotency check, then an atomic claim. Nothing is held across a slow operation.",
+          caption:
+            "Idempotency check, then an atomic claim. Nothing is held across a slow operation.",
           actors: [
             { id: "g1", label: "Gate 1" },
             { id: "g2", label: "Gate 2" },
@@ -228,12 +255,37 @@ class ReserveLargeForVans implements SpotAllocator {
           ],
           messages: [
             { from: "g1", to: "svc", label: "park(car, gate1, req-a)", kind: "call" },
-            { from: "g2", to: "svc", label: "park(car, gate2, req-b)", kind: "call", note: "same instant" },
-            { from: "svc", to: "db", label: "SELECT ticket WHERE request_id = req-a", kind: "call", note: "idempotency: has this retry already parked?" },
-            { from: "svc", to: "db", label: "UPDATE spot SET state='OCCUPIED' WHERE id='B12' AND state='FREE'", kind: "call", tone: "accent", note: "compare-and-set: rows affected decides the winner" },
+            {
+              from: "g2",
+              to: "svc",
+              label: "park(car, gate2, req-b)",
+              kind: "call",
+              note: "same instant",
+            },
+            {
+              from: "svc",
+              to: "db",
+              label: "SELECT ticket WHERE request_id = req-a",
+              kind: "call",
+              note: "idempotency: has this retry already parked?",
+            },
+            {
+              from: "svc",
+              to: "db",
+              label: "UPDATE spot SET state='OCCUPIED' WHERE id='B12' AND state='FREE'",
+              kind: "call",
+              tone: "accent",
+              note: "compare-and-set: rows affected decides the winner",
+            },
             { from: "db", to: "svc", label: "1 row (gate 1) / 0 rows (gate 2)", kind: "return" },
             { from: "svc", to: "g1", label: "Ticket(B12)", kind: "return", tone: "ok" },
-            { from: "svc", to: "svc", label: "gate 2: retry with the next candidate spot", kind: "self", tone: "warn" },
+            {
+              from: "svc",
+              to: "svc",
+              label: "gate 2: retry with the next candidate spot",
+              kind: "self",
+              tone: "warn",
+            },
           ],
         },
         code: [
@@ -320,12 +372,36 @@ LIMIT 1;
         table: {
           headers: ["Extension", "What it adds to the model", "Trap"],
           rows: [
-            ["Reservations", "HELD state with expiry, a reservation entity, a release sweeper", "Held spots that never expire slowly starve the lot"],
-            ["EV charging", "Feature on the spot, charging session with its own billing", "Cars that stay plugged in after charging; add an idle fee"],
-            ["Monthly passes", "Subscription entity; pricing returns zero but the spot is still tracked", "Pass holders in a full lot — reserve a block for them"],
-            ["Multiple lots", "Lot becomes an aggregate; availability is queried across lots", "Cross-lot search is a read model, not a scan of every lot"],
-            ["Display boards", "Read model updated on park/unpark events", "Counting free spots on every refresh; keep counters incrementally"],
-            ["Valet", "Attendant as an actor, spot chosen without a driver", "Two claims on one spot from valet and gate; same atomicity rules"],
+            [
+              "Reservations",
+              "HELD state with expiry, a reservation entity, a release sweeper",
+              "Held spots that never expire slowly starve the lot",
+            ],
+            [
+              "EV charging",
+              "Feature on the spot, charging session with its own billing",
+              "Cars that stay plugged in after charging; add an idle fee",
+            ],
+            [
+              "Monthly passes",
+              "Subscription entity; pricing returns zero but the spot is still tracked",
+              "Pass holders in a full lot — reserve a block for them",
+            ],
+            [
+              "Multiple lots",
+              "Lot becomes an aggregate; availability is queried across lots",
+              "Cross-lot search is a read model, not a scan of every lot",
+            ],
+            [
+              "Display boards",
+              "Read model updated on park/unpark events",
+              "Counting free spots on every refresh; keep counters incrementally",
+            ],
+            [
+              "Valet",
+              "Attendant as an actor, spot chosen without a driver",
+              "Two claims on one spot from valet and gate; same atomicity rules",
+            ],
           ],
         },
       },
@@ -520,11 +596,26 @@ class Car {
         table: {
           headers: ["Policy", "Average wait", "Worst case", "Notes"],
           rows: [
-            ["Nearest stop first (greedy)", "Good when idle", "Unbounded — far floors starve", "Ping-pongs around busy floors"],
+            [
+              "Nearest stop first (greedy)",
+              "Good when idle",
+              "Unbounded — far floors starve",
+              "Ping-pongs around busy floors",
+            ],
             ["FCFS per car", "Poor", "Bounded", "Ignores that the car passes floors on the way"],
             ["SCAN / elevator", "Good", "One sweep", "The standard answer; simple to implement"],
-            ["LOOK (SCAN, reverse early)", "Slightly better", "One sweep", "Reverses at the last request, not the last floor"],
-            ["Destination dispatch", "Best", "Bounded", "Passengers enter destination in the lobby; groups by destination — mention it as the modern approach"],
+            [
+              "LOOK (SCAN, reverse early)",
+              "Slightly better",
+              "One sweep",
+              "Reverses at the last request, not the last floor",
+            ],
+            [
+              "Destination dispatch",
+              "Best",
+              "Bounded",
+              "Passengers enter destination in the lobby; groups by destination — mention it as the modern approach",
+            ],
           ],
         },
         callout: {
@@ -588,13 +679,31 @@ class ScoredDispatcher implements Dispatcher {
             { id: "m", label: "Motor + doors" },
           ],
           messages: [
-            { from: "p", to: "d", label: "hallCall(7, DOWN)", kind: "call", note: "deduped by (floor, direction)" },
-            { from: "d", to: "c2", label: "score? → 5 + 2 stops", kind: "call", note: "on the way, same direction" },
+            {
+              from: "p",
+              to: "d",
+              label: "hallCall(7, DOWN)",
+              kind: "call",
+              note: "deduped by (floor, direction)",
+            },
+            {
+              from: "d",
+              to: "c2",
+              label: "score? → 5 + 2 stops",
+              kind: "call",
+              note: "on the way, same direction",
+            },
             { from: "d", to: "c2", label: "assign(call)", kind: "call", tone: "ok" },
             { from: "c2", to: "c2", label: "stops.add(7, DOWN)", kind: "self" },
             { from: "c2", to: "m", label: "continue DOWN, stop at 7", kind: "call" },
             { from: "m", to: "c2", label: "arrived", kind: "return" },
-            { from: "c2", to: "m", label: "DOORS_OPENING → DOORS_OPEN (dwell 4s)", kind: "call", tone: "warn" },
+            {
+              from: "c2",
+              to: "m",
+              label: "DOORS_OPENING → DOORS_OPEN (dwell 4s)",
+              kind: "call",
+              tone: "warn",
+            },
             { from: "c2", to: "d", label: "call served, clear indicator", kind: "return" },
           ],
         },
@@ -604,12 +713,36 @@ class ScoredDispatcher implements Dispatcher {
         table: {
           headers: ["Concern", "Rule", "Where it lives"],
           rows: [
-            ["Motion with doors open", "Physically interlocked; software must also refuse the transition", "Car state machine — a hard invariant, not a policy"],
-            ["Obstruction while closing", "Reopen, restart dwell, count reopens and eventually alarm", "DOORS_CLOSING transition"],
-            ["Overload", "Refuse to move, sound alarm, hold doors open", "Car; also excludes it from dispatch"],
-            ["Fire alarm", "All cars to the designated floor, doors open, out of service", "System-level override that pre-empts the dispatcher"],
-            ["Power loss", "Battery lowers the car to the nearest floor and opens", "Outside software's control; model as a state you can enter"],
-            ["Car unresponsive", "Watchdog removes it from dispatch, reassigns its hall calls", "Dispatcher — hall calls must survive a car failure"],
+            [
+              "Motion with doors open",
+              "Physically interlocked; software must also refuse the transition",
+              "Car state machine — a hard invariant, not a policy",
+            ],
+            [
+              "Obstruction while closing",
+              "Reopen, restart dwell, count reopens and eventually alarm",
+              "DOORS_CLOSING transition",
+            ],
+            [
+              "Overload",
+              "Refuse to move, sound alarm, hold doors open",
+              "Car; also excludes it from dispatch",
+            ],
+            [
+              "Fire alarm",
+              "All cars to the designated floor, doors open, out of service",
+              "System-level override that pre-empts the dispatcher",
+            ],
+            [
+              "Power loss",
+              "Battery lowers the car to the nearest floor and opens",
+              "Outside software's control; model as a state you can enter",
+            ],
+            [
+              "Car unresponsive",
+              "Watchdog removes it from dispatch, reassigns its hall calls",
+              "Dispatcher — hall calls must survive a car failure",
+            ],
           ],
         },
         callout: {

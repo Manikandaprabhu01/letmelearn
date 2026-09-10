@@ -4,7 +4,8 @@ export const hldMessaging: Concept[] = [
   {
     slug: "message-queues",
     title: "Message Queues & Streams",
-    subtitle: "Decouple producers from consumers, absorb bursts, and survive a consumer being down.",
+    subtitle:
+      "Decouple producers from consumers, absorb bursts, and survive a consumer being down.",
     level: "intermediate",
     minutes: 17,
     tags: ["async", "messaging", "architecture"],
@@ -23,13 +24,41 @@ export const hldMessaging: Concept[] = [
         table: {
           headers: ["Reason", "Concretely", "Example"],
           rows: [
-            ["Latency", "Return to the user before the slow work is done", "Sign-up returns; the welcome email is queued"],
-            ["Burst absorption", "Accept at peak rate, process at sustainable rate", "Black Friday orders; workers drain steadily"],
-            ["Decoupling availability", "Producer succeeds even if the consumer is down", "Analytics pipeline restart does not fail checkout"],
-            ["Fan-out", "One event, many independent consumers", "Order placed → email, invoice, search index, fraud"],
-            ["Retry with backoff", "Transient failures handled outside the request", "Payment provider blip retried for an hour"],
-            ["Work distribution", "Many workers pull from one backlog", "Video transcoding across a worker fleet"],
-            ["Ordering", "Serialise operations on one key", "All events for one account processed in order"],
+            [
+              "Latency",
+              "Return to the user before the slow work is done",
+              "Sign-up returns; the welcome email is queued",
+            ],
+            [
+              "Burst absorption",
+              "Accept at peak rate, process at sustainable rate",
+              "Black Friday orders; workers drain steadily",
+            ],
+            [
+              "Decoupling availability",
+              "Producer succeeds even if the consumer is down",
+              "Analytics pipeline restart does not fail checkout",
+            ],
+            [
+              "Fan-out",
+              "One event, many independent consumers",
+              "Order placed → email, invoice, search index, fraud",
+            ],
+            [
+              "Retry with backoff",
+              "Transient failures handled outside the request",
+              "Payment provider blip retried for an hour",
+            ],
+            [
+              "Work distribution",
+              "Many workers pull from one backlog",
+              "Video transcoding across a worker fleet",
+            ],
+            [
+              "Ordering",
+              "Serialise operations on one key",
+              "All events for one account processed in order",
+            ],
           ],
         },
         callout: {
@@ -177,7 +206,8 @@ export const hldMessaging: Concept[] = [
           {
             title: "Retry transient failures with backoff and jitter",
             text: "Exponential backoff — 1s, 2s, 4s, 8s — with randomised jitter so a downstream outage does not produce synchronised retry waves. Cap the attempts.",
-            detail: "Distinguish transient (timeout, 503, connection reset) from permanent (validation error, 404). Never retry the latter.",
+            detail:
+              "Distinguish transient (timeout, 503, connection reset) from permanent (validation error, 404). Never retry the latter.",
           },
           {
             title: "Dead-letter after N attempts",
@@ -237,7 +267,9 @@ SELECT * FROM outbox WHERE sent_at IS NULL ORDER BY created_at LIMIT 100
       },
     ],
     related: ["/hld/pub-sub", "/hld/idempotency", "/examples/distributed-mq", "/lld/command"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -266,12 +298,19 @@ SELECT * FROM outbox WHERE sent_at IS NULL ORDER BY created_at LIMIT 100
           columns: [
             {
               title: "Publisher",
-              nodes: [{ id: "o", label: "Order service", sub: "publishes OrderPlaced", tone: "accent" }],
+              nodes: [
+                { id: "o", label: "Order service", sub: "publishes OrderPlaced", tone: "accent" },
+              ],
             },
             {
               title: "Topic",
               nodes: [
-                { id: "t", label: "orders.placed", sub: "12 partitions, 7-day retention", tone: "accent" },
+                {
+                  id: "t",
+                  label: "orders.placed",
+                  sub: "12 partitions, 7-day retention",
+                  tone: "accent",
+                },
               ],
             },
             {
@@ -280,7 +319,12 @@ SELECT * FROM outbox WHERE sent_at IS NULL ORDER BY created_at LIMIT 100
                 { id: "g1", label: "group: email", sub: "3 workers share the partitions" },
                 { id: "g2", label: "group: analytics", sub: "own offsets, own pace" },
                 { id: "g3", label: "group: search-index", sub: "can replay from offset 0" },
-                { id: "g4", label: "group: fraud", sub: "added later, no publisher change", tone: "ok" },
+                {
+                  id: "g4",
+                  label: "group: fraud",
+                  sub: "added later, no publisher change",
+                  tone: "ok",
+                },
               ],
             },
           ],
@@ -291,8 +335,16 @@ SELECT * FROM outbox WHERE sent_at IS NULL ORDER BY created_at LIMIT 100
             ["Who receives a message", "Exactly one consumer", "Every subscriber gets a copy"],
             ["Adding a consumer", "Splits the existing work", "Adds a new independent stream"],
             ["Typical payload", "A task to perform", "A fact that occurred"],
-            ["Coupling", "Producer knows work must be done", "Publisher knows nothing about subscribers"],
-            ["Failure isolation", "Message retried by whoever took it", "Each subscriber retries independently"],
+            [
+              "Coupling",
+              "Producer knows work must be done",
+              "Publisher knows nothing about subscribers",
+            ],
+            [
+              "Failure isolation",
+              "Message retried by whoever took it",
+              "Each subscriber retries independently",
+            ],
           ],
         },
       },
@@ -347,7 +399,8 @@ SELECT * FROM outbox WHERE sent_at IS NULL ORDER BY created_at LIMIT 100
         ],
         diagram: {
           kind: "sequence",
-          caption: "Independent failure and retry per subscriber — the property that makes it worth the cost.",
+          caption:
+            "Independent failure and retry per subscriber — the property that makes it worth the cost.",
           actors: [
             { id: "p", label: "Publisher" },
             { id: "t", label: "Topic" },
@@ -359,8 +412,20 @@ SELECT * FROM outbox WHERE sent_at IS NULL ORDER BY created_at LIMIT 100
             { from: "t", to: "a", label: "deliver", kind: "async" },
             { from: "t", to: "b", label: "deliver", kind: "async" },
             { from: "a", to: "t", label: "commit offset", kind: "return", tone: "ok" },
-            { from: "b", to: "b", label: "index fails → retry with backoff", kind: "self", tone: "warn", note: "email is unaffected; offsets are per group" },
-            { from: "b", to: "t", label: "commit offset after success (or send to DLQ)", kind: "return" },
+            {
+              from: "b",
+              to: "b",
+              label: "index fails → retry with backoff",
+              kind: "self",
+              tone: "warn",
+              note: "email is unaffected; offsets are per group",
+            },
+            {
+              from: "b",
+              to: "t",
+              label: "commit offset after success (or send to DLQ)",
+              kind: "return",
+            },
           ],
         },
       },
@@ -369,13 +434,48 @@ SELECT * FROM outbox WHERE sent_at IS NULL ORDER BY created_at LIMIT 100
         table: {
           headers: ["System", "Model", "Delivery", "Fits"],
           rows: [
-            ["Kafka / Redpanda", "Partitioned log, consumer groups", "At least once, ordered per partition", "High-volume event streams, replay, CDC"],
-            ["Redis Pub/Sub", "Fire and forget, no persistence", "At most once", "Live fan-out where loss is fine: presence, cache invalidation"],
-            ["Redis Streams", "Log with consumer groups", "At least once", "Lightweight streaming without running Kafka"],
-            ["SNS + SQS", "Topic fanning into queues", "At least once", "AWS-native fan-out with per-consumer DLQs"],
-            ["Google Pub/Sub", "Managed topics and subscriptions", "At least once (exactly-once option)", "GCP-native, low operational burden"],
-            ["NATS / JetStream", "Lightweight messaging", "Configurable", "Low latency, edge and IoT"],
-            ["RabbitMQ (fanout exchange)", "Exchange to queues", "At least once", "Existing AMQP estate; rich routing rules"],
+            [
+              "Kafka / Redpanda",
+              "Partitioned log, consumer groups",
+              "At least once, ordered per partition",
+              "High-volume event streams, replay, CDC",
+            ],
+            [
+              "Redis Pub/Sub",
+              "Fire and forget, no persistence",
+              "At most once",
+              "Live fan-out where loss is fine: presence, cache invalidation",
+            ],
+            [
+              "Redis Streams",
+              "Log with consumer groups",
+              "At least once",
+              "Lightweight streaming without running Kafka",
+            ],
+            [
+              "SNS + SQS",
+              "Topic fanning into queues",
+              "At least once",
+              "AWS-native fan-out with per-consumer DLQs",
+            ],
+            [
+              "Google Pub/Sub",
+              "Managed topics and subscriptions",
+              "At least once (exactly-once option)",
+              "GCP-native, low operational burden",
+            ],
+            [
+              "NATS / JetStream",
+              "Lightweight messaging",
+              "Configurable",
+              "Low latency, edge and IoT",
+            ],
+            [
+              "RabbitMQ (fanout exchange)",
+              "Exchange to queues",
+              "At least once",
+              "Existing AMQP estate; rich routing rules",
+            ],
           ],
         },
         callout: {
@@ -406,7 +506,9 @@ SELECT * FROM outbox WHERE sent_at IS NULL ORDER BY created_at LIMIT 100
       },
     ],
     related: ["/hld/message-queues", "/lld/observer", "/hld/idempotency", "/hld/websockets"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -511,12 +613,25 @@ SELECT * FROM outbox WHERE sent_at IS NULL ORDER BY created_at LIMIT 100
           ],
           messages: [
             { from: "a", to: "g1", label: "send({to: B, text})", kind: "call" },
-            { from: "g1", to: "g1", label: "persist message", kind: "self", note: "durable before delivery — the socket is not a database" },
+            {
+              from: "g1",
+              to: "g1",
+              label: "persist message",
+              kind: "self",
+              note: "durable before delivery — the socket is not a database",
+            },
             { from: "g1", to: "reg", label: "where is B?", kind: "call" },
             { from: "reg", to: "g1", label: "gateway-2", kind: "return" },
             { from: "g1", to: "bus", label: "publish to gateway-2 channel", kind: "async" },
             { from: "bus", to: "g2", label: "deliver", kind: "async" },
-            { from: "g2", to: "g2", label: "push over B's socket", kind: "self", tone: "ok", note: "if B is offline: push notification + fetch on next open" },
+            {
+              from: "g2",
+              to: "g2",
+              label: "push over B's socket",
+              kind: "self",
+              tone: "ok",
+              note: "if B is offline: push notification + fetch on next open",
+            },
           ],
         },
         bullets: [
@@ -533,7 +648,8 @@ SELECT * FROM outbox WHERE sent_at IS NULL ORDER BY created_at LIMIT 100
           {
             title: "Size per connection",
             text: "Budget memory per connection — socket buffers plus your per-user state. A few kilobytes each means 100k connections is a few hundred megabytes plus buffers, and the practical ceiling is usually 10k-100k per node.",
-            detail: "Raise file descriptor limits and tune TCP buffers; the defaults are for a different workload.",
+            detail:
+              "Raise file descriptor limits and tune TCP buffers; the defaults are for a different workload.",
           },
           {
             title: "Separate the gateway from the logic",
@@ -596,7 +712,9 @@ function connect() {
       },
     ],
     related: ["/hld/pub-sub", "/examples/chat", "/hld/load-balancing", "/examples/nearby-friends"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -775,10 +893,29 @@ X-RateLimit-Remaining: 0`,
           kind: "layers",
           caption: "The common shape: typed and binary inside, cacheable and flexible at the edge.",
           layers: [
-            { title: "Browsers and mobile", items: ["REST for cacheable public reads", "GraphQL for screen-shaped queries", "SSE / WebSocket for live updates"] },
-            { title: "Edge", items: ["API gateway", "auth, rate limiting", "CDN cache for REST GETs"] },
-            { title: "Service to service", items: ["gRPC: typed, binary, streaming", "async events over Kafka for anything not request-scoped"] },
-            { title: "Third parties", items: ["REST with webhooks", "Idempotency-Key", "signed payloads"] },
+            {
+              title: "Browsers and mobile",
+              items: [
+                "REST for cacheable public reads",
+                "GraphQL for screen-shaped queries",
+                "SSE / WebSocket for live updates",
+              ],
+            },
+            {
+              title: "Edge",
+              items: ["API gateway", "auth, rate limiting", "CDN cache for REST GETs"],
+            },
+            {
+              title: "Service to service",
+              items: [
+                "gRPC: typed, binary, streaming",
+                "async events over Kafka for anything not request-scoped",
+              ],
+            },
+            {
+              title: "Third parties",
+              items: ["REST with webhooks", "Idempotency-Key", "signed payloads"],
+            },
           ],
         },
         bullets: [
@@ -811,6 +948,8 @@ X-RateLimit-Remaining: 0`,
       },
     ],
     related: ["/hld/api-gateway", "/hld/idempotency", "/hld/caching", "/hld/websockets"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 ];

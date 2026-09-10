@@ -38,7 +38,9 @@ function Figure({
   return (
     <figure className={cn("my-5 rounded-lg border border-border bg-inset p-3 sm:p-4", className)}>
       {children}
-      {caption ? <figcaption className="mt-3 text-center text-xs text-muted">{caption}</figcaption> : null}
+      {caption ? (
+        <figcaption className="mt-3 text-center text-xs text-muted">{caption}</figcaption>
+      ) : null}
     </figure>
   );
 }
@@ -100,7 +102,9 @@ function SystemBoard({ columns, caption }: { columns: SystemColumn[]; caption?: 
             ) : null}
             <div className="flex min-h-full flex-col rounded-md border border-border bg-surface p-3">
               <div className="mb-2 flex items-center justify-between gap-2">
-                <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-faint">{col.title}</div>
+                <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-faint">
+                  {col.title}
+                </div>
                 {i < columns.length - 1 ? (
                   <span className="hidden text-faint sm:inline" aria-hidden>
                     →
@@ -132,7 +136,10 @@ function SequenceBoard({ diagram }: { diagram: SequenceDiagram }) {
       <div className="min-w-[560px]">
         <div className="grid gap-2" style={{ gridTemplateColumns: cols }}>
           {actors.map((a) => (
-            <div key={a.id} className="rounded-md border border-accent/30 bg-accent/8 px-2 py-2 text-center">
+            <div
+              key={a.id}
+              className="rounded-md border border-accent/30 bg-accent/8 px-2 py-2 text-center"
+            >
               <div className="text-[13px] font-medium leading-snug text-fg">{a.label}</div>
               {a.sub ? <div className="mt-0.5 text-[10px] text-muted">{a.sub}</div> : null}
             </div>
@@ -141,7 +148,11 @@ function SequenceBoard({ diagram }: { diagram: SequenceDiagram }) {
 
         <div className="relative mt-2">
           {/* lifelines */}
-          <div className="pointer-events-none absolute inset-0 grid" style={{ gridTemplateColumns: cols }} aria-hidden>
+          <div
+            className="pointer-events-none absolute inset-0 grid"
+            style={{ gridTemplateColumns: cols }}
+            aria-hidden
+          >
             {actors.map((a) => (
               <div key={a.id} className="flex justify-center">
                 <span className="h-full w-px bg-border" />
@@ -167,7 +178,9 @@ function SequenceBoard({ diagram }: { diagram: SequenceDiagram }) {
                   style={{ gridRow: i + 1, gridColumn: `${start + 1} / ${end + 2}` }}
                 >
                   <div className="flex items-baseline gap-2">
-                    <span className="mt-px font-mono text-[10px] tabular-nums text-faint">{i + 1}</span>
+                    <span className="mt-px font-mono text-[10px] tabular-nums text-faint">
+                      {i + 1}
+                    </span>
                     <span className="text-[12px] leading-snug text-fg">{m.label}</span>
                   </div>
                   {self ? (
@@ -186,7 +199,9 @@ function SequenceBoard({ diagram }: { diagram: SequenceDiagram }) {
                     </div>
                   ) : (
                     <div className={cn("mt-1 flex items-center", stroke)} aria-hidden>
-                      {!rightward ? <span className="-mr-px text-[10px] leading-none">◀</span> : null}
+                      {!rightward ? (
+                        <span className="-mr-px text-[10px] leading-none">◀</span>
+                      ) : null}
                       <span
                         className={cn("h-px flex-1", dashed ? "bg-transparent" : "bg-current")}
                         style={
@@ -199,10 +214,14 @@ function SequenceBoard({ diagram }: { diagram: SequenceDiagram }) {
                             : undefined
                         }
                       />
-                      {rightward ? <span className="-ml-px text-[10px] leading-none">▶</span> : null}
+                      {rightward ? (
+                        <span className="-ml-px text-[10px] leading-none">▶</span>
+                      ) : null}
                     </div>
                   )}
-                  {m.note ? <div className="mt-1 text-[11px] leading-snug text-muted">{m.note}</div> : null}
+                  {m.note ? (
+                    <div className="mt-1 text-[11px] leading-snug text-muted">{m.note}</div>
+                  ) : null}
                 </div>
               );
             })}
@@ -247,7 +266,9 @@ function ErBoard({ diagram }: { diagram: ErDiagram }) {
                     <span className="w-[26px] shrink-0" aria-hidden />
                   )}
                   <span className="font-mono text-[12px] text-fg">{f.name}</span>
-                  <span className="ml-auto shrink-0 font-mono text-[11px] text-faint">{f.type}</span>
+                  <span className="ml-auto shrink-0 font-mono text-[11px] text-faint">
+                    {f.type}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -257,7 +278,10 @@ function ErBoard({ diagram }: { diagram: ErDiagram }) {
       {diagram.relations?.length ? (
         <ul className="mt-3 space-y-1.5 rounded-md border border-border bg-surface px-3 py-2">
           {diagram.relations.map((r) => (
-            <li key={`${r.from}-${r.to}-${r.label}`} className="flex flex-wrap items-baseline gap-x-2 text-[12px]">
+            <li
+              key={`${r.from}-${r.to}-${r.label}`}
+              className="flex flex-wrap items-baseline gap-x-2 text-[12px]"
+            >
               <span className="font-mono text-fg">{r.from}</span>
               <span className="text-faint" aria-hidden>
                 ──▶
@@ -287,7 +311,10 @@ function CompareBoard({ diagram }: { diagram: CompareDiagram }) {
         {diagram.options.map((o) => (
           <div
             key={o.title}
-            className={cn("flex flex-col rounded-md border bg-surface p-3", toneClass[o.tone ?? "default"])}
+            className={cn(
+              "flex flex-col rounded-md border bg-surface p-3",
+              toneClass[o.tone ?? "default"],
+            )}
           >
             <div className="text-sm font-medium text-fg">{o.title}</div>
             {o.sub ? <div className="mt-0.5 text-[11px] text-muted">{o.sub}</div> : null}
@@ -311,7 +338,9 @@ function CompareBoard({ diagram }: { diagram: CompareDiagram }) {
             </ul>
             {o.verdict ? (
               <div className="mt-auto border-t border-border pt-2 text-[11.5px] leading-5 text-fg">
-                <span className="text-[10px] uppercase tracking-[0.14em] text-faint">Pick when </span>
+                <span className="text-[10px] uppercase tracking-[0.14em] text-faint">
+                  Pick when{" "}
+                </span>
                 {o.verdict}
               </div>
             ) : null}
@@ -346,11 +375,16 @@ function UmlBoard({ diagram }: { diagram: UmlDiagram }) {
         {diagram.boxes.map((b) => (
           <div
             key={b.name}
-            className={cn("overflow-hidden rounded-md border bg-surface", toneClass[b.tone ?? "default"])}
+            className={cn(
+              "overflow-hidden rounded-md border bg-surface",
+              toneClass[b.tone ?? "default"],
+            )}
           >
             <div className="border-b border-border bg-raised px-3 py-2 text-center">
               {b.stereotype && stereotypeLabel[b.stereotype] ? (
-                <div className="font-mono text-[10px] text-faint">{stereotypeLabel[b.stereotype]}</div>
+                <div className="font-mono text-[10px] text-faint">
+                  {stereotypeLabel[b.stereotype]}
+                </div>
               ) : null}
               <div className="font-mono text-[13px] font-medium text-fg">{b.name}</div>
             </div>
@@ -366,7 +400,9 @@ function UmlBoard({ diagram }: { diagram: UmlDiagram }) {
                   >
                     {m.name}
                   </span>
-                  {m.note ? <span className="ml-1 text-[10.5px] text-faint">— {m.note}</span> : null}
+                  {m.note ? (
+                    <span className="ml-1 text-[10.5px] text-faint">— {m.note}</span>
+                  ) : null}
                 </li>
               ))}
             </ul>
@@ -376,7 +412,10 @@ function UmlBoard({ diagram }: { diagram: UmlDiagram }) {
       {diagram.edges?.length ? (
         <ul className="mt-3 space-y-1.5 rounded-md border border-border bg-surface px-3 py-2">
           {diagram.edges.map((e) => (
-            <li key={`${e.from}-${e.to}-${e.kind}`} className="flex flex-wrap items-baseline gap-x-2 text-[12px]">
+            <li
+              key={`${e.from}-${e.to}-${e.kind}`}
+              className="flex flex-wrap items-baseline gap-x-2 text-[12px]"
+            >
               <span className="font-mono text-fg">{e.from}</span>
               <span className="font-mono text-faint" aria-hidden>
                 {edgeGlyph[e.kind ?? "uses"]}
@@ -408,9 +447,15 @@ export function ArchDiagram({ diagram }: { diagram: Diagram }) {
       <Figure caption={diagram.caption} className="overflow-x-auto">
         <div className="flex min-w-min flex-col gap-3">
           {diagram.rows.map((row, i) => (
-            <div key={i} className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-center">
+            <div
+              key={i}
+              className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-center"
+            >
               {row.map((node, j) => (
-                <div key={node.id} className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
+                <div
+                  key={node.id}
+                  className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center"
+                >
                   {j > 0 ? <Arrow /> : null}
                   <NodeCard node={node} />
                 </div>
@@ -427,10 +472,15 @@ export function ArchDiagram({ diagram }: { diagram: Diagram }) {
       <figure className="my-5 overflow-hidden rounded-lg border border-border bg-inset">
         {diagram.layers.map((layer, i) => (
           <div key={layer.title} className={cn("px-4 py-3", i > 0 && "border-t border-border")}>
-            <div className="mb-2 text-[11px] font-medium uppercase tracking-[0.14em] text-faint">{layer.title}</div>
+            <div className="mb-2 text-[11px] font-medium uppercase tracking-[0.14em] text-faint">
+              {layer.title}
+            </div>
             <div className="flex flex-wrap gap-2">
               {layer.items.map((item) => (
-                <span key={item} className="rounded-md border border-border bg-raised px-2.5 py-1 text-xs text-fg">
+                <span
+                  key={item}
+                  className="rounded-md border border-border bg-raised px-2.5 py-1 text-xs text-fg"
+                >
                   {item}
                 </span>
               ))}
@@ -438,7 +488,9 @@ export function ArchDiagram({ diagram }: { diagram: Diagram }) {
           </div>
         ))}
         {diagram.caption ? (
-          <figcaption className="border-t border-border px-4 py-2 text-xs text-muted">{diagram.caption}</figcaption>
+          <figcaption className="border-t border-border px-4 py-2 text-xs text-muted">
+            {diagram.caption}
+          </figcaption>
         ) : null}
       </figure>
     );

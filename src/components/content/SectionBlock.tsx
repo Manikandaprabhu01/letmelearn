@@ -76,7 +76,9 @@ export function SectionBlock({ section, index }: { section: Section; index: numb
         <ol className="mt-3 max-w-prose space-y-2 text-[15px] leading-6 text-muted">
           {section.numbered.map((b, i) => (
             <li key={b} className="flex gap-3">
-              <span className="font-mono text-xs text-accent tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+              <span className="font-mono text-xs text-accent tabular-nums">
+                {String(i + 1).padStart(2, "0")}
+              </span>
               <span>{b}</span>
             </li>
           ))}
@@ -111,7 +113,9 @@ export function SectionBlock({ section, index }: { section: Section; index: numb
                   <th className="w-[28%] px-3 py-2 align-top font-medium text-fg">{m.label}</th>
                   <td className="px-3 py-2 align-top font-mono text-[12px] text-muted">
                     {m.expr}
-                    {m.note ? <div className="mt-0.5 font-sans text-[11.5px] text-faint">{m.note}</div> : null}
+                    {m.note ? (
+                      <div className="mt-0.5 font-sans text-[11.5px] text-faint">{m.note}</div>
+                    ) : null}
                   </td>
                   <td className="w-[22%] whitespace-nowrap px-3 py-2 text-right align-top font-mono text-[12.5px] font-medium text-accent">
                     {m.result}
@@ -202,7 +206,9 @@ export function SectionBlock({ section, index }: { section: Section; index: numb
 
       {section.takeaways ? (
         <div className="mt-4 rounded-lg border border-accent/25 bg-accent/6 px-4 py-3">
-          <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-accent">Takeaways</div>
+          <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-accent">
+            Takeaways
+          </div>
           <ul className="mt-2 space-y-1.5">
             {section.takeaways.map((t) => (
               <li key={t} className="flex gap-2 text-[14px] leading-6 text-muted">

@@ -99,17 +99,30 @@ register("sms",   (d) => new SmsNotifier(d.twilio));`,
               stereotype: "abstract",
               tone: "accent",
               members: [
-                { name: "run(rows)", kind: "method", note: "template: open → write → close → upload" },
-                { name: "createWriter(): Writer", kind: "method", vis: "#", note: "the factory method" },
+                {
+                  name: "run(rows)",
+                  kind: "method",
+                  note: "template: open → write → close → upload",
+                },
+                {
+                  name: "createWriter(): Writer",
+                  kind: "method",
+                  vis: "#",
+                  note: "the factory method",
+                },
               ],
             },
             {
               name: "CsvExportJob",
-              members: [{ name: "createWriter()", kind: "method", vis: "#", note: "returns CsvWriter" }],
+              members: [
+                { name: "createWriter()", kind: "method", vis: "#", note: "returns CsvWriter" },
+              ],
             },
             {
               name: "ParquetExportJob",
-              members: [{ name: "createWriter()", kind: "method", vis: "#", note: "returns ParquetWriter" }],
+              members: [
+                { name: "createWriter()", kind: "method", vis: "#", note: "returns ParquetWriter" },
+              ],
             },
             {
               name: "Writer",
@@ -124,7 +137,12 @@ register("sms",   (d) => new SmsNotifier(d.twilio));`,
           edges: [
             { from: "CsvExportJob", to: "ExportJob", kind: "extends" },
             { from: "ParquetExportJob", to: "ExportJob", kind: "extends" },
-            { from: "ExportJob", to: "Writer", kind: "uses", label: "created by the factory method" },
+            {
+              from: "ExportJob",
+              to: "Writer",
+              kind: "uses",
+              label: "created by the factory method",
+            },
           ],
         },
         code: {
@@ -213,7 +231,9 @@ const factory: StorageFactory =
       },
     ],
     related: ["/lld/builder", "/lld/strategy", "/lld/dependency-injection", "/lld/singleton-di"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -312,20 +332,40 @@ interface Ready       { header(k: string, v: string): Ready;
               title: "Named / default arguments",
               sub: "Kotlin, Python, TS object literal",
               tone: "ok",
-              good: ["No extra class", "Compiler checks required fields", "Reads well at the call site"],
-              bad: ["No natural place for cross-field validation", "Awkward if construction happens in steps across a codebase"],
+              good: [
+                "No extra class",
+                "Compiler checks required fields",
+                "Reads well at the call site",
+              ],
+              bad: [
+                "No natural place for cross-field validation",
+                "Awkward if construction happens in steps across a codebase",
+              ],
               verdict: "Default choice in a language that has them.",
             },
             {
               title: "Classic fluent builder",
-              good: ["Cross-field validation in build()", "Assembly can be spread across code paths", "Product can stay immutable"],
-              bad: ["Missing required field fails at runtime", "Boilerplate, and two objects to keep in sync"],
+              good: [
+                "Cross-field validation in build()",
+                "Assembly can be spread across code paths",
+                "Product can stay immutable",
+              ],
+              bad: [
+                "Missing required field fails at runtime",
+                "Boilerplate, and two objects to keep in sync",
+              ],
               verdict: "Java-style APIs, or when assembly is genuinely multi-step.",
             },
             {
               title: "Staged builder",
-              good: ["Required fields enforced by the type system", "Impossible to call build() too early"],
-              bad: ["One interface per stage; verbose", "Painful when ordering is not naturally linear"],
+              good: [
+                "Required fields enforced by the type system",
+                "Impossible to call build() too early",
+              ],
+              bad: [
+                "One interface per stage; verbose",
+                "Painful when ordering is not naturally linear",
+              ],
               verdict: "Public SDKs where misuse must be impossible.",
             },
           ],
@@ -403,6 +443,8 @@ const req = Presets.thirdParty(HttpRequest.builder(url)).method("GET").build();`
       },
     ],
     related: ["/lld/factory", "/lld/solid", "/lld/repository"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 ];

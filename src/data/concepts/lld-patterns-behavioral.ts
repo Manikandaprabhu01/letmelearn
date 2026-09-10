@@ -137,11 +137,31 @@ class Pricing {
         table: {
           headers: ["Pattern", "Intent", "Tell them apart by"],
           rows: [
-            ["Strategy", "Interchangeable algorithms for one step", "Caller picks; all options are peers"],
-            ["State", "Behaviour changes as the object's state changes", "The object swaps its own strategy in response to events"],
-            ["Template method", "Fixed skeleton, subclass fills steps", "Inheritance; the algorithm's shape is fixed"],
-            ["Decorator", "Add behaviour around the same interface", "Wraps and delegates; can stack"],
-            ["Command", "Encapsulate an invocation for later", "Carries the arguments; can be queued and undone"],
+            [
+              "Strategy",
+              "Interchangeable algorithms for one step",
+              "Caller picks; all options are peers",
+            ],
+            [
+              "State",
+              "Behaviour changes as the object's state changes",
+              "The object swaps its own strategy in response to events",
+            ],
+            [
+              "Template method",
+              "Fixed skeleton, subclass fills steps",
+              "Inheritance; the algorithm's shape is fixed",
+            ],
+            [
+              "Decorator",
+              "Add behaviour around the same interface",
+              "Wraps and delegates; can stack",
+            ],
+            [
+              "Command",
+              "Encapsulate an invocation for later",
+              "Carries the arguments; can be queued and undone",
+            ],
           ],
         },
         callout: {
@@ -298,11 +318,23 @@ off();`,
             { id: "stats", label: "AnalyticsObserver" },
           ],
           messages: [
-            { from: "svc", to: "db", label: "INSERT order + INSERT outbox row (one tx)", kind: "call", note: "event is durable exactly when the order is" },
+            {
+              from: "svc",
+              to: "db",
+              label: "INSERT order + INSERT outbox row (one tx)",
+              kind: "call",
+              note: "event is durable exactly when the order is",
+            },
             { from: "db", to: "svc", label: "COMMIT", kind: "return", tone: "ok" },
             { from: "bus", to: "db", label: "poll outbox", kind: "call" },
             { from: "bus", to: "mail", label: "OrderPlaced", kind: "async" },
-            { from: "bus", to: "stats", label: "OrderPlaced", kind: "async", note: "independent retry per observer" },
+            {
+              from: "bus",
+              to: "stats",
+              label: "OrderPlaced",
+              kind: "async",
+              note: "independent retry per observer",
+            },
             { from: "mail", to: "bus", label: "ack", kind: "return" },
           ],
         },
@@ -310,10 +342,18 @@ off();`,
           headers: ["", "Synchronous", "Asynchronous"],
           rows: [
             ["Latency", "Publisher waits for every observer", "Publisher returns immediately"],
-            ["Failure isolation", "Needs try/catch per observer", "Natural — separate consumers, separate retries"],
+            [
+              "Failure isolation",
+              "Needs try/catch per observer",
+              "Natural — separate consumers, separate retries",
+            ],
             ["Ordering", "Guaranteed, in subscription order", "Only within a partition, if at all"],
             ["Delivery", "Exactly once, in-memory", "At least once — observers must be idempotent"],
-            ["Transactions", "Can run inside the publisher's tx", "Needs an outbox to avoid 'committed but never published'"],
+            [
+              "Transactions",
+              "Can run inside the publisher's tx",
+              "Needs an outbox to avoid 'committed but never published'",
+            ],
             ["Debugging", "One stack trace", "Correlation ids and a trace, or you are guessing"],
           ],
         },
@@ -372,7 +412,9 @@ off();`,
       },
     ],
     related: ["/hld/message-queues", "/hld/pub-sub", "/lld/command", "/lld/concurrency"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 
   {
@@ -411,7 +453,11 @@ off();`,
               name: "InsertText",
               members: [
                 { name: "at: int, text: string", kind: "field", vis: "-" },
-                { name: "execute() / undo()", kind: "method", note: "undo deletes what it inserted" },
+                {
+                  name: "execute() / undo()",
+                  kind: "method",
+                  note: "undo deletes what it inserted",
+                },
               ],
             },
             {
@@ -495,9 +541,16 @@ class CommandHistory {
             {
               title: "Memento / snapshot",
               sub: "undo restores captured state",
-              good: ["Always works, including for lossy operations", "Simple to reason about and to test"],
-              bad: ["Memory grows with document size × history depth", "Snapshotting large state is slow"],
-              verdict: "Lossy or complex operations; cap the history, or snapshot only the touched region.",
+              good: [
+                "Always works, including for lossy operations",
+                "Simple to reason about and to test",
+              ],
+              bad: [
+                "Memory grows with document size × history depth",
+                "Snapshotting large state is slow",
+              ],
+              verdict:
+                "Lossy or complex operations; cap the history, or snapshot only the touched region.",
             },
           ],
         },
@@ -546,12 +599,36 @@ async function work(job: Job, attempt: number) {
         table: {
           headers: ["Use", "What the command becomes", "What it buys"],
           rows: [
-            ["Undo/redo", "Two stacks of commands", "Editor semantics with no special-casing per operation"],
-            ["Job queue", "A serialised row or message", "Retry, backoff, scheduling, crash recovery"],
-            ["Transactional outbox", "A command written in the same tx as the state change", "No lost events when the process dies after commit"],
-            ["Macro / composite", "A command containing commands", "Batching and 'undo the whole thing' in one step"],
-            ["Event sourcing", "An immutable log of commands' results", "Time travel, audit, rebuilding read models"],
-            ["CQRS write side", "A command object validated then applied", "One explicit place for invariants"],
+            [
+              "Undo/redo",
+              "Two stacks of commands",
+              "Editor semantics with no special-casing per operation",
+            ],
+            [
+              "Job queue",
+              "A serialised row or message",
+              "Retry, backoff, scheduling, crash recovery",
+            ],
+            [
+              "Transactional outbox",
+              "A command written in the same tx as the state change",
+              "No lost events when the process dies after commit",
+            ],
+            [
+              "Macro / composite",
+              "A command containing commands",
+              "Batching and 'undo the whole thing' in one step",
+            ],
+            [
+              "Event sourcing",
+              "An immutable log of commands' results",
+              "Time travel, audit, rebuilding read models",
+            ],
+            [
+              "CQRS write side",
+              "A command object validated then applied",
+              "One explicit place for invariants",
+            ],
           ],
         },
       },
@@ -578,6 +655,8 @@ async function work(job: Job, attempt: number) {
       },
     ],
     related: ["/lld/observer", "/hld/message-queues", "/hld/idempotency", "/lld/strategy"],
-    furtherReading: [{ label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
+    ],
   },
 ];

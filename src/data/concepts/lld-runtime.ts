@@ -4,7 +4,8 @@ export const lldRuntime: Concept[] = [
   {
     slug: "logging",
     title: "Design a Logging Framework",
-    subtitle: "Levels, appenders, formatters — and the async ring buffer that keeps it off the hot path.",
+    subtitle:
+      "Levels, appenders, formatters — and the async ring buffer that keeps it off the hot path.",
     level: "intermediate",
     minutes: 15,
     tags: ["machine-coding", "patterns", "observability"],
@@ -44,7 +45,12 @@ export const lldRuntime: Concept[] = [
               tone: "accent",
               members: [
                 { name: "name: string", kind: "field", vis: "-" },
-                { name: "level: Level", kind: "field", vis: "-", note: "volatile; changeable at runtime" },
+                {
+                  name: "level: Level",
+                  kind: "field",
+                  vis: "-",
+                  note: "volatile; changeable at runtime",
+                },
                 { name: "info(msg, fields)", kind: "method" },
                 { name: "isEnabled(level): boolean", kind: "method", note: "the hot-path check" },
                 { name: "with(fields): Logger", kind: "method", note: "child with bound context" },
@@ -93,7 +99,12 @@ export const lldRuntime: Concept[] = [
             { from: "Logger", to: "Appender", kind: "uses", label: "fan-out to many" },
             { from: "AsyncAppender", to: "Appender", kind: "implements" },
             { from: "RollingFileAppender", to: "Appender", kind: "implements" },
-            { from: "AsyncAppender", to: "RollingFileAppender", kind: "has", label: "decorates: queue in front of the real sink" },
+            {
+              from: "AsyncAppender",
+              to: "RollingFileAppender",
+              kind: "has",
+              label: "decorates: queue in front of the real sink",
+            },
             { from: "RollingFileAppender", to: "Formatter", kind: "uses" },
             { from: "Logger", to: "LogEvent", kind: "uses", label: "creates" },
           ],
@@ -193,10 +204,26 @@ log.debug("state", () => ({ state: bigObject }));   // lazy: only runs if enable
         table: {
           headers: ["Back-pressure policy", "Behaviour when full", "Use when"],
           rows: [
-            ["Drop newest", "New events discarded; oldest history preserved", "Default — cheapest, keeps the events leading to the incident"],
-            ["Drop oldest", "Ring overwrites; you keep the most recent context", "Debugging a crash, where the last lines matter most"],
-            ["Block the caller", "Back-pressure reaches the request", "Audit logs that legally cannot be lost"],
-            ["Sample below a level", "Keep all errors, sample info/debug", "High-volume services; the practical hybrid"],
+            [
+              "Drop newest",
+              "New events discarded; oldest history preserved",
+              "Default — cheapest, keeps the events leading to the incident",
+            ],
+            [
+              "Drop oldest",
+              "Ring overwrites; you keep the most recent context",
+              "Debugging a crash, where the last lines matter most",
+            ],
+            [
+              "Block the caller",
+              "Back-pressure reaches the request",
+              "Audit logs that legally cannot be lost",
+            ],
+            [
+              "Sample below a level",
+              "Keep all errors, sample info/debug",
+              "High-volume services; the practical hybrid",
+            ],
           ],
         },
         callout: {
@@ -251,12 +278,36 @@ app.use((req, res, next) =>
         table: {
           headers: ["Pattern", "Where", "Why it fits"],
           rows: [
-            ["Strategy", "Formatter (JSON, text, logfmt)", "Interchangeable rendering with one interface"],
-            ["Decorator", "AsyncAppender wrapping FileAppender", "Adds queueing without the sink knowing"],
-            ["Observer", "Logger fanning out to appenders", "One event, many independent destinations"],
-            ["Chain of responsibility", "Hierarchical logger levels", "Resolution walks up the name hierarchy"],
-            ["Builder", "Configuring appenders and rotation", "Many optional settings, validated together"],
-            ["Singleton (scoped)", "LoggerFactory", "One registry — constructed once and injected, not a global"],
+            [
+              "Strategy",
+              "Formatter (JSON, text, logfmt)",
+              "Interchangeable rendering with one interface",
+            ],
+            [
+              "Decorator",
+              "AsyncAppender wrapping FileAppender",
+              "Adds queueing without the sink knowing",
+            ],
+            [
+              "Observer",
+              "Logger fanning out to appenders",
+              "One event, many independent destinations",
+            ],
+            [
+              "Chain of responsibility",
+              "Hierarchical logger levels",
+              "Resolution walks up the name hierarchy",
+            ],
+            [
+              "Builder",
+              "Configuring appenders and rotation",
+              "Many optional settings, validated together",
+            ],
+            [
+              "Singleton (scoped)",
+              "LoggerFactory",
+              "One registry — constructed once and injected, not a global",
+            ],
           ],
         },
       },
@@ -374,7 +425,8 @@ if (!claimed) throw new SeatTaken();
           {
             title: "Make it immutable",
             text: "An object that never changes after construction is safe to share by definition. Return new instances instead of mutating; keep mutable state in one small, well-guarded place.",
-            detail: "Value objects (Money, Instant), copy-on-write config, persistent data structures",
+            detail:
+              "Value objects (Money, Instant), copy-on-write config, persistent data structures",
           },
           {
             title: "Use an atomic",
@@ -456,7 +508,8 @@ void transfer(Account from, Account to, Money amount) {
                 "Deadlock risk grows with the number of locks",
                 "Terrible across a network — a lock plus a round trip",
               ],
-              verdict: "High contention on the same rows: seat booking, inventory of one, a hot counter.",
+              verdict:
+                "High contention on the same rows: seat booking, inventory of one, a hot counter.",
             },
             {
               title: "Optimistic — detect on write",
@@ -472,7 +525,8 @@ void transfer(Account from, Account to, Money amount) {
                 "Under high contention, retries can livelock without backoff",
                 "Caller must handle the retry; it cannot be hidden entirely",
               ],
-              verdict: "Low-to-moderate contention: editing a profile, updating an order, most CRUD.",
+              verdict:
+                "Low-to-moderate contention: editing a profile, updating an order, most CRUD.",
             },
           ],
         },

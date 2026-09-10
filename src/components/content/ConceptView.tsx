@@ -54,7 +54,9 @@ export function ConceptView({
           <div className="min-w-0 flex-1 space-y-10">
             <div className="space-y-4">
               <p className="max-w-prose text-[16px] leading-7 text-fg">{concept.summary}</p>
-              {concept.prerequisites?.length ? <Prerequisites paths={concept.prerequisites} /> : null}
+              {concept.prerequisites?.length ? (
+                <Prerequisites paths={concept.prerequisites} />
+              ) : null}
             </div>
 
             {concept.keyPoints?.length ? (
@@ -88,7 +90,9 @@ export function ConceptView({
 
             {concept.furtherReading.length ? (
               <div>
-                <h2 className="text-[11px] font-medium uppercase tracking-[0.16em] text-faint">Sources</h2>
+                <h2 className="text-[11px] font-medium uppercase tracking-[0.16em] text-faint">
+                  Sources
+                </h2>
                 <ul className="mt-3 space-y-2">
                   {concept.furtherReading.map((l) => (
                     <li key={l.href}>

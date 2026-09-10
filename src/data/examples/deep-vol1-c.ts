@@ -76,15 +76,36 @@ export const vol1DeepC: DesignExample[] = [
       },
     ],
     apis: [
-      { method: "GET", path: "/v1/rules?key=&endpoint=", desc: "Rules service — limits by tier and route, cached locally with a short TTL" },
-      { method: "INTERNAL", path: "allow(key, endpoint, cost) → Decision", desc: "The hot path — returns ok, remaining, resetAt, retryAfter" },
+      {
+        method: "GET",
+        path: "/v1/rules?key=&endpoint=",
+        desc: "Rules service — limits by tier and route, cached locally with a short TTL",
+      },
+      {
+        method: "INTERNAL",
+        path: "allow(key, endpoint, cost) → Decision",
+        desc: "The hot path — returns ok, remaining, resetAt, retryAfter",
+      },
       { method: "PUT", path: "/v1/rules/{tier}", desc: "Update limits without a deploy" },
-      { method: "GET", path: "/v1/usage/{key}", desc: "Customer-facing usage, so limits are not a surprise" },
+      {
+        method: "GET",
+        path: "/v1/usage/{key}",
+        desc: "Customer-facing usage, so limits are not a surprise",
+      },
     ],
     dataModel: [
-      { entity: "rules", fields: ["tier (pk)", "endpoint", "limit", "window_seconds", "cost_multiplier", "burst"] },
-      { entity: "bucket:{key}:{endpoint}", fields: ["Redis hash", "tokens (float)", "ts (ms)", "PEXPIRE ≈ 2× refill time"] },
-      { entity: "exemptions", fields: ["key (pk)", "reason", "expires_at", "→ audited, never permanent by default"] },
+      {
+        entity: "rules",
+        fields: ["tier (pk)", "endpoint", "limit", "window_seconds", "cost_multiplier", "burst"],
+      },
+      {
+        entity: "bucket:{key}:{endpoint}",
+        fields: ["Redis hash", "tokens (float)", "ts (ms)", "PEXPIRE ≈ 2× refill time"],
+      },
+      {
+        entity: "exemptions",
+        fields: ["key (pk)", "reason", "expires_at", "→ audited, never permanent by default"],
+      },
     ],
     architecture: [
       {
@@ -95,9 +116,7 @@ export const vol1DeepC: DesignExample[] = [
           columns: [
             {
               title: "Edge",
-              nodes: [
-                { id: "cdn", label: "CDN / WAF", sub: "volumetric, per-IP", tone: "accent" },
-              ],
+              nodes: [{ id: "cdn", label: "CDN / WAF", sub: "volumetric, per-IP", tone: "accent" }],
             },
             {
               title: "Gateway",
@@ -167,11 +186,41 @@ class TokenBucket {
         table: {
           headers: ["Algorithm", "Memory/key", "Burst", "Exact?", "Use"],
           rows: [
-            ["Token bucket", "2 numbers", "Up to capacity", "Yes, by its definition", "The default for API limits"],
-            ["Leaky bucket", "A bounded queue", "Absorbed, output smoothed", "Yes, on output rate", "Protecting a downstream that cannot burst"],
-            ["Fixed window", "1 counter", "Up to 2× at a boundary", "No", "Cheapest; coarse protection"],
-            ["Sliding window log", "O(limit) timestamps", "None", "Yes", "Low limits where exactness matters (logins)"],
-            ["Sliding window counter", "3 numbers", "Small overshoot", "Approximate", "Per-minute limits at scale"],
+            [
+              "Token bucket",
+              "2 numbers",
+              "Up to capacity",
+              "Yes, by its definition",
+              "The default for API limits",
+            ],
+            [
+              "Leaky bucket",
+              "A bounded queue",
+              "Absorbed, output smoothed",
+              "Yes, on output rate",
+              "Protecting a downstream that cannot burst",
+            ],
+            [
+              "Fixed window",
+              "1 counter",
+              "Up to 2× at a boundary",
+              "No",
+              "Cheapest; coarse protection",
+            ],
+            [
+              "Sliding window log",
+              "O(limit) timestamps",
+              "None",
+              "Yes",
+              "Low limits where exactness matters (logins)",
+            ],
+            [
+              "Sliding window counter",
+              "3 numbers",
+              "Small overshoot",
+              "Approximate",
+              "Per-minute limits at scale",
+            ],
           ],
         },
         callout: {
@@ -192,11 +241,30 @@ class TokenBucket {
           ],
           messages: [
             { from: "c", to: "gw", label: "GET /v1/search", kind: "call" },
-            { from: "gw", to: "l", label: "check local share", kind: "call", note: "no network when comfortably under" },
+            {
+              from: "gw",
+              to: "l",
+              label: "check local share",
+              kind: "call",
+              note: "no network when comfortably under",
+            },
             { from: "l", to: "gw", label: "remaining 70% → allow", kind: "return", tone: "ok" },
-            { from: "gw", to: "r", label: "EVALSHA rate_limit(key, now)", kind: "call", tone: "warn", note: "only when the key approaches its limit" },
+            {
+              from: "gw",
+              to: "r",
+              label: "EVALSHA rate_limit(key, now)",
+              kind: "call",
+              tone: "warn",
+              note: "only when the key approaches its limit",
+            },
             { from: "r", to: "gw", label: "[allowed, remaining]", kind: "return" },
-            { from: "gw", to: "c", label: "429 + Retry-After when denied", kind: "return", tone: "warn" },
+            {
+              from: "gw",
+              to: "c",
+              label: "429 + Retry-After when denied",
+              kind: "return",
+              tone: "warn",
+            },
           ],
         },
         code: {
@@ -243,12 +311,14 @@ return { allowed and 1 or 0, math.floor(tokens) }`,
           {
             title: "Add a local pre-filter",
             text: "Keep an in-process bucket sized to this gateway's share. Only consult Redis when a key gets within, say, 30% of its limit. Cold keys cost nothing; hot keys stay accurate.",
-            detail: "Typically removes 90%+ of Redis calls, because most keys are nowhere near their limit.",
+            detail:
+              "Typically removes 90%+ of Redis calls, because most keys are nowhere near their limit.",
           },
           {
             title: "Or distribute the budget",
             text: "Divide the global limit across N gateways and redistribute periodically based on observed demand, so idle gateways donate capacity to busy ones.",
-            detail: "Works well with even routing; poorly when traffic is skewed to a few gateways.",
+            detail:
+              "Works well with even routing; poorly when traffic is skewed to a few gateways.",
           },
           {
             title: "Decide the failure policy per route",
@@ -380,7 +450,12 @@ Content-Type: application/json
         a: "I would want the limiter to emit, on a sampled basis, which key, which rule and which limit fired, along with the remaining count. Without that the complaint is unfalsifiable. The most common genuine cause is an IP-based limit hitting a shared NAT, which is an argument for authenticating traffic and limiting per key wherever possible.",
       },
     ],
-    related: ["/hld/rate-limiting", "/lld/rate-limiter", "/hld/api-gateway", "/playgrounds/rate-limiter"],
+    related: [
+      "/hld/rate-limiting",
+      "/lld/rate-limiter",
+      "/hld/api-gateway",
+      "/playgrounds/rate-limiter",
+    ],
     furtherReading: [
       {
         label: "Rate limiter playground",
@@ -472,19 +547,83 @@ Content-Type: application/json
       },
     ],
     apis: [
-      { method: "POST", path: "/v1/notifications", desc: "Enqueue — body {userId, templateId, vars, channels?, idempotencyKey}" },
-      { method: "POST", path: "/v1/notifications/bulk", desc: "Campaign — a segment id rather than a list of users" },
+      {
+        method: "POST",
+        path: "/v1/notifications",
+        desc: "Enqueue — body {userId, templateId, vars, channels?, idempotencyKey}",
+      },
+      {
+        method: "POST",
+        path: "/v1/notifications/bulk",
+        desc: "Campaign — a segment id rather than a list of users",
+      },
       { method: "GET", path: "/v1/notifications/{id}", desc: "Status per channel and per attempt" },
-      { method: "PUT", path: "/v1/users/{id}/preferences", desc: "Per-channel, per-category opt-in and quiet hours" },
-      { method: "POST", path: "/v1/devices", desc: "Register a device token; provider feedback prunes dead ones" },
-      { method: "POST", path: "/webhooks/{provider}", desc: "Delivery and bounce callbacks — signature-verified" },
+      {
+        method: "PUT",
+        path: "/v1/users/{id}/preferences",
+        desc: "Per-channel, per-category opt-in and quiet hours",
+      },
+      {
+        method: "POST",
+        path: "/v1/devices",
+        desc: "Register a device token; provider feedback prunes dead ones",
+      },
+      {
+        method: "POST",
+        path: "/webhooks/{provider}",
+        desc: "Delivery and bounce callbacks — signature-verified",
+      },
     ],
     dataModel: [
-      { entity: "notifications", fields: ["id (pk)", "user_id (idx)", "template_id", "vars (json)", "status", "created_at", "idempotency_key (unique)"] },
-      { entity: "deliveries", fields: ["notification_id (fk)", "channel", "provider", "provider_message_id", "state", "attempts", "last_error"] },
-      { entity: "devices", fields: ["user_id (idx)", "token (unique)", "platform", "app_version", "last_seen", "invalid_at"] },
-      { entity: "preferences", fields: ["user_id (pk part)", "category (pk part)", "channels[]", "quiet_hours", "timezone"] },
-      { entity: "templates", fields: ["id (pk)", "locale", "channel", "subject", "body", "version"] },
+      {
+        entity: "notifications",
+        fields: [
+          "id (pk)",
+          "user_id (idx)",
+          "template_id",
+          "vars (json)",
+          "status",
+          "created_at",
+          "idempotency_key (unique)",
+        ],
+      },
+      {
+        entity: "deliveries",
+        fields: [
+          "notification_id (fk)",
+          "channel",
+          "provider",
+          "provider_message_id",
+          "state",
+          "attempts",
+          "last_error",
+        ],
+      },
+      {
+        entity: "devices",
+        fields: [
+          "user_id (idx)",
+          "token (unique)",
+          "platform",
+          "app_version",
+          "last_seen",
+          "invalid_at",
+        ],
+      },
+      {
+        entity: "preferences",
+        fields: [
+          "user_id (pk part)",
+          "category (pk part)",
+          "channels[]",
+          "quiet_hours",
+          "timezone",
+        ],
+      },
+      {
+        entity: "templates",
+        fields: ["id (pk)", "locale", "channel", "subject", "body", "version"],
+      },
     ],
     architecture: [
       {
@@ -503,8 +642,18 @@ Content-Type: application/json
             {
               title: "Ingest",
               nodes: [
-                { id: "api", label: "Notification API", sub: "validate, dedupe, persist", tone: "accent" },
-                { id: "pref", label: "Preference filter", sub: "opt-out, quiet hours, caps", tone: "warn" },
+                {
+                  id: "api",
+                  label: "Notification API",
+                  sub: "validate, dedupe, persist",
+                  tone: "accent",
+                },
+                {
+                  id: "pref",
+                  label: "Preference filter",
+                  sub: "opt-out, quiet hours, caps",
+                  tone: "warn",
+                },
               ],
             },
             {
@@ -530,12 +679,14 @@ Content-Type: application/json
           {
             title: "Accept and persist",
             text: "Validate, apply the idempotency key, write the notification row, and return. The caller's request is done in milliseconds and the work is durable.",
-            detail: "Use the transactional outbox so the queue message and the row commit together.",
+            detail:
+              "Use the transactional outbox so the queue message and the row commit together.",
           },
           {
             title: "Resolve preferences",
             text: "Opt-outs, per-category channel choices, quiet hours in the user's time zone, and per-user frequency caps. This is the step that keeps users from unsubscribing entirely.",
-            detail: "Transactional notifications bypass quiet hours; promotional ones do not. Encode that as a property of the template.",
+            detail:
+              "Transactional notifications bypass quiet hours; promotional ones do not. Encode that as a property of the template.",
           },
           {
             title: "Render",
@@ -702,8 +853,16 @@ function scheduleFor(user: User, localHour = 9): Date {
             ["Queue depth per channel", "Backlog growth", "Oldest message age, not raw count"],
             ["Provider error rate", "Provider degradation", "Per-provider, per-error-class"],
             ["DLQ depth", "Silent data loss", "Anything above zero"],
-            ["Delivery rate (webhooks)", "Sent ≠ delivered", "A drop, which often means token or reputation problems"],
-            ["Complaint rate (email)", "Reputation damage", "Above ~0.1% — providers may throttle you"],
+            [
+              "Delivery rate (webhooks)",
+              "Sent ≠ delivered",
+              "A drop, which often means token or reputation problems",
+            ],
+            [
+              "Complaint rate (email)",
+              "Reputation damage",
+              "Above ~0.1% — providers may throttle you",
+            ],
             ["Per-user send count", "Runaway rules", "Any user over the frequency cap"],
           ],
         },

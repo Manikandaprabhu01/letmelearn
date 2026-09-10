@@ -13,5 +13,9 @@ export function headingId(heading: string, index: number) {
 export type TocEntry = { id: string; label: string; group?: string };
 
 export function tocFromSections(sections: Section[], group?: string, offset = 0): TocEntry[] {
-  return sections.map((s, i) => ({ id: headingId(s.heading, i + offset), label: s.heading, group }));
+  return sections.map((s, i) => ({
+    id: headingId(s.heading, i + offset),
+    label: s.heading,
+    group,
+  }));
 }
