@@ -291,14 +291,14 @@ private sweep(budget = 200) {
         ],
       },
     ],
-    related: ["/hld/caching", "/playgrounds/lru", "/lld/proxy", "/hld/consistent-hashing"],
+    related: ["/hld/caching", "/playgrounds/lru-cache", "/lld/proxy", "/hld/consistent-hashing"],
     furtherReading: [
       {
         label: "awesome-system-design-resources",
         href: "https://github.com/ashishps1/awesome-system-design-resources",
       },
     ],
-    playground: "lru",
+    playground: "lru-cache",
   },
 
   {
