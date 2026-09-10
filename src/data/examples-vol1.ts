@@ -13,15 +13,8 @@ export const vol1Examples: DesignExample[] = [
     summary:
       "The opening chapter of Alex Xu Volume 1 is a tour of the standard web stack: one server, then split, load balance, cache, replica, CDN, queue, and shard. Use it as the skeleton under every later design.",
     requirements: {
-      functional: [
-        "Users can read and write the product's core objects",
-        "Sessions survive more than one app box",
-      ],
-      nonFunctional: [
-        "Grow from 1 to 10M users without a rewrite",
-        "Survive a single-AZ app failure",
-        "Keep p95 latency interactive",
-      ],
+      functional: ["Users can read and write the product's core objects", "Sessions survive more than one app box"],
+      nonFunctional: ["Grow from 1 to 10M users without a rewrite", "Survive a single-AZ app failure", "Keep p95 latency interactive"],
     },
     architecture: [
       {
@@ -43,10 +36,7 @@ export const vol1Examples: DesignExample[] = [
             { title: "Stateless", items: ["Web / API fleet"] },
             { title: "Stateful fast", items: ["Redis cache / sessions"] },
             { title: "Async", items: ["Queue + workers"] },
-            {
-              title: "Source of truth",
-              items: ["Primary DB", "Replicas", "Shards", "Object storage"],
-            },
+            { title: "Source of truth", items: ["Primary DB", "Replicas", "Shards", "Object storage"] },
           ],
         },
       },
@@ -60,21 +50,11 @@ export const vol1Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      {
-        choice: "Vertical first",
-        pickWhen: "Early product, strong transactions, small team",
-        cost: "Ceiling and blast radius",
-      },
-      {
-        choice: "Shard early",
-        pickWhen: "Write-heavy, obvious partition key (tenant, city)",
-        cost: "Joins and ops forever",
-      },
+      { choice: "Vertical first", pickWhen: "Early product, strong transactions, small team", cost: "Ceiling and blast radius" },
+      { choice: "Shard early", pickWhen: "Write-heavy, obvious partition key (tenant, city)", cost: "Joins and ops forever" },
     ],
     related: ["/hld/scaling", "/hld/caching", "/hld/load-balancing"],
-    furtherReading: [
-      { label: "roadmap.sh system design", href: "https://roadmap.sh/system-design" },
-    ],
+    furtherReading: [{ label: "roadmap.sh system design", href: "https://roadmap.sh/system-design" }],
   },
   {
     slug: "interview-framework",
@@ -120,24 +100,11 @@ export const vol1Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      {
-        choice: "Go deep on one subsystem",
-        pickWhen: "45–60 min interviews",
-        cost: "Thin coverage of the rest — say so",
-      },
-      {
-        choice: "Survey everything",
-        pickWhen: "Junior loops, or the interviewer wants breadth",
-        cost: "Looks shallow if you never pick a hard part",
-      },
+      { choice: "Go deep on one subsystem", pickWhen: "45–60 min interviews", cost: "Thin coverage of the rest — say so" },
+      { choice: "Survey everything", pickWhen: "Junior loops, or the interviewer wants breadth", cost: "Looks shallow if you never pick a hard part" },
     ],
     related: ["/hld/estimation", "/examples/rate-limiter", "/examples/url-shortener"],
-    furtherReading: [
-      {
-        label: "roadmap.sh interview questions",
-        href: "https://roadmap.sh/questions/system-design",
-      },
-    ],
+    furtherReading: [{ label: "roadmap.sh interview questions", href: "https://roadmap.sh/questions/system-design" }],
   },
   {
     slug: "rate-limiter",
@@ -156,25 +123,14 @@ export const vol1Examples: DesignExample[] = [
         "Return 429 with Retry-After and remaining quota headers",
         "Rules change without a deploy",
       ],
-      nonFunctional: [
-        "Adds < few ms on the hot path",
-        "Accurate enough across a fleet of app servers",
-        "Survives Redis blips without melting origin",
-      ],
+      nonFunctional: ["Adds < few ms on the hot path", "Accurate enough across a fleet of app servers", "Survives Redis blips without melting origin"],
     },
     estimation: [
       { item: "Peak QPS", calc: "If the API is 100k QPS, the limiter sees 100k decisions/sec" },
-      {
-        item: "State",
-        calc: "One bucket per key. 10M active keys × ~50 B ≈ 0.5 GB in Redis — small",
-      },
+      { item: "State", calc: "One bucket per key. 10M active keys × ~50 B ≈ 0.5 GB in Redis — small" },
     ],
     apis: [
-      {
-        method: "ANY",
-        path: "/…",
-        desc: "Middleware wraps existing APIs. Decision is allow or 429.",
-      },
+      { method: "ANY", path: "/…", desc: "Middleware wraps existing APIs. Decision is allow or 429." },
       { method: "GET", path: "/internal/rules", desc: "Workers pull the rule set into cache." },
     ],
     architecture: [
@@ -227,23 +183,12 @@ export const vol1Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      {
-        choice: "Central Redis",
-        pickWhen: "You need one global limit",
-        cost: "Extra hop, a dependency",
-      },
-      {
-        choice: "Local token buckets + periodic sync",
-        pickWhen: "Ultra-low latency, approximate is OK",
-        cost: "Over-allow across boxes",
-      },
+      { choice: "Central Redis", pickWhen: "You need one global limit", cost: "Extra hop, a dependency" },
+      { choice: "Local token buckets + periodic sync", pickWhen: "Ultra-low latency, approximate is OK", cost: "Over-allow across boxes" },
     ],
     related: ["/playgrounds/rate-limiter", "/hld/rate-limiting", "/lld/rate-limiter"],
     furtherReading: [
-      {
-        label: "LLD rate-limiter playground",
-        href: "https://rawang9.github.io/LLD/web_content/rate-limiter-playground.html",
-      },
+      { label: "LLD rate-limiter playground", href: "https://rawang9.github.io/LLD/web_content/rate-limiter-playground.html" },
     ],
     playground: "rate-limiter",
   },
@@ -259,11 +204,7 @@ export const vol1Examples: DesignExample[] = [
     summary:
       "Volume 1 chapter 5. A hash ring plus virtual nodes so adding a cache or database host remaps only a slice of keys. This is the partitioning backbone of the key-value store chapter that follows.",
     requirements: {
-      functional: [
-        "Map key → server",
-        "Add/remove a server with minimal remapping",
-        "Balance load across heterogeneous boxes",
-      ],
+      functional: ["Map key → server", "Add/remove a server with minimal remapping", "Balance load across heterogeneous boxes"],
       nonFunctional: ["O(log n) lookup", "No central rebalance coordinator required"],
     },
     architecture: [
@@ -302,24 +243,11 @@ export const vol1Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      {
-        choice: "More vnodes",
-        pickWhen: "Load looks spiky",
-        cost: "Larger membership map, more remaps on a host fail",
-      },
-      {
-        choice: "Modulo hashing",
-        pickWhen: "N is fixed forever (it isn't)",
-        cost: "Near-total remap on change",
-      },
+      { choice: "More vnodes", pickWhen: "Load looks spiky", cost: "Larger membership map, more remaps on a host fail" },
+      { choice: "Modulo hashing", pickWhen: "N is fixed forever (it isn't)", cost: "Near-total remap on change" },
     ],
     related: ["/playgrounds/consistent-hashing", "/hld/consistent-hashing", "/examples/kv-store"],
-    furtherReading: [
-      {
-        label: "Dynamo paper §4.2",
-        href: "https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf",
-      },
-    ],
+    furtherReading: [{ label: "Dynamo paper §4.2", href: "https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf" }],
     playground: "consistent-hashing",
   },
   {
@@ -334,16 +262,8 @@ export const vol1Examples: DesignExample[] = [
     summary:
       "Volume 1 chapter 6 is a Dynamo-class AP store: consistent hashing, replication, sloppy quorum, gossip, Merkle trees, and hinted handoff. It is the hardest 'pure infrastructure' question in the first book.",
     requirements: {
-      functional: [
-        "put(key, value), get(key)",
-        "Tunable consistency",
-        "Survive disk and node loss",
-      ],
-      nonFunctional: [
-        "Million+ QPS class",
-        "Single-digit ms gets on hot keys",
-        "Always writable (AP lean)",
-      ],
+      functional: ["put(key, value), get(key)", "Tunable consistency", "Survive disk and node loss"],
+      nonFunctional: ["Million+ QPS class", "Single-digit ms gets on hot keys", "Always writable (AP lean)"],
     },
     architecture: [
       {
@@ -357,10 +277,7 @@ export const vol1Examples: DesignExample[] = [
             { title: "API", items: ["Coordinator / smart client"] },
             { title: "Membership", items: ["Hash ring", "Gossip", "Failure detector"] },
             { title: "Replication", items: ["N copies", "Quorum R/W", "Hinted handoff"] },
-            {
-              title: "Storage engine",
-              items: ["Commit log", "Memtable", "SSTables", "Compaction"],
-            },
+            { title: "Storage engine", items: ["Commit log", "Memtable", "SSTables", "Compaction"] },
           ],
         },
       },
@@ -380,34 +297,12 @@ export const vol1Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      {
-        choice: "W=N, R=1",
-        pickWhen: "Read-heavy, can wait on writes",
-        cost: "Writes fail if any replica is down",
-      },
-      {
-        choice: "W=1, R=1",
-        pickWhen: "Availability over correctness",
-        cost: "Easy to lose or split values",
-      },
-      {
-        choice: "CP leader store instead",
-        pickWhen: "Need linearizable counters / locks",
-        cost: "You are no longer designing Dynamo",
-      },
+      { choice: "W=N, R=1", pickWhen: "Read-heavy, can wait on writes", cost: "Writes fail if any replica is down" },
+      { choice: "W=1, R=1", pickWhen: "Availability over correctness", cost: "Easy to lose or split values" },
+      { choice: "CP leader store instead", pickWhen: "Need linearizable counters / locks", cost: "You are no longer designing Dynamo" },
     ],
-    related: [
-      "/hld/quorum",
-      "/hld/consistent-hashing",
-      "/hld/bloom-filters",
-      "/playgrounds/quorum",
-    ],
-    furtherReading: [
-      {
-        label: "Amazon Dynamo paper",
-        href: "https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf",
-      },
-    ],
+    related: ["/hld/quorum", "/hld/consistent-hashing", "/hld/bloom-filters", "/playgrounds/quorum"],
+    furtherReading: [{ label: "Amazon Dynamo paper", href: "https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf" }],
     playground: "quorum",
   },
   {
@@ -422,12 +317,7 @@ export const vol1Examples: DesignExample[] = [
     summary:
       "Volume 1 chapter 7. 64-bit, roughly time-ordered IDs, unique across datacenters, no coordination on the hot path. Twitter Snowflake is the default answer; ticket servers and UUIDs are the foils.",
     requirements: {
-      functional: [
-        "IDs unique globally",
-        "Fit in 64 bits",
-        "Roughly sortable by time",
-        "Generate > 10k/s per machine",
-      ],
+      functional: ["IDs unique globally", "Fit in 64 bits", "Roughly sortable by time", "Generate > 10k/s per machine"],
       nonFunctional: ["Available across regions", "Survive clock drift with a defined policy"],
     },
     architecture: [
@@ -464,16 +354,8 @@ export const vol1Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      {
-        choice: "Snowflake",
-        pickWhen: "Need compact, sortable IDs at high QPS",
-        cost: "Worker ID ops, clock care",
-      },
-      {
-        choice: "UUID v7",
-        pickWhen: "You can afford 128 bits and want less ops",
-        cost: "Index bloat vs bigint",
-      },
+      { choice: "Snowflake", pickWhen: "Need compact, sortable IDs at high QPS", cost: "Worker ID ops, clock care" },
+      { choice: "UUID v7", pickWhen: "You can afford 128 bits and want less ops", cost: "Index bloat vs bigint" },
     ],
     related: ["/playgrounds/snowflake", "/hld/estimation", "/examples/url-shortener"],
     furtherReading: [{ label: "Snowflake ID", href: "https://en.wikipedia.org/wiki/Snowflake_ID" }],
@@ -491,16 +373,8 @@ export const vol1Examples: DesignExample[] = [
     summary:
       "Volume 1 chapter 8. Tiny write volume, huge read volume, a 301/302 redirect, and a compact ID in base62. The data model is almost one table; the interesting bits are ID generation, hashing vs counter, and analytics.",
     requirements: {
-      functional: [
-        "shorten(long) → short",
-        "redirect(short) → long",
-        "optional expiry, custom alias, click counts",
-      ],
-      nonFunctional: [
-        "Redirect p99 of a few tens of ms",
-        "Read-heavy (often 10:1 or more)",
-        "Years of retention",
-      ],
+      functional: ["shorten(long) → short", "redirect(short) → long", "optional expiry, custom alias, click counts"],
+      nonFunctional: ["Redirect p99 of a few tens of ms", "Read-heavy (often 10:1 or more)", "Years of retention"],
     },
     estimation: [
       { item: "Write QPS", calc: "100M new URLs/day ≈ 1.2k writes/s (peak ~3k)" },
@@ -509,19 +383,12 @@ export const vol1Examples: DesignExample[] = [
       { item: "Storage", calc: "365B records × ~500 B ≈ 180 TB plus replicas" },
     ],
     apis: [
-      {
-        method: "POST",
-        path: "/api/v1/links",
-        desc: "{ longUrl, customAlias?, ttlDays? } → { shortUrl }",
-      },
+      { method: "POST", path: "/api/v1/links", desc: "{ longUrl, customAlias?, ttlDays? } → { shortUrl }" },
       { method: "GET", path: "/:code", desc: "302 (or 301) to the long URL" },
       { method: "GET", path: "/api/v1/links/:code/stats", desc: "Clicks, referrers, days" },
     ],
     dataModel: [
-      {
-        entity: "Link",
-        fields: ["id (pk)", "code (unique)", "long_url", "created_at", "expires_at", "owner_id"],
-      },
+      { entity: "Link", fields: ["id (pk)", "code (unique)", "long_url", "created_at", "expires_at", "owner_id"] },
       { entity: "Click (optional, batched)", fields: ["code", "ts", "country", "ua"] },
     ],
     architecture: [
@@ -552,31 +419,19 @@ export const vol1Examples: DesignExample[] = [
         table: {
           headers: ["Method", "Note"],
           rows: [
-            [
-              "Hash long URL (MD5) then base62, take 7 chars",
-              "Collisions; same URL → same code (sometimes wanted)",
-            ],
-            [
-              "Counter + base62 (ticket / Snowflake)",
-              "No collision, not deterministic from the URL",
-            ],
+            ["Hash long URL (MD5) then base62, take 7 chars", "Collisions; same URL → same code (sometimes wanted)"],
+            ["Counter + base62 (ticket / Snowflake)", "No collision, not deterministic from the URL"],
             ["Pre-generated unused codes in a pool", "Low latency writes, workers refill the pool"],
           ],
         },
       },
     ],
     tradeoffs: [
-      {
-        choice: "302",
-        pickWhen: "Mappings can change; you want every click",
-        cost: "Less CDN cache",
-      },
+      { choice: "302", pickWhen: "Mappings can change; you want every click", cost: "Less CDN cache" },
       { choice: "301", pickWhen: "Mappings are eternal", cost: "Browsers cache; stats undercount" },
     ],
     related: ["/playgrounds/url-shortener", "/examples/unique-id", "/hld/caching"],
-    furtherReading: [
-      { label: "roadmap.sh — URL shortener", href: "https://roadmap.sh/questions/system-design" },
-    ],
+    furtherReading: [{ label: "roadmap.sh — URL shortener", href: "https://roadmap.sh/questions/system-design" }],
     playground: "url-shortener",
   },
   {
@@ -591,17 +446,8 @@ export const vol1Examples: DesignExample[] = [
     summary:
       "Volume 1 chapter 9. A polite, distributed URL frontier, DNS, fetcher, renderer (maybe), parser, and duplicate URL / content detection. Bloom filters keep the 'have we seen this URL?' set in memory.",
     requirements: {
-      functional: [
-        "Start from seed URLs",
-        "Respect robots.txt and politeness per host",
-        "Extract links, store documents",
-        "Detect duplicates",
-      ],
-      nonFunctional: [
-        "Billions of pages",
-        "Freshness for hot sites",
-        "No thundering a small origin",
-      ],
+      functional: ["Start from seed URLs", "Respect robots.txt and politeness per host", "Extract links, store documents", "Detect duplicates"],
+      nonFunctional: ["Billions of pages", "Freshness for hot sites", "No thundering a small origin"],
     },
     architecture: [
       {
@@ -636,19 +482,10 @@ export const vol1Examples: DesignExample[] = [
     ],
     tradeoffs: [
       { choice: "Headless render", pickWhen: "JS-heavy web", cost: "Orders of magnitude slower" },
-      {
-        choice: "Bloom-only seen set",
-        pickWhen: "RAM is tight",
-        cost: "False positives skip new pages",
-      },
+      { choice: "Bloom-only seen set", pickWhen: "RAM is tight", cost: "False positives skip new pages" },
     ],
     related: ["/hld/bloom-filters", "/hld/message-queues", "/examples/autocomplete"],
-    furtherReading: [
-      {
-        label: "Mercator / Google crawler papers (ideas)",
-        href: "https://en.wikipedia.org/wiki/Web_crawler",
-      },
-    ],
+    furtherReading: [{ label: "Mercator / Google crawler papers (ideas)", href: "https://en.wikipedia.org/wiki/Web_crawler" }],
   },
   {
     slug: "notification",
@@ -662,24 +499,11 @@ export const vol1Examples: DesignExample[] = [
     summary:
       "Volume 1 chapter 10. One service, many channels (push, email, SMS, in-app). Ingest events, template them, honor preferences, rate-limit per user and per channel, and retry with a DLQ.",
     requirements: {
-      functional: [
-        "Trigger from other services",
-        "User preferences and quiet hours",
-        "Push / email / SMS / in-app",
-        "Delivery receipts",
-      ],
-      nonFunctional: [
-        "Millions/day, bursty",
-        "At-least-once with idempotency keys",
-        "Channel provider outages isolated",
-      ],
+      functional: ["Trigger from other services", "User preferences and quiet hours", "Push / email / SMS / in-app", "Delivery receipts"],
+      nonFunctional: ["Millions/day, bursty", "At-least-once with idempotency keys", "Channel provider outages isolated"],
     },
     apis: [
-      {
-        method: "POST",
-        path: "/v1/notifications",
-        desc: "{ userId, templateId, data, channels? } → { id }",
-      },
+      { method: "POST", path: "/v1/notifications", desc: "{ userId, templateId, data, channels? } → { id }" },
       { method: "POST", path: "/v1/preferences", desc: "Mute, channel opt-in" },
     ],
     architecture: [
@@ -714,20 +538,11 @@ export const vol1Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      {
-        choice: "One topic, many consumer groups",
-        pickWhen: "Same event fans out to several channels",
-        cost: "Harder per-channel backpressure",
-      },
+      { choice: "One topic, many consumer groups", pickWhen: "Same event fans out to several channels", cost: "Harder per-channel backpressure" },
       { choice: "Queue per channel", pickWhen: "Isolation matters", cost: "More moving parts" },
     ],
     related: ["/hld/message-queues", "/hld/rate-limiting", "/lld/factory"],
-    furtherReading: [
-      {
-        label: "roadmap.sh — notification system",
-        href: "https://roadmap.sh/questions/system-design",
-      },
-    ],
+    furtherReading: [{ label: "roadmap.sh — notification system", href: "https://roadmap.sh/questions/system-design" }],
   },
   {
     slug: "news-feed",
@@ -741,17 +556,8 @@ export const vol1Examples: DesignExample[] = [
     summary:
       "Volume 1 chapter 11. Fan-out on write vs fan-out on read is the whole plot. Celebrities break write-fanout; quiet users make read-fanout slow. Hybrid is what production does.",
     requirements: {
-      functional: [
-        "Publish a post",
-        "Read a personalized feed",
-        "Follow / unfollow",
-        "Media in posts",
-      ],
-      nonFunctional: [
-        "Read-heavy",
-        "p99 feed load under a few hundred ms",
-        "Eventual consistency OK for likes",
-      ],
+      functional: ["Publish a post", "Read a personalized feed", "Follow / unfollow", "Media in posts"],
+      nonFunctional: ["Read-heavy", "p99 feed load under a few hundred ms", "Eventual consistency OK for likes"],
     },
     estimation: [
       { item: "DAU", calc: "300M, 2 posts/day → ~7k writes/s average, tens of k peak" },
@@ -797,21 +603,11 @@ export const vol1Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      {
-        choice: "Push",
-        pickWhen: "Bounded follower counts",
-        cost: "Celebrity writes, storage × followers",
-      },
-      {
-        choice: "Pull",
-        pickWhen: "Celebrity graph, or a new product",
-        cost: "Read latency, thundering herds",
-      },
+      { choice: "Push", pickWhen: "Bounded follower counts", cost: "Celebrity writes, storage × followers" },
+      { choice: "Pull", pickWhen: "Celebrity graph, or a new product", cost: "Read latency, thundering herds" },
     ],
     related: ["/examples/chat", "/hld/caching", "/hld/message-queues"],
-    furtherReading: [
-      { label: "roadmap.sh — social feed", href: "https://roadmap.sh/questions/system-design" },
-    ],
+    furtherReading: [{ label: "roadmap.sh — social feed", href: "https://roadmap.sh/questions/system-design" }],
   },
   {
     slug: "chat",
@@ -825,18 +621,8 @@ export const vol1Examples: DesignExample[] = [
     summary:
       "Volume 1 chapter 12. 1:1 and group chat, online presence, and delivery receipts. WebSockets for the online path, a message store that can take writes, and a connection service that knows which box holds each user.",
     requirements: {
-      functional: [
-        "1:1 and group messages",
-        "Online/offline presence",
-        "Delivery and read receipts",
-        "Unread counts",
-        "Media",
-      ],
-      nonFunctional: [
-        "Low latency for online users",
-        "Store years of history",
-        "Exactly-once *effects* via client-generated IDs",
-      ],
+      functional: ["1:1 and group messages", "Online/offline presence", "Delivery and read receipts", "Unread counts", "Media"],
+      nonFunctional: ["Low latency for online users", "Store years of history", "Exactly-once *effects* via client-generated IDs"],
     },
     dataModel: [
       { entity: "Message", fields: ["id", "channel_id", "sender_id", "body", "ts", "seq"] },
@@ -880,21 +666,11 @@ export const vol1Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      {
-        choice: "Cassandra / wide-column for messages",
-        pickWhen: "Huge sequential writes, range by channel+time",
-        cost: "Weaker ad-hoc queries",
-      },
-      {
-        choice: "Postgres per shard",
-        pickWhen: "Smaller scale, richer queries",
-        cost: "Operational sharding",
-      },
+      { choice: "Cassandra / wide-column for messages", pickWhen: "Huge sequential writes, range by channel+time", cost: "Weaker ad-hoc queries" },
+      { choice: "Postgres per shard", pickWhen: "Smaller scale, richer queries", cost: "Operational sharding" },
     ],
     related: ["/hld/websockets", "/examples/nearby-friends", "/hld/message-queues"],
-    furtherReading: [
-      { label: "roadmap.sh — chat", href: "https://roadmap.sh/questions/system-design" },
-    ],
+    furtherReading: [{ label: "roadmap.sh — chat", href: "https://roadmap.sh/questions/system-design" }],
   },
   {
     slug: "autocomplete",
@@ -908,16 +684,8 @@ export const vol1Examples: DesignExample[] = [
     summary:
       "Volume 1 chapter 13. Type-ahead: given a prefix, return the top-k queries. A trie (or a prefix index) in memory at the edge, rebuilt from logs, with caching on hot prefixes.",
     requirements: {
-      functional: [
-        "Top-k completions for a prefix",
-        "Personalization optional",
-        "Handle typos at the next layer",
-      ],
-      nonFunctional: [
-        "< 100 ms, often < 50",
-        "High QPS on one-letter prefixes",
-        "Update popularity daily or faster",
-      ],
+      functional: ["Top-k completions for a prefix", "Personalization optional", "Handle typos at the next layer"],
+      nonFunctional: ["< 100 ms, often < 50", "High QPS on one-letter prefixes", "Update popularity daily or faster"],
     },
     architecture: [
       {
@@ -949,21 +717,11 @@ export const vol1Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      {
-        choice: "In-memory trie",
-        pickWhen: "Ultra-low latency, bounded dictionary",
-        cost: "RAM, rebuilds",
-      },
-      {
-        choice: "Search engine prefix fields",
-        pickWhen: "Already have ES, fuzzy needed",
-        cost: "Latency, cluster ops",
-      },
+      { choice: "In-memory trie", pickWhen: "Ultra-low latency, bounded dictionary", cost: "RAM, rebuilds" },
+      { choice: "Search engine prefix fields", pickWhen: "Already have ES, fuzzy needed", cost: "Latency, cluster ops" },
     ],
     related: ["/hld/caching", "/hld/cdn", "/examples/web-crawler"],
-    furtherReading: [
-      { label: "roadmap.sh — autocomplete", href: "https://roadmap.sh/questions/system-design" },
-    ],
+    furtherReading: [{ label: "roadmap.sh — autocomplete", href: "https://roadmap.sh/questions/system-design" }],
   },
   {
     slug: "youtube",
@@ -977,24 +735,11 @@ export const vol1Examples: DesignExample[] = [
     summary:
       "Volume 1 chapter 14. Upload, transcode into many bitrates, store blobs, stream via CDN with adaptive bitrate (HLS/DASH), plus a thin metadata and recommendation plane.",
     requirements: {
-      functional: [
-        "Upload video",
-        "Process into renditions",
-        "Play with ABR",
-        "Thumbnails, titles, comments",
-        "Like / subscribe",
-      ],
-      nonFunctional: [
-        "Petabytes stored",
-        "Start playback fast worldwide",
-        "Encode is slow and async",
-      ],
+      functional: ["Upload video", "Process into renditions", "Play with ABR", "Thumbnails, titles, comments", "Like / subscribe"],
+      nonFunctional: ["Petabytes stored", "Start playback fast worldwide", "Encode is slow and async"],
     },
     estimation: [
-      {
-        item: "Storage",
-        calc: "500 hours uploaded/min class × many renditions is PB–EB with retention. Interview: show you know original + transcodes dominate.",
-      },
+      { item: "Storage", calc: "500 hours uploaded/min class × many renditions is PB–EB with retention. Interview: show you know original + transcodes dominate." },
       { item: "Bandwidth", calc: "Playback is the cost center — hence CDN, not origin." },
     ],
     architecture: [
@@ -1003,14 +748,8 @@ export const vol1Examples: DesignExample[] = [
         diagram: {
           kind: "layers",
           layers: [
-            {
-              title: "Control (cheap)",
-              items: ["Upload API", "Metadata SQL", "Comments", "Recommendations"],
-            },
-            {
-              title: "Data (expensive)",
-              items: ["Object storage", "Transcoder workers", "CDN POPs", "ABR player"],
-            },
+            { title: "Control (cheap)", items: ["Upload API", "Metadata SQL", "Comments", "Recommendations"] },
+            { title: "Data (expensive)", items: ["Object storage", "Transcoder workers", "CDN POPs", "ABR player"] },
           ],
         },
         numbered: [
@@ -1029,21 +768,11 @@ export const vol1Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      {
-        choice: "More renditions",
-        pickWhen: "Global, mobile-heavy audience",
-        cost: "Encode CPU and storage",
-      },
-      {
-        choice: "Pre-signed direct upload",
-        pickWhen: "Large files",
-        cost: "You need completion callbacks and virus scan workers",
-      },
+      { choice: "More renditions", pickWhen: "Global, mobile-heavy audience", cost: "Encode CPU and storage" },
+      { choice: "Pre-signed direct upload", pickWhen: "Large files", cost: "You need completion callbacks and virus scan workers" },
     ],
     related: ["/hld/cdn", "/hld/message-queues", "/examples/object-storage"],
-    furtherReading: [
-      { label: "roadmap.sh — video streaming", href: "https://roadmap.sh/questions/system-design" },
-    ],
+    furtherReading: [{ label: "roadmap.sh — video streaming", href: "https://roadmap.sh/questions/system-design" }],
   },
   {
     slug: "google-drive",
@@ -1057,17 +786,8 @@ export const vol1Examples: DesignExample[] = [
     summary:
       "Volume 1 chapter 15. Metadata vs block storage, chunked uploads, dedup, notification of changes, and conflict stories for offline clients. Close cousin of Volume 2's object storage, with a sync client on top.",
     requirements: {
-      functional: [
-        "Upload / download / folder tree",
-        "Share with ACLs",
-        "Sync across devices",
-        "Version history",
-      ],
-      nonFunctional: [
-        "Huge files, flaky networks",
-        "Dedup identical blocks",
-        "Strong metadata, eventual file bits OK",
-      ],
+      functional: ["Upload / download / folder tree", "Share with ACLs", "Sync across devices", "Version history"],
+      nonFunctional: ["Huge files, flaky networks", "Dedup identical blocks", "Strong metadata, eventual file bits OK"],
     },
     architecture: [
       {
@@ -1098,20 +818,10 @@ export const vol1Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      {
-        choice: "Smaller chunks",
-        pickWhen: "Delta-friendly, bad networks",
-        cost: "More metadata, more requests",
-      },
-      {
-        choice: "Whole-file store",
-        pickWhen: "Tiny files, simpler",
-        cost: "Re-upload everything on one byte change",
-      },
+      { choice: "Smaller chunks", pickWhen: "Delta-friendly, bad networks", cost: "More metadata, more requests" },
+      { choice: "Whole-file store", pickWhen: "Tiny files, simpler", cost: "Re-upload everything on one byte change" },
     ],
     related: ["/examples/object-storage", "/hld/consistency", "/lld/command"],
-    furtherReading: [
-      { label: "roadmap.sh — Dropbox / Drive", href: "https://roadmap.sh/questions/system-design" },
-    ],
+    furtherReading: [{ label: "roadmap.sh — Dropbox / Drive", href: "https://roadmap.sh/questions/system-design" }],
   },
 ];

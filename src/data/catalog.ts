@@ -58,8 +58,7 @@ export function searchCatalog(q: string, limit = 12): CatalogHit[] {
   if (!s) return catalog.slice(0, limit);
   return catalog
     .map((item) => {
-      const hay =
-        `${item.title} ${item.subtitle} ${item.kind} ${item.tags.join(" ")}`.toLowerCase();
+      const hay = `${item.title} ${item.subtitle} ${item.kind} ${item.tags.join(" ")}`.toLowerCase();
       let score = 0;
       if (item.title.toLowerCase().includes(s)) score += 5;
       if (hay.includes(s)) score += 2;
