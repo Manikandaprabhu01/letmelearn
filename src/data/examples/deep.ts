@@ -1,9 +1,13 @@
 import { frameworkExamples } from "@/data/examples/deep-framework";
+import { infraDeepExamples } from "@/data/examples/deep-infra";
+import { socialDeepExamples } from "@/data/examples/deep-social";
 import { mediaAndMoneyExamples } from "@/data/examples/deep-media-money";
 import { vol1DeepA } from "@/data/examples/deep-vol1-a";
 import { vol1DeepB } from "@/data/examples/deep-vol1-b";
 import { vol1DeepC } from "@/data/examples/deep-vol1-c";
 import { vol1DeepD } from "@/data/examples/deep-vol1-d";
+import { vol1DeepE } from "@/data/examples/deep-vol1-e";
+import { vol2DeepA } from "@/data/examples/deep-vol2-a";
 import type { DesignExample } from "@/data/types";
 
 /**
@@ -17,5 +21,9 @@ export const deepExamples: DesignExample[] = [
   ...vol1DeepB,
   ...vol1DeepC,
   ...vol1DeepD,
+  ...vol1DeepE,
+  ...vol2DeepA,
+  ...infraDeepExamples,
+  ...socialDeepExamples,
   ...mediaAndMoneyExamples,
 ];

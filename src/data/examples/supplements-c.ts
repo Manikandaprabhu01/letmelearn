@@ -153,44 +153,6 @@ export const supplementsC: Record<string, Partial<DesignExample>> = {
     ],
   },
 
-  "distributed-cache": {
-    clarifying: [
-      {
-        q: "Cache-aside or read-through?",
-        a: "Cache-aside by default: the application controls the fallback, and a cache outage degrades performance rather than breaking correctness.",
-      },
-      {
-        q: "How stale can data be?",
-        a: "The most important question, and the answer differs per key type. Prices and permissions want seconds; a follower count is fine at minutes.",
-      },
-      {
-        q: "What happens when the cache is unavailable?",
-        a: "Reads fall through to the database, which must be able to survive that — or you have built a cache that is actually a dependency.",
-      },
-    ],
-    wrapUp: [
-      "Nodes are placed on a consistent hash ring so that adding or losing one moves ~1/N of the keys rather than nearly all of them.",
-      "Eviction policy and memory limits must be set explicitly — a cache with no eviction policy that fills up starts rejecting writes.",
-      "The three failure modes are stampede, penetration and avalanche, and each has a specific fix: single-flight, negative caching, and TTL jitter.",
-      "Delete on write rather than update, so two concurrent writers cannot leave the cache holding the older value permanently.",
-      "With another hour: replication for hot keys, and client-side near-caching with an invalidation channel.",
-    ],
-    followUps: [
-      {
-        q: "A single key gets 50,000 requests per second. What breaks?",
-        a: "Consistent hashing sends that key to exactly one node, which becomes a hotspot no matter how well the rest is balanced. The fixes are to put a small in-process cache in front so most requests never leave the application server, or to replicate the key across several nodes and read a random replica. It is worth stating clearly that consistent hashing distributes keys, not traffic.",
-      },
-      {
-        q: "How do you avoid a stampede when a hot key expires?",
-        a: "Single-flight: the first request to miss takes a lock on that key and loads it while the others wait on the same result, so one database query serves them all. Better still, refresh probabilistically before expiry so the key never actually goes cold under load, and serve the stale value while the refresh happens.",
-      },
-      {
-        q: "The whole cache tier goes down. What happens?",
-        a: "With cache-aside, correctness is unaffected and the full read load lands on the database, which is usually not provisioned for it — so it is a genuine outage mode. I would rate limit or shed load at the edge while it recovers, keep a small in-process cache as a second line of defence, and warm the cache before returning it to service rather than letting it cold-start under full traffic.",
-      },
-    ],
-  },
-
   "job-scheduler": {
     clarifying: [
       {

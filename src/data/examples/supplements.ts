@@ -1,4 +1,3 @@
-import { supplementsA } from "@/data/examples/supplements-a";
 import { supplementsB } from "@/data/examples/supplements-b";
 import { supplementsC } from "@/data/examples/supplements-c";
 import { supplementsD } from "@/data/examples/supplements-d";
@@ -11,7 +10,6 @@ import type { DesignExample } from "@/data/types";
  * page walks the same four-step structure.
  */
 export const exampleSupplements: Record<string, Partial<DesignExample>> = {
-  ...supplementsA,
   ...supplementsB,
   ...supplementsC,
   ...supplementsD,

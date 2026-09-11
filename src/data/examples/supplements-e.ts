@@ -152,42 +152,4 @@ export const supplementsE: Record<string, Partial<DesignExample>> = {
       },
     ],
   },
-
-  "distributed-lock": {
-    clarifying: [
-      {
-        q: "Is the lock for correctness or for efficiency?",
-        a: "The crucial distinction. For efficiency — avoiding duplicate work — a best-effort lock is fine. For correctness, you need fencing tokens and should question whether a lock is the right tool at all.",
-      },
-      {
-        q: "How long is the lock held?",
-        a: "As briefly as possible, and never across an unbounded operation. Long holds make lease expiry during work far more likely.",
-      },
-      {
-        q: "What happens if the holder pauses?",
-        a: "A garbage-collection pause or a VM stall can exceed the lease while the holder still believes it owns the lock. This is the failure mode the whole design has to account for.",
-      },
-    ],
-    wrapUp: [
-      "A distributed lock is a lease, not a mutex: it expires, and the holder can be wrong about still owning it.",
-      "Fencing tokens are what make it safe — the storage layer rejects writes carrying an older token, so a resurrected holder cannot corrupt state.",
-      "Consensus-backed stores (etcd, ZooKeeper) give correct leases; Redis-based locks are best-effort and should be described as such.",
-      "The better answer is often to avoid the lock: make the operation idempotent, or use a conditional update on the resource itself.",
-      "With another hour: lease renewal and the safe hand-off when a holder is shutting down gracefully.",
-    ],
-    followUps: [
-      {
-        q: "Why is a lease not enough?",
-        a: "Because the holder can pause — a long garbage collection, a VM migration — past its expiry, wake up believing it still holds the lock, and write. Meanwhile another process legitimately acquired it. The fix is a fencing token: each acquisition gets a monotonically increasing number, and the storage layer rejects writes carrying an older one, so the stale writer is stopped where the damage would occur.",
-      },
-      {
-        q: "Redis or etcd for locks?",
-        a: "etcd or ZooKeeper when correctness matters, because leadership and leases come from a consensus protocol with a majority, so a partitioned minority cannot grant a lock. A single-instance Redis lock is fast and simple but is best-effort — it can grant the same lock twice across a failover. I would use Redis for efficiency locks and say plainly that it is not a correctness guarantee.",
-      },
-      {
-        q: "Can you avoid the lock entirely?",
-        a: "Usually, and that is generally the better design. A conditional update on the resource — succeed only if the state is what I expect — provides mutual exclusion exactly where it is needed without a separate lock service. Making the operation idempotent removes the need for exclusion altogether. A distributed lock is a consistency claim that a network partition can break, so I reach for it last.",
-      },
-    ],
-  },
 };
