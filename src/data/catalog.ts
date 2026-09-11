@@ -1,4 +1,5 @@
 import { examples } from "@/data/examples";
+import { fdeConcepts } from "@/data/fde";
 import { hldConcepts } from "@/data/hld";
 import { lldConcepts } from "@/data/lld";
 import { playgrounds } from "@/data/playgrounds";
@@ -24,6 +25,13 @@ export const catalog: CatalogHit[] = [
     title: c.title,
     subtitle: c.subtitle,
     kind: "LLD",
+    tags: c.tags,
+  })),
+  ...fdeConcepts.map((c) => ({
+    path: `/fde/${c.slug}`,
+    title: c.title,
+    subtitle: c.subtitle,
+    kind: "AI FDE",
     tags: c.tags,
   })),
   ...examples.map((c) => ({

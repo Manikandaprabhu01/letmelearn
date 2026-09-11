@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { useProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
 
-type SlugTo = "/hld/$slug" | "/lld/$slug" | "/examples/$slug" | "/playgrounds/$slug";
+type SlugTo = "/hld/$slug" | "/lld/$slug" | "/fde/$slug" | "/examples/$slug" | "/playgrounds/$slug";
 
 export function TopicCard({
   to,

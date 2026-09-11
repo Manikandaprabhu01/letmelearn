@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as ExamplesIndexRouteImport } from './routes/examples/index'
 import { Route as ExamplesSlugRouteImport } from './routes/examples/$slug'
+import { Route as FdeIndexRouteImport } from './routes/fde/index'
+import { Route as FdeSlugRouteImport } from './routes/fde/$slug'
 import { Route as HldIndexRouteImport } from './routes/hld/index'
 import { Route as HldSlugRouteImport } from './routes/hld/$slug'
 import { Route as LldIndexRouteImport } from './routes/lld/index'
@@ -38,6 +40,16 @@ const ExamplesIndexRoute = ExamplesIndexRouteImport.update({
 const ExamplesSlugRoute = ExamplesSlugRouteImport.update({
   id: '/examples/$slug',
   path: '/examples/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FdeIndexRoute = FdeIndexRouteImport.update({
+  id: '/fde/',
+  path: '/fde/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FdeSlugRoute = FdeSlugRouteImport.update({
+  id: '/fde/$slug',
+  path: '/fde/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HldIndexRoute = HldIndexRouteImport.update({
@@ -75,10 +87,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/resources': typeof ResourcesRoute
   '/examples/$slug': typeof ExamplesSlugRoute
+  '/fde/$slug': typeof FdeSlugRoute
   '/hld/$slug': typeof HldSlugRoute
   '/lld/$slug': typeof LldSlugRoute
   '/playgrounds/$slug': typeof PlaygroundsSlugRoute
   '/examples/': typeof ExamplesIndexRoute
+  '/fde/': typeof FdeIndexRoute
   '/hld/': typeof HldIndexRoute
   '/lld/': typeof LldIndexRoute
   '/playgrounds/': typeof PlaygroundsIndexRoute
@@ -87,10 +101,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/resources': typeof ResourcesRoute
   '/examples/$slug': typeof ExamplesSlugRoute
+  '/fde/$slug': typeof FdeSlugRoute
   '/hld/$slug': typeof HldSlugRoute
   '/lld/$slug': typeof LldSlugRoute
   '/playgrounds/$slug': typeof PlaygroundsSlugRoute
   '/examples': typeof ExamplesIndexRoute
+  '/fde': typeof FdeIndexRoute
   '/hld': typeof HldIndexRoute
   '/lld': typeof LldIndexRoute
   '/playgrounds': typeof PlaygroundsIndexRoute
@@ -100,10 +116,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/resources': typeof ResourcesRoute
   '/examples/$slug': typeof ExamplesSlugRoute
+  '/fde/$slug': typeof FdeSlugRoute
   '/hld/$slug': typeof HldSlugRoute
   '/lld/$slug': typeof LldSlugRoute
   '/playgrounds/$slug': typeof PlaygroundsSlugRoute
   '/examples/': typeof ExamplesIndexRoute
+  '/fde/': typeof FdeIndexRoute
   '/hld/': typeof HldIndexRoute
   '/lld/': typeof LldIndexRoute
   '/playgrounds/': typeof PlaygroundsIndexRoute
@@ -114,10 +132,12 @@ export interface FileRouteTypes {
     | '/'
     | '/resources'
     | '/examples/$slug'
+    | '/fde/$slug'
     | '/hld/$slug'
     | '/lld/$slug'
     | '/playgrounds/$slug'
     | '/examples/'
+    | '/fde/'
     | '/hld/'
     | '/lld/'
     | '/playgrounds/'
@@ -126,10 +146,12 @@ export interface FileRouteTypes {
     | '/'
     | '/resources'
     | '/examples/$slug'
+    | '/fde/$slug'
     | '/hld/$slug'
     | '/lld/$slug'
     | '/playgrounds/$slug'
     | '/examples'
+    | '/fde'
     | '/hld'
     | '/lld'
     | '/playgrounds'
@@ -138,10 +160,12 @@ export interface FileRouteTypes {
     | '/'
     | '/resources'
     | '/examples/$slug'
+    | '/fde/$slug'
     | '/hld/$slug'
     | '/lld/$slug'
     | '/playgrounds/$slug'
     | '/examples/'
+    | '/fde/'
     | '/hld/'
     | '/lld/'
     | '/playgrounds/'
@@ -151,10 +175,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ResourcesRoute: typeof ResourcesRoute
   ExamplesSlugRoute: typeof ExamplesSlugRoute
+  FdeSlugRoute: typeof FdeSlugRoute
   HldSlugRoute: typeof HldSlugRoute
   LldSlugRoute: typeof LldSlugRoute
   PlaygroundsSlugRoute: typeof PlaygroundsSlugRoute
   ExamplesIndexRoute: typeof ExamplesIndexRoute
+  FdeIndexRoute: typeof FdeIndexRoute
   HldIndexRoute: typeof HldIndexRoute
   LldIndexRoute: typeof LldIndexRoute
   PlaygroundsIndexRoute: typeof PlaygroundsIndexRoute
@@ -188,6 +214,20 @@ declare module '@tanstack/react-router' {
       path: '/examples/$slug'
       fullPath: '/examples/$slug'
       preLoaderRoute: typeof ExamplesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fde/': {
+      id: '/fde/'
+      path: '/fde'
+      fullPath: '/fde/'
+      preLoaderRoute: typeof FdeIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fde/$slug': {
+      id: '/fde/$slug'
+      path: '/fde/$slug'
+      fullPath: '/fde/$slug'
+      preLoaderRoute: typeof FdeSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hld/': {
@@ -239,10 +279,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ResourcesRoute: ResourcesRoute,
   ExamplesSlugRoute: ExamplesSlugRoute,
+  FdeSlugRoute: FdeSlugRoute,
   HldSlugRoute: HldSlugRoute,
   LldSlugRoute: LldSlugRoute,
   PlaygroundsSlugRoute: PlaygroundsSlugRoute,
   ExamplesIndexRoute: ExamplesIndexRoute,
+  FdeIndexRoute: FdeIndexRoute,
   HldIndexRoute: HldIndexRoute,
   LldIndexRoute: LldIndexRoute,
   PlaygroundsIndexRoute: PlaygroundsIndexRoute,
