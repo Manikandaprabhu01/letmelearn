@@ -81,18 +81,17 @@ function Arrow({ axis = "x" }: { axis?: "x" | "y" }) {
   );
 }
 
-const colCount: Record<number, string> = {
-  2: "sm:grid-cols-2",
-  3: "sm:grid-cols-3",
-  4: "sm:grid-cols-4",
-  5: "sm:grid-cols-5",
-  6: "sm:grid-cols-6",
-};
-
 function SystemBoard({ columns, caption }: { columns: SystemColumn[]; caption?: string }) {
   return (
     <Figure caption={caption} className="overflow-x-auto">
-      <div className={cn("grid grid-cols-1 gap-3", colCount[columns.length] ?? "sm:grid-cols-4")}>
+      {/* Columns keep a readable minimum and scroll rather than squeezing, so a
+          wide board stays legible instead of wrapping every label. */}
+      <div
+        className={cn(
+          "grid grid-cols-1 gap-3",
+          "sm:grid-flow-col sm:auto-cols-[minmax(9.5rem,1fr)]",
+        )}
+      >
         {columns.map((col, i) => (
           <div key={col.title} className="flex flex-col">
             {i > 0 ? (
