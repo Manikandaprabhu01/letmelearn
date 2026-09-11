@@ -7,7 +7,7 @@ app; the interactive labs are not included, since they are React components.
 
 ```
 npx vite build --config site/vite.config.mjs   # bundle the data modules to JSON
-node site/build.mjs                            # -> site/lattice.html
+node site/build.mjs                            # -> site/letmelearn.html
 ```
 
 | File | Role |
@@ -16,9 +16,9 @@ node site/build.mjs                            # -> site/lattice.html
 | `vite.config.mjs` | Resolves the `@/` alias and emits `site/.build/data-entry.js` |
 | `head.html` | Page shell: design tokens (light + dark), layout, component CSS |
 | `app.js` | Renderers for every section and diagram kind, hash router, search |
-| `build.mjs` | Inlines the content JSON into the shell and writes `lattice.html` |
+| `build.mjs` | Inlines the content JSON into the shell and writes `letmelearn.html` |
 
-`lattice.html` and `.build/` are generated and stay out of version control.
+`letmelearn.html` and `.build/` are generated and stay out of version control.
 
 The renderers here mirror `src/components/content/*`. When a new `Section` field
 or `Diagram` kind is added to `src/data/types.ts`, add the matching branch in

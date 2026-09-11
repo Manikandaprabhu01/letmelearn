@@ -6,4 +6,4 @@ node_modules/
 
 # static reading build (site/)
 site/.build/
-site/lattice.html
+site/letmelearn.html

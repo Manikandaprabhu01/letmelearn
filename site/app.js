@@ -555,7 +555,7 @@
       "<p>High-level architecture and low-level object design, written the way the interview actually goes: scope it, size it, draw it, then defend the trade-offs. Every page carries diagrams, worked arithmetic, failure modes and the follow-up questions.</p>" +
       '<div class="stats">' + stats + "</div></section>" +
       '<div class="homegrid">' + cells + "</div>" +
-      '<div class="note"><p>This is a reading build of the Lattice study app. The eight interactive labs — rate limiter, hash ring, quorum, CAP, LRU, load balancer, Snowflake and URL shortener — run in the full application and are not included here.</p></div>' +
+      '<div class="note"><p>This is a reading build of the LetMeLearn study app. The eight interactive labs — rate limiter, hash ring, quorum, CAP, LRU, load balancer, Snowflake and URL shortener — run in the full application and are not included here.</p></div>' +
       "</article>";
   }
 

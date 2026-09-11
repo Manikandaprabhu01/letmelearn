@@ -22,7 +22,7 @@ function ExamplesIndex() {
         >
           awesome-system-design-resources
         </a>{" "}
-        list — original Lattice notes for the problems those books do not cover. Every page uses the four-step
+        list — original LetMeLearn notes for the problems those books do not cover. Every page uses the four-step
         framework: scope, sketch, deep dive, wrap. Every example now opens with a full architecture board and a
         numbered walkthrough of the data path.
       </p>
