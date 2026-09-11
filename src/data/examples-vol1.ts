@@ -66,7 +66,7 @@ export const vol1Examples: DesignExample[] = [
     tags: ["interview"],
     companies: ["FAANG-style loops"],
     summary:
-      "Volume 1 chapter 3 (and Volume 2's opening) is a four-step script: clarify, sketch, deep-dive, wrap. Every example in Lattice is written in that order so you can reuse the muscle memory.",
+      "Volume 1 chapter 3 (and Volume 2's opening) is a four-step script: clarify, sketch, deep-dive, wrap. Every example in LetMeLearn is written in that order so you can reuse the muscle memory.",
     requirements: {
       functional: ["Agree on use cases and who the users are", "Agree on what is out of scope"],
       nonFunctional: ["QPS, latency, consistency, availability, cost"],

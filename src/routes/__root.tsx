@@ -24,7 +24,7 @@ export const Route = createRootRoute({
       { name: "theme-color", content: "#0b0c0e" },
       {
         name: "description",
-        content: "Lattice — system design studio. HLD, LLD, Alex Xu examples, the awesome list, and interactive labs.",
+        content: "LetMeLearn — system design studio. HLD, LLD, Alex Xu examples, the awesome list, and interactive labs.",
       },
     ],
     links: [

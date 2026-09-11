@@ -1,6 +1,6 @@
 /**
  * Source 6 — curated from ashishps1/awesome-system-design-resources.
- * Lattice pages where we teach the problem; otherwise the public link from the list.
+ * LetMeLearn pages where we teach the problem; otherwise the public link from the list.
  */
 
 export type AwesomeBand = "easy" | "medium" | "hard";
@@ -23,7 +23,7 @@ export const awesomeRepo = {
   title: "awesome-system-design-resources",
   href: "https://github.com/ashishps1/awesome-system-design-resources",
   blurb:
-    "Ashish Pratap Singh's public list: 30 core concepts, Easy/Medium/Hard interview problems, papers, and channels. Lattice uses it as source 6 — original notes here, the list for everything else.",
+    "Ashish Pratap Singh's public list: 30 core concepts, Easy/Medium/Hard interview problems, papers, and channels. LetMeLearn uses it as source 6 — original notes here, the list for everything else.",
 };
 
 export const awesomeProblems: AwesomeProblem[] = [
@@ -94,7 +94,7 @@ export const awesomeProblems: AwesomeProblem[] = [
     band: "easy",
     href: "https://www.youtube.com/watch?v=QpLy0_c_RXk",
     lattice: "/examples/payment",
-    blurb: "India's real-time rails. Lattice's payment example is the adjacent money path.",
+    blurb: "India's real-time rails. LetMeLearn's payment example is the adjacent money path.",
   },
   {
     title: "WhatsApp",
@@ -227,7 +227,7 @@ export const awesomeProblems: AwesomeProblem[] = [
     band: "medium",
     href: "https://www.youtube.com/watch?v=qsGcfVGvFSs",
     lattice: "/examples/ticket-booking",
-    blurb: "Seats + fares + PNR. Lattice's ticket-booking example is the hold/pay/commit path.",
+    blurb: "Seats + fares + PNR. LetMeLearn's ticket-booking example is the hold/pay/commit path.",
   },
   {
     title: "Online code editor",
@@ -303,7 +303,7 @@ export const awesomeProblems: AwesomeProblem[] = [
     title: "Code deployment system",
     band: "hard",
     href: "https://www.youtube.com/watch?v=q0KGYwNbf-0",
-    blurb: "Build, artifact store, rolling / canary / blue-green. Not a Lattice example — watch this one.",
+    blurb: "Build, artifact store, rolling / canary / blue-green. Not a LetMeLearn example — watch this one.",
   },
   {
     title: "Object storage (S3)",

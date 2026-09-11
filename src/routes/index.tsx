@@ -70,7 +70,7 @@ function Home() {
         <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
           ashishps1/awesome-system-design-resources — Easy / Medium / Hard prompts, the Dynamo-to-Chubby paper stack,
           and the channels people actually watch. Unique designs (Instagram, Uber, Docs, Zoom, locks) are original
-          Lattice notes. The rest map onto Volume 1, Volume 2, or a lab.
+          LetMeLearn notes. The rest map onto Volume 1, Volume 2, or a lab.
         </p>
         <div className="mt-6 flex flex-wrap gap-3 text-sm">
           <Link
@@ -91,7 +91,7 @@ function Home() {
       <section className="px-5 py-12 sm:px-8 lg:px-12">
         <h2 className="font-display text-2xl font-medium tracking-tight">The four-step interview</h2>
         <p className="mt-2 max-w-xl text-sm text-muted">
-          Alex Xu Volume 1, chapter 3. Every example page in Lattice is written in this order so the muscle memory
+          Alex Xu Volume 1, chapter 3. Every example page in LetMeLearn is written in this order so the muscle memory
           transfers.
         </p>
         <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

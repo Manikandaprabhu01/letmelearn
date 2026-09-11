@@ -5,7 +5,7 @@ export const resources: ResourceLink[] = [
   {
     title: "roadmap.sh — System Design",
     href: "https://roadmap.sh/system-design",
-    blurb: "The topic map: load balancers, caches, queues, CDNs, scaling. Lattice's HLD syllabus follows this spine.",
+    blurb: "The topic map: load balancers, caches, queues, CDNs, scaling. LetMeLearn's HLD syllabus follows this spine.",
     kind: "roadmap",
   },
   {
@@ -17,7 +17,7 @@ export const resources: ResourceLink[] = [
   {
     title: "Rate limiter playground (LLD)",
     href: "https://rawang9.github.io/LLD/web_content/rate-limiter-playground.html",
-    blurb: "The interactive five-algorithm visualizer that inspired Lattice's rate-limiter lab. HLD + LLD on one page.",
+    blurb: "The interactive five-algorithm visualizer that inspired LetMeLearn's rate-limiter lab. HLD + LLD on one page.",
     kind: "playground",
   },
   {

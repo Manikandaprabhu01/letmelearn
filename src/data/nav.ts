@@ -7,5 +7,5 @@ export const NAV = [
   { to: "/resources", label: "Sources", match: "prefix" as const },
 ] as const;
 
-export const APP_NAME = "Lattice";
+export const APP_NAME = "LetMeLearn";
 export const APP_TAGLINE = "System design, taught like the interview.";
