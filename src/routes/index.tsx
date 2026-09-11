@@ -4,14 +4,28 @@ import { examples } from "@/data/examples";
 import { hldConcepts } from "@/data/hld";
 import { lldConcepts } from "@/data/lld";
 import { playgrounds } from "@/data/playgrounds";
+import { ClientOnly } from "@/components/auth/ClientOnly";
+import { SignedOut } from "@/lib/auth/gates";
 import { useProgress } from "@/lib/progress";
 
 export const Route = createFileRoute("/")({ component: Home });
 
 const STEPS = [
-  { n: "01", title: "Scope", body: "Users, features, QPS, SLAs. Write the numbers down. Ask what is out of scope." },
-  { n: "02", title: "Sketch", body: "Boxes, APIs, stores. Get buy-in before you deep-dive the matching engine." },
-  { n: "03", title: "Deep dive", body: "The two hard parts: fan-out, the hash ring, the ledger, the 429 path." },
+  {
+    n: "01",
+    title: "Scope",
+    body: "Users, features, QPS, SLAs. Write the numbers down. Ask what is out of scope.",
+  },
+  {
+    n: "02",
+    title: "Sketch",
+    body: "Boxes, APIs, stores. Get buy-in before you deep-dive the matching engine.",
+  },
+  {
+    n: "03",
+    title: "Deep dive",
+    body: "The two hard parts: fan-out, the hash ring, the ledger, the 429 path.",
+  },
   { n: "04", title: "Wrap", body: "Bottlenecks, failure modes, what another hour would buy." },
 ];
 
@@ -21,16 +35,36 @@ function Home() {
 
   return (
     <main>
+      {/* `ClientOnly` keeps the first client paint identical to the server's, and
+          `SignedOut` then renders nothing for a signed-in visitor. */}
+      <ClientOnly>
+        <SignedOut>
+          <Link
+            to="/welcome"
+            className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-b border-border bg-inset px-5 py-2.5 text-center text-[13px] text-muted hover:text-fg"
+          >
+            <span>New here? See everything inside and unlock it for good.</span>
+            <span className="inline-flex items-center gap-1 text-accent">
+              Take the tour
+              <ArrowRight className="size-3.5" />
+            </span>
+          </Link>
+        </SignedOut>
+      </ClientOnly>
+
       <section className="relative overflow-hidden border-b border-border px-5 py-12 sm:px-8 sm:py-16 lg:px-12">
         <div className="lattice-grid pointer-events-none absolute inset-0" />
-        <p className="relative text-[11px] font-medium uppercase tracking-[0.18em] text-accent">System design studio</p>
+        <p className="relative text-[11px] font-medium uppercase tracking-[0.18em] text-accent">
+          System design studio
+        </p>
         <h1 className="relative mt-4 max-w-2xl font-display text-4xl font-medium tracking-tight sm:text-5xl lg:text-6xl">
           Learn the map, then run the labs.
         </h1>
         <p className="relative mt-5 max-w-xl text-[16px] leading-7 text-muted">
-          HLD concepts, LLD object models, and every worked example from Alex Xu's System Design Interview Volume 1
-          and Volume 2 — plus source 6, the public awesome-system-design-resources list, and interactive playgrounds
-          in the spirit of the rate-limiter visualizer.
+          HLD concepts, LLD object models, and every worked example from Alex Xu's System Design
+          Interview Volume 1 and Volume 2 — plus source 6, the public
+          awesome-system-design-resources list, and interactive playgrounds in the spirit of the
+          rate-limiter visualizer.
         </p>
         <div className="relative mt-8 flex flex-wrap gap-6 text-sm">
           <Stat n={hldConcepts.length} label="HLD concepts" />
@@ -68,9 +102,10 @@ function Home() {
           The public awesome list, in the atlas
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
-          ashishps1/awesome-system-design-resources — Easy / Medium / Hard prompts, the Dynamo-to-Chubby paper stack,
-          and the channels people actually watch. Unique designs (Instagram, Uber, Docs, Zoom, locks) are original
-          LetMeLearn notes. The rest map onto Volume 1, Volume 2, or a lab.
+          ashishps1/awesome-system-design-resources — Easy / Medium / Hard prompts, the
+          Dynamo-to-Chubby paper stack, and the channels people actually watch. Unique designs
+          (Instagram, Uber, Docs, Zoom, locks) are original LetMeLearn notes. The rest map onto
+          Volume 1, Volume 2, or a lab.
         </p>
         <div className="mt-6 flex flex-wrap gap-3 text-sm">
           <Link
@@ -89,10 +124,12 @@ function Home() {
       </section>
 
       <section className="px-5 py-12 sm:px-8 lg:px-12">
-        <h2 className="font-display text-2xl font-medium tracking-tight">The four-step interview</h2>
+        <h2 className="font-display text-2xl font-medium tracking-tight">
+          The four-step interview
+        </h2>
         <p className="mt-2 max-w-xl text-sm text-muted">
-          Alex Xu Volume 1, chapter 3. Every example page in LetMeLearn is written in this order so the muscle memory
-          transfers.
+          Alex Xu Volume 1, chapter 3. Every example page in LetMeLearn is written in this order so
+          the muscle memory transfers.
         </p>
         <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((s) => (
@@ -110,11 +147,14 @@ function Home() {
           <div>
             <h2 className="font-display text-2xl font-medium tracking-tight">Labs</h2>
             <p className="mt-2 max-w-xl text-sm text-muted">
-              Fire a burst at a token bucket. Split a CAP cluster. Mint a Snowflake. Modeled on interactive LLD
-              playgrounds such as the five-algorithm rate limiter.
+              Fire a burst at a token bucket. Split a CAP cluster. Mint a Snowflake. Modeled on
+              interactive LLD playgrounds such as the five-algorithm rate limiter.
             </p>
           </div>
-          <Link to="/playgrounds" className="hidden items-center gap-1 text-sm text-accent hover:underline sm:flex">
+          <Link
+            to="/playgrounds"
+            className="hidden items-center gap-1 text-sm text-accent hover:underline sm:flex"
+          >
             All labs <ArrowRight className="size-4" />
           </Link>
         </div>
@@ -126,7 +166,9 @@ function Home() {
               params={{ slug: p.slug }}
               className="rounded-lg border border-border bg-surface p-4 hover:border-border-strong"
             >
-              <div className="text-[11px] uppercase tracking-[0.14em] text-accent">{p.tags.join(" · ")}</div>
+              <div className="text-[11px] uppercase tracking-[0.14em] text-accent">
+                {p.tags.join(" · ")}
+              </div>
               <div className="mt-2 font-medium">{p.title}</div>
               <p className="mt-1 text-sm text-muted">{p.subtitle}</p>
             </Link>
@@ -146,7 +188,17 @@ function Stat({ n, label }: { n: number; label: string }) {
   );
 }
 
-function Door({ to, kicker, title, body }: { to: string; kicker: string; title: string; body: string }) {
+function Door({
+  to,
+  kicker,
+  title,
+  body,
+}: {
+  to: string;
+  kicker: string;
+  title: string;
+  body: string;
+}) {
   return (
     <Link to={to} className="block bg-bg p-6 hover:bg-surface sm:p-8">
       <div className="text-[11px] uppercase tracking-[0.14em] text-accent">{kicker}</div>

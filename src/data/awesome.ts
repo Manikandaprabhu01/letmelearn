@@ -213,7 +213,8 @@ export const awesomeProblems: AwesomeProblem[] = [
     band: "medium",
     href: "https://www.youtube.com/watch?v=Z-0g_aJL5Fw",
     lattice: "/examples/youtube",
-    blurb: "For You ranking on a short-video firehose. Start from the YouTube example, then add the ranker.",
+    blurb:
+      "For You ranking on a short-video firehose. Start from the YouTube example, then add the ranker.",
   },
   {
     title: "E-commerce (Amazon / Shopify)",
@@ -303,7 +304,8 @@ export const awesomeProblems: AwesomeProblem[] = [
     title: "Code deployment system",
     band: "hard",
     href: "https://www.youtube.com/watch?v=q0KGYwNbf-0",
-    blurb: "Build, artifact store, rolling / canary / blue-green. Not a LetMeLearn example — watch this one.",
+    blurb:
+      "Build, artifact store, rolling / canary / blue-green. Not a LetMeLearn example — watch this one.",
   },
   {
     title: "Object storage (S3)",
@@ -408,11 +410,39 @@ export const awesomeArticles: AwesomeLink[] = [
 ];
 
 export const awesomeChannels: AwesomeLink[] = [
-  { title: "Tech Dummies Narendra L", href: "https://www.youtube.com/@TechDummiesNarendraL", blurb: "Long-form HLD walkthroughs of the classic prompts." },
-  { title: "Gaurav Sen", href: "https://www.youtube.com/@gkcs", blurb: "Trade-off first. Good for CAP, queues, and ranking." },
-  { title: "codeKarle", href: "https://www.youtube.com/@codeKarle", blurb: "Interview-shaped designs with numbers." },
-  { title: "ByteByteGo", href: "https://www.youtube.com/@ByteByteGo", blurb: "Alex Xu / Sahn Lam diagrams in motion." },
-  { title: "System Design Interview", href: "https://www.youtube.com/@SystemDesignInterview", blurb: "Mock loops, not just architecture tours." },
-  { title: "sudoCODE", href: "https://www.youtube.com/@sudocode", blurb: "Distributed-systems internals." },
-  { title: "Success in Tech", href: "https://www.youtube.com/@SuccessinTech/videos", blurb: "Staff-level interview framing." },
+  {
+    title: "Tech Dummies Narendra L",
+    href: "https://www.youtube.com/@TechDummiesNarendraL",
+    blurb: "Long-form HLD walkthroughs of the classic prompts.",
+  },
+  {
+    title: "Gaurav Sen",
+    href: "https://www.youtube.com/@gkcs",
+    blurb: "Trade-off first. Good for CAP, queues, and ranking.",
+  },
+  {
+    title: "codeKarle",
+    href: "https://www.youtube.com/@codeKarle",
+    blurb: "Interview-shaped designs with numbers.",
+  },
+  {
+    title: "ByteByteGo",
+    href: "https://www.youtube.com/@ByteByteGo",
+    blurb: "Alex Xu / Sahn Lam diagrams in motion.",
+  },
+  {
+    title: "System Design Interview",
+    href: "https://www.youtube.com/@SystemDesignInterview",
+    blurb: "Mock loops, not just architecture tours.",
+  },
+  {
+    title: "sudoCODE",
+    href: "https://www.youtube.com/@sudocode",
+    blurb: "Distributed-systems internals.",
+  },
+  {
+    title: "Success in Tech",
+    href: "https://www.youtube.com/@SuccessinTech/videos",
+    blurb: "Staff-level interview framing.",
+  },
 ];

@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { AccountStrip } from "@/components/layout/AccountStrip";
 import { BackButton } from "@/components/layout/BackButton";
 import { LogoMark } from "@/components/layout/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
@@ -8,6 +9,13 @@ import { CommandSearch } from "@/components/search/CommandSearch";
 import { Button } from "@/components/ui/button";
 import { APP_NAME, NAV } from "@/data/nav";
 import { cn } from "@/lib/utils";
+
+/**
+ * Routes that bring their own full-page chrome (their own header, their own
+ * hero). Wrapping these in the studio sidebar would frame a landing page inside
+ * the product it is trying to sell.
+ */
+const BARE_LAYOUT_PATHS = new Set(["/welcome", "/login"]);
 
 function isActive(pathname: string, to: string, match: "exact" | "prefix") {
   if (match === "exact") return pathname === to;
@@ -41,6 +49,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState(false);
+  const bare = BARE_LAYOUT_PATHS.has(pathname);
 
   useEffect(() => {
     setOpen(false);
@@ -56,6 +65,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  // After every hook — an early return above them would change hook order
+  // between a bare route and a studio route.
+  if (bare) return <div className="min-h-dvh bg-bg text-fg">{children}</div>;
 
   return (
     <div className="min-h-dvh bg-bg text-fg">
@@ -89,8 +102,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {open ? (
-        <div className="fixed inset-0 z-20 bg-bg/95 px-4 pt-16 lg:hidden">
+        <div className="fixed inset-0 z-20 overflow-y-auto bg-bg/95 px-4 pb-8 pt-16 lg:hidden">
           <NavLinks pathname={pathname} onNavigate={() => setOpen(false)} />
+          <div className="mt-4 border-t border-border pt-4">
+            <AccountStrip />
+          </div>
         </div>
       ) : null}
 
@@ -120,6 +136,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </span>
               <kbd className="font-mono text-[10px] text-faint">⌘K</kbd>
             </button>
+            <div className="mt-3">
+              <AccountStrip />
+            </div>
           </div>
         </aside>
         <div className="min-w-0">

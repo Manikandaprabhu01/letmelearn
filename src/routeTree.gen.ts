@@ -10,7 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as ExamplesIndexRouteImport } from './routes/examples/index'
 import { Route as ExamplesSlugRouteImport } from './routes/examples/$slug'
 import { Route as FdeIndexRouteImport } from './routes/fde/index'
@@ -23,15 +26,31 @@ import { Route as LldIndexRouteImport } from './routes/lld/index'
 import { Route as LldSlugRouteImport } from './routes/lld/$slug'
 import { Route as PlaygroundsIndexRouteImport } from './routes/playgrounds/index'
 import { Route as PlaygroundsSlugRouteImport } from './routes/playgrounds/$slug'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WelcomeRoute = WelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExamplesIndexRoute = ExamplesIndexRouteImport.update({
@@ -94,10 +113,18 @@ const PlaygroundsSlugRoute = PlaygroundsSlugRouteImport.update({
   path: '/playgrounds/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/resources': typeof ResourcesRoute
+  '/welcome': typeof WelcomeRoute
   '/examples/$slug': typeof ExamplesSlugRoute
   '/fde/$slug': typeof FdeSlugRoute
   '/hld/$slug': typeof HldSlugRoute
@@ -110,10 +137,14 @@ export interface FileRoutesByFullPath {
   '/java/': typeof JavaIndexRoute
   '/lld/': typeof LldIndexRoute
   '/playgrounds/': typeof PlaygroundsIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/resources': typeof ResourcesRoute
+  '/welcome': typeof WelcomeRoute
   '/examples/$slug': typeof ExamplesSlugRoute
   '/fde/$slug': typeof FdeSlugRoute
   '/hld/$slug': typeof HldSlugRoute
@@ -126,11 +157,15 @@ export interface FileRoutesByTo {
   '/java': typeof JavaIndexRoute
   '/lld': typeof LldIndexRoute
   '/playgrounds': typeof PlaygroundsIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/resources': typeof ResourcesRoute
+  '/welcome': typeof WelcomeRoute
   '/examples/$slug': typeof ExamplesSlugRoute
   '/fde/$slug': typeof FdeSlugRoute
   '/hld/$slug': typeof HldSlugRoute
@@ -143,12 +178,16 @@ export interface FileRoutesById {
   '/java/': typeof JavaIndexRoute
   '/lld/': typeof LldIndexRoute
   '/playgrounds/': typeof PlaygroundsIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/login'
+    | '/pricing'
     | '/resources'
+    | '/welcome'
     | '/examples/$slug'
     | '/fde/$slug'
     | '/hld/$slug'
@@ -161,10 +200,14 @@ export interface FileRouteTypes {
     | '/java/'
     | '/lld/'
     | '/playgrounds/'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/login'
+    | '/pricing'
     | '/resources'
+    | '/welcome'
     | '/examples/$slug'
     | '/fde/$slug'
     | '/hld/$slug'
@@ -177,10 +220,14 @@ export interface FileRouteTypes {
     | '/java'
     | '/lld'
     | '/playgrounds'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/'
+    | '/login'
+    | '/pricing'
     | '/resources'
+    | '/welcome'
     | '/examples/$slug'
     | '/fde/$slug'
     | '/hld/$slug'
@@ -193,11 +240,15 @@ export interface FileRouteTypes {
     | '/java/'
     | '/lld/'
     | '/playgrounds/'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
+  PricingRoute: typeof PricingRoute
   ResourcesRoute: typeof ResourcesRoute
+  WelcomeRoute: typeof WelcomeRoute
   ExamplesSlugRoute: typeof ExamplesSlugRoute
   FdeSlugRoute: typeof FdeSlugRoute
   HldSlugRoute: typeof HldSlugRoute
@@ -210,6 +261,7 @@ export interface RootRouteChildren {
   JavaIndexRoute: typeof JavaIndexRoute
   LldIndexRoute: typeof LldIndexRoute
   PlaygroundsIndexRoute: typeof PlaygroundsIndexRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -221,11 +273,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resources': {
       id: '/resources'
       path: '/resources'
       fullPath: '/resources'
       preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/welcome': {
+      id: '/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof WelcomeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/examples/': {
@@ -312,12 +385,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlaygroundsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
+  PricingRoute: PricingRoute,
   ResourcesRoute: ResourcesRoute,
+  WelcomeRoute: WelcomeRoute,
   ExamplesSlugRoute: ExamplesSlugRoute,
   FdeSlugRoute: FdeSlugRoute,
   HldSlugRoute: HldSlugRoute,
@@ -330,6 +413,7 @@ const rootRouteChildren: RootRouteChildren = {
   JavaIndexRoute: JavaIndexRoute,
   LldIndexRoute: LldIndexRoute,
   PlaygroundsIndexRoute: PlaygroundsIndexRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
