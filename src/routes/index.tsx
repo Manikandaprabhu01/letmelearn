@@ -4,8 +4,6 @@ import { examples } from "@/data/examples";
 import { hldConcepts } from "@/data/hld";
 import { lldConcepts } from "@/data/lld";
 import { playgrounds } from "@/data/playgrounds";
-import { ClientOnly } from "@/components/auth/ClientOnly";
-import { SignedOut } from "@/lib/auth/gates";
 import { useProgress } from "@/lib/progress";
 
 export const Route = createFileRoute("/")({ component: Home });
@@ -35,23 +33,6 @@ function Home() {
 
   return (
     <main>
-      {/* `ClientOnly` keeps the first client paint identical to the server's, and
-          `SignedOut` then renders nothing for a signed-in visitor. */}
-      <ClientOnly>
-        <SignedOut>
-          <Link
-            to="/welcome"
-            className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-b border-border bg-inset px-5 py-2.5 text-center text-[13px] text-muted hover:text-fg"
-          >
-            <span>New here? See everything inside and unlock it for good.</span>
-            <span className="inline-flex items-center gap-1 text-accent">
-              Take the tour
-              <ArrowRight className="size-3.5" />
-            </span>
-          </Link>
-        </SignedOut>
-      </ClientOnly>
-
       <section className="relative overflow-hidden border-b border-border px-5 py-12 sm:px-8 sm:py-16 lg:px-12">
         <div className="lattice-grid pointer-events-none absolute inset-0" />
         <p className="relative text-[11px] font-medium uppercase tracking-[0.18em] text-accent">

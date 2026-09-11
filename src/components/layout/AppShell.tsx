@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { RequireSignIn } from "@/components/auth/RequireSignIn";
 import { AccountStrip } from "@/components/layout/AccountStrip";
 import { BackButton } from "@/components/layout/BackButton";
 import { LogoMark } from "@/components/layout/Logo";
@@ -16,6 +17,15 @@ import { cn } from "@/lib/utils";
  * the product it is trying to sell.
  */
 const BARE_LAYOUT_PATHS = new Set(["/welcome", "/login"]);
+
+/**
+ * Readable without signing in. Everything else is the studio, which
+ * `RequireSignIn` sends signed-out visitors away from.
+ *
+ * Pricing is public on purpose: asking someone to sign in before they can see
+ * what the thing costs loses the sale.
+ */
+const PUBLIC_PATHS = new Set([...BARE_LAYOUT_PATHS, "/pricing"]);
 
 function isActive(pathname: string, to: string, match: "exact" | "prefix") {
   if (match === "exact") return pathname === to;
@@ -50,6 +60,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState(false);
   const bare = BARE_LAYOUT_PATHS.has(pathname);
+  const isPublic = PUBLIC_PATHS.has(pathname);
 
   useEffect(() => {
     setOpen(false);
@@ -70,7 +81,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // between a bare route and a studio route.
   if (bare) return <div className="min-h-dvh bg-bg text-fg">{children}</div>;
 
-  return (
+  const shell = (
     <div className="min-h-dvh bg-bg text-fg">
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b border-border bg-bg/90 px-3 backdrop-blur-sm lg:hidden">
         <div className="flex min-w-0 items-center gap-1">
@@ -153,4 +164,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {search ? <CommandSearch onClose={() => setSearch(false)} /> : null}
     </div>
   );
+
+  if (isPublic) return shell;
+  return <RequireSignIn>{shell}</RequireSignIn>;
 }

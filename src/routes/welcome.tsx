@@ -3,8 +3,8 @@ import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ClientOnly } from "@/components/auth/ClientOnly";
 import { LogoMark } from "@/components/layout/Logo";
-import { SignedIn, SignedOut } from "@/lib/auth/gates";
 import { APP_NAME } from "@/data/nav";
+import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { formatPaise, priceFor } from "@/lib/billing/pricing";
 
 export const Route = createFileRoute("/welcome")({ component: Welcome });
@@ -48,6 +48,21 @@ const PROOF = [
 ];
 
 function Welcome() {
+  // The signed-out page is what the server renders and what the first client
+  // paint repeats; `WelcomeLive` swaps in the signed-in wording after hydration.
+  return (
+    <ClientOnly fallback={<WelcomeBody signedIn={false} />}>
+      <WelcomeLive />
+    </ClientOnly>
+  );
+}
+
+function WelcomeLive() {
+  const { user } = useCurrentUserState();
+  return <WelcomeBody signedIn={user !== null} />;
+}
+
+function WelcomeBody({ signedIn }: { signedIn: boolean }) {
   const full = priceFor(null);
   const discounted = priceFor("LEARN50");
 
@@ -55,7 +70,7 @@ function Welcome() {
     <main className="min-h-dvh">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-5 sm:px-10">
-        <Link to="/" className="flex items-center gap-2.5 text-fg">
+        <Link to="/welcome" className="flex items-center gap-2.5 text-fg">
           <LogoMark className="size-7" />
           <span className="font-display text-xl tracking-tight">{APP_NAME}</span>
         </Link>
@@ -63,18 +78,9 @@ function Welcome() {
           <Link to="/pricing" className="px-3 py-2 text-sm text-muted hover:text-fg">
             Pricing
           </Link>
-          <ClientOnly fallback={<div className="h-8 w-24" aria-hidden />}>
-            <SignedOut>
-              <Link to="/login">
-                <Button size="sm">Sign in</Button>
-              </Link>
-            </SignedOut>
-            <SignedIn>
-              <Link to="/">
-                <Button size="sm">Open the studio</Button>
-              </Link>
-            </SignedIn>
-          </ClientOnly>
+          <Link to={signedIn ? "/" : "/login"}>
+            <Button size="sm">{signedIn ? "Open the studio" : "Sign in"}</Button>
+          </Link>
         </nav>
       </header>
 
@@ -104,9 +110,9 @@ function Welcome() {
                 <ArrowRight className="ml-1.5 size-4" />
               </Button>
             </Link>
-            <Link to="/hld">
+            <Link to={signedIn ? "/hld" : "/login"}>
               <Button size="lg" variant="secondary">
-                Browse the concepts
+                {signedIn ? "Browse the concepts" : "Sign in"}
               </Button>
             </Link>
           </div>
@@ -133,7 +139,9 @@ function Welcome() {
             {TRACKS.map((t) => (
               <Link
                 key={t.to}
-                to={t.to}
+                // Signed out, the studio guard would send this straight back to
+                // /welcome — so send them where they can actually get in.
+                to={signedIn ? t.to : "/login"}
                 className="group rounded-xl border border-border bg-surface p-6 transition-colors hover:border-border-strong"
               >
                 <div className="flex items-center justify-between">
@@ -145,7 +153,7 @@ function Welcome() {
                 <h3 className="mt-3 font-display text-xl tracking-tight">{t.title}</h3>
                 <p className="mt-2 text-[14px] leading-6 text-muted">{t.body}</p>
                 <span className="mt-4 inline-flex items-center gap-1 text-sm text-accent">
-                  Open
+                  {signedIn ? "Open" : "Sign in to open"}
                   <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                 </span>
               </Link>
