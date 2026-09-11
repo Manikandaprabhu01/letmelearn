@@ -31,12 +31,75 @@
   --shadow-panel: 0 1px 0 color-mix(in oklab, var(--color-fg) 6%, transparent);
 }
 
+/* ---------------------------------------------------------------------------
+   Light theme. Tailwind v4 emits the @theme tokens as custom properties on
+   :root and every utility resolves them through var(), so overriding the same
+   names re-themes the whole app without touching a single component.
+
+   Two rules, in this order:
+     1. Follow the OS when the user has made no explicit choice. This is pure
+        CSS, so it applies on the very first paint even with JS disabled —
+        which is what makes a flash impossible for most visitors.
+     2. An explicit [data-theme] choice always wins over the OS preference.
+   --------------------------------------------------------------------------- */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --color-bg: #faf9f7;
+    --color-surface: #ffffff;
+    --color-raised: #f1efea;
+    --color-inset: #f5f3ef;
+    --color-fg: #1c1b19;
+    --color-muted: #5c5a55;
+    --color-faint: #7a786f;
+    --color-accent: #3f5d78;
+    --color-accent-fg: #ffffff;
+    --color-border: #e2ded5;
+    --color-border-strong: #c8c3b8;
+    --color-ok: #456f52;
+    --color-warn: #8a6520;
+    --color-bad: #a24036;
+    --color-link: #3f5d78;
+
+    --shadow-panel: 0 1px 2px color-mix(in oklab, #1c1b19 8%, transparent);
+  }
+}
+
+:root[data-theme="light"] {
+  --color-bg: #faf9f7;
+  --color-surface: #ffffff;
+  --color-raised: #f1efea;
+  --color-inset: #f5f3ef;
+  --color-fg: #1c1b19;
+  --color-muted: #5c5a55;
+  --color-faint: #7a786f;
+  --color-accent: #3f5d78;
+  --color-accent-fg: #ffffff;
+  --color-border: #e2ded5;
+  --color-border-strong: #c8c3b8;
+  --color-ok: #456f52;
+  --color-warn: #8a6520;
+  --color-bad: #a24036;
+  --color-link: #3f5d78;
+
+  --shadow-panel: 0 1px 2px color-mix(in oklab, #1c1b19 8%, transparent);
+}
+
 @layer base {
   html {
     color-scheme: dark;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background: var(--color-bg);
+  }
+
+  html[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: light) {
+    html:not([data-theme="dark"]) {
+      color-scheme: light;
+    }
   }
 
   body {
@@ -92,7 +155,11 @@
 .lattice-grid {
   background-image:
     linear-gradient(color-mix(in oklab, var(--color-fg) 5%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklab, var(--color-fg) 5%, transparent) 1px, transparent 1px);
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--color-fg) 5%, transparent) 1px,
+      transparent 1px
+    );
   background-size: 48px 48px;
   mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, black 20%, transparent 75%);
 }

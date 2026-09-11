@@ -3,6 +3,7 @@ import { Menu, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { BackButton } from "@/components/layout/BackButton";
 import { LogoMark } from "@/components/layout/Logo";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { CommandSearch } from "@/components/search/CommandSearch";
 import { Button } from "@/components/ui/button";
 import { APP_NAME, NAV } from "@/data/nav";
@@ -13,13 +14,7 @@ function isActive(pathname: string, to: string, match: "exact" | "prefix") {
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 
-function NavLinks({
-  pathname,
-  onNavigate,
-}: {
-  pathname: string;
-  onNavigate?: () => void;
-}) {
+function NavLinks({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
   return (
     <nav className="flex flex-col gap-0.5">
       {NAV.map((item) => {
@@ -73,7 +68,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
         </div>
         <div className="flex shrink-0 items-center gap-1">
-          <Button variant="ghost" size="icon-sm" onClick={() => setSearch(true)} aria-label="Search">
+          <ThemeToggle />
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => setSearch(true)}
+            aria-label="Search"
+          >
             <Search className="size-4" />
           </Button>
           <Button
@@ -99,7 +100,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <LogoMark />
             <div>
               <div className="font-display text-xl leading-none tracking-tight">{APP_NAME}</div>
-              <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-faint">System design</div>
+              <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-faint">
+                System design
+              </div>
             </div>
           </Link>
           <div className="flex-1 overflow-y-auto px-3 pb-6">
@@ -120,8 +123,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </aside>
         <div className="min-w-0">
-          <div className="sticky top-0 z-20 hidden h-12 items-center border-b border-border bg-bg/90 px-5 backdrop-blur-sm lg:flex">
+          <div className="sticky top-0 z-20 hidden h-12 items-center justify-between border-b border-border bg-bg/90 px-5 backdrop-blur-sm lg:flex">
             <BackButton />
+            <ThemeToggle />
           </div>
           {children}
         </div>
