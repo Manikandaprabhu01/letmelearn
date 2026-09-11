@@ -1,5 +1,6 @@
 import { examples } from "@/data/examples";
 import { fdeConcepts } from "@/data/fde";
+import { javaConcepts } from "@/data/java";
 import { hldConcepts } from "@/data/hld";
 import { lldConcepts } from "@/data/lld";
 import { playgrounds } from "@/data/playgrounds";
@@ -34,6 +35,13 @@ export const catalog: CatalogHit[] = [
     kind: "AI FDE",
     tags: c.tags,
   })),
+  ...javaConcepts.map((c) => ({
+    path: `/java/${c.slug}`,
+    title: c.title,
+    subtitle: c.subtitle,
+    kind: "Java",
+    tags: c.tags,
+  })),
   ...examples.map((c) => ({
     path: `/examples/${c.slug}`,
     title: c.title,
@@ -66,7 +74,8 @@ export function searchCatalog(q: string, limit = 12): CatalogHit[] {
   if (!s) return catalog.slice(0, limit);
   return catalog
     .map((item) => {
-      const hay = `${item.title} ${item.subtitle} ${item.kind} ${item.tags.join(" ")}`.toLowerCase();
+      const hay =
+        `${item.title} ${item.subtitle} ${item.kind} ${item.tags.join(" ")}`.toLowerCase();
       let score = 0;
       if (item.title.toLowerCase().includes(s)) score += 5;
       if (hay.includes(s)) score += 2;
