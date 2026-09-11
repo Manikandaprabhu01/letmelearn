@@ -96,6 +96,7 @@ def evaluate(case: EvalCase) -> dict:
           "Build the eval set from real customer questions, including the failures. Synthetic questions are systematically easier and produce a flattering, useless number.",
           "Calibrate an LLM judge against human ratings before trusting it — an uncalibrated judge measures its own preferences.",
           "Put evals in CI with a blocking threshold, or 'improving the prompt' stays an act of faith.",
+          "Agents need their own eval shape: scoring the final answer alone hides a run that reached the right result through three wrong tool calls. Score the trajectory — which tools were chosen, with what arguments — alongside the outcome.",
         ],
         links: [
           {
@@ -105,6 +106,10 @@ def evaluate(case: EvalCase) -> dict:
           {
             label: "OpenAI Evals — open-source framework",
             href: "https://github.com/openai/evals",
+          },
+          {
+            label: "DeepLearning.AI — Evaluating AI agents",
+            href: "https://www.deeplearning.ai/short-courses/evaluating-ai-agents/",
           },
         ],
       },
@@ -322,6 +327,10 @@ def evaluate(case: EvalCase) -> dict:
           {
             label: "NIST AI Risk Management Framework",
             href: "https://www.nist.gov/itl/ai-risk-management-framework",
+          },
+          {
+            label: "Google — Secure AI Framework (SAIF)",
+            href: "https://safety.google/cybersecurity-advancements/saif/",
           },
         ],
       },

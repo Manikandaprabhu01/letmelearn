@@ -137,6 +137,18 @@ USER = f"""<context>
             href: "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview",
           },
           {
+            label: "Anthropic — interactive prompt engineering tutorial",
+            href: "https://github.com/anthropics/prompt-eng-interactive-tutorial",
+          },
+          {
+            label: "Prompt Engineering Guide (promptingguide.ai)",
+            href: "https://www.promptingguide.ai/",
+          },
+          {
+            label: "The Prompt Report — a systematic survey of prompting techniques",
+            href: "https://arxiv.org/abs/2406.06608",
+          },
+          {
             label: "YouTube search — prompt engineering techniques that work",
             href: YT("prompt engineering techniques few shot chain of thought tutorial"),
           },
@@ -255,6 +267,10 @@ else:
             ],
           ],
         },
+        bullets: [
+          "Evaluate retrieval separately from generation. Measuring only end-to-end answer quality leaves you unable to tell which half is broken.",
+          'Graph RAG is the variant worth knowing: build a knowledge graph of entities and relationships and traverse it, rather than ranking chunks by similarity. It answers multi-hop and "how are these connected" questions that vector search handles poorly — at the cost of an extraction pipeline to build and maintain the graph.',
+        ],
         callout: {
           kind: "insight",
           title: "Scope RAG projects as data projects",
@@ -416,7 +432,80 @@ raise StepBudgetExceeded()                     # loops that cannot end are outag
         ],
       },
       {
-        heading: "8. MCP (Model Context Protocol)",
+        heading: "8. Agent frameworks — and when to use none",
+        lede: "The build-versus-adopt decision, and it usually goes against the framework.",
+        body: [
+          "There is a large and fast-moving ecosystem here, and an FDE is regularly asked which one to standardise on. The honest answer for most enterprise work is that a framework earns its place only when you need what it provides beyond the provider SDK — durable state, graph-shaped control flow, or a multi-agent protocol — because everything a framework adds is also something the customer's team must learn, debug and keep upgrading after you leave.",
+        ],
+        table: {
+          caption: "What each is actually for.",
+          headers: ["Framework", "Strength", "Consider when"],
+          rows: [
+            [
+              "Provider SDK only",
+              "No abstraction to debug through",
+              "The default — most single-agent work",
+            ],
+            [
+              "LangChain",
+              "Huge integration surface, fast prototyping",
+              "You need many connectors quickly",
+            ],
+            [
+              "LangGraph",
+              "Explicit graph, durable state, human-in-the-loop",
+              "Long-running or resumable workflows",
+            ],
+            [
+              "CrewAI",
+              "Role-based multi-agent orchestration",
+              "Genuinely parallel specialised roles",
+            ],
+            [
+              "Google ADK",
+              "Agent development on Google Cloud",
+              "The customer is standardised on Vertex",
+            ],
+            [
+              "Agno",
+              "Lightweight, low-overhead agents",
+              "You want structure without a large runtime",
+            ],
+          ],
+        },
+        bullets: [
+          "Prototype with a framework if it gets you to an answer faster, but be deliberate about whether it ships. An abstraction you cannot debug at 2am in a customer's VPC is a liability, not a convenience.",
+          "LangGraph's durable state is the feature most worth paying an abstraction for: an agent that must survive a restart mid-task is genuinely awkward to build from scratch.",
+          "Frameworks move fast and break APIs. Pin versions, and check the upgrade cadence against what the customer's team can realistically absorb.",
+          "Whichever you choose, the constraints from section 7 still apply — step budget, cost ceiling, timeout, write approval. A framework does not supply judgment.",
+        ],
+        links: [
+          {
+            label: "LangGraph — tutorials and durable execution",
+            href: "https://langchain-ai.github.io/langgraph/tutorials/introduction/",
+          },
+          {
+            label: "LangChain — documentation",
+            href: "https://python.langchain.com/docs/get_started/introduction",
+          },
+          { label: "CrewAI — multi-agent orchestration", href: "https://www.crewai.com/" },
+          {
+            label: "Google Agent Development Kit (ADK)",
+            href: "https://google.github.io/adk-docs/",
+          },
+          { label: "Agno — lightweight agents", href: "https://docs.agno.com/introduction/agents" },
+          {
+            label: "DeepLearning.AI — AI Agents in LangGraph",
+            href: "https://www.deeplearning.ai/short-courses/ai-agents-in-langgraph/",
+          },
+          {
+            label: "DeepLearning.AI — Multi-agent systems with CrewAI",
+            href: "https://www.deeplearning.ai/short-courses/multi-ai-agent-systems-with-crewai/",
+          },
+        ],
+      },
+      {
+        heading: "9. MCP and A2A — the agent protocols",
         lede: "An open standard for exposing tools, resources and prompts — n×m becomes n+m.",
         body: [
           "MCP is a JSON-RPC protocol introduced by Anthropic that gives LLM applications a consistent way to connect to external tools and data. A host application runs a client; the client connects to servers that expose three primitives — tools (actions), resources (read-only context) and prompts (reusable templates). Build the server once and any compliant client can use it.",
@@ -457,6 +546,7 @@ raise StepBudgetExceeded()                     # loops that cannot end are outag
           "For an FDE this is the difference between integrating a customer's systems once versus once per assistant they adopt.",
           "The same permission rules apply: an MCP server must execute with the end user's authority, not a shared service account.",
           "Transports differ — stdio for local processes, HTTP for remote servers — with the same JSON-RPC payloads on both.",
+          "MCP and A2A solve adjacent problems and are worth distinguishing: MCP connects one agent to tools and data, while Agent2Agent (A2A) is about agents from different vendors discovering and delegating to each other. Most enterprise work needs MCP; A2A matters once several independently-built agents must cooperate.",
         ],
         links: [
           {
@@ -468,13 +558,21 @@ raise StepBudgetExceeded()                     # loops that cannot end are outag
             href: "https://blog.modelcontextprotocol.io/",
           },
           {
+            label: "Agent Skills — an open standard for extending agent capabilities",
+            href: "https://agentskills.io/home",
+          },
+          {
+            label: "Coursera — Intro to Model Context Protocol (MCP)",
+            href: "https://www.coursera.org/learn/intro-to-model-context-protocol-mcp",
+          },
+          {
             label: "YouTube search — Model Context Protocol explained and building servers",
             href: YT("Model Context Protocol MCP explained build server tutorial"),
           },
         ],
       },
       {
-        heading: "9. Memory",
+        heading: "10. Memory",
         lede: "Retrieval, not magic — which puts you back in RAG's problems and solutions.",
         table: {
           caption: "Three different things all called 'memory'.",
@@ -514,7 +612,7 @@ raise StepBudgetExceeded()                     # loops that cannot end are outag
         ],
       },
       {
-        heading: "10. Multimodal AI",
+        heading: "11. Multimodal AI",
         lede: "Images, audio and documents as input — and where it genuinely changes an enterprise use case.",
         body: [
           "Vision capability matters most for documents. Scanned invoices, engineering diagrams, screenshots in support tickets and photographs of damage are everywhere in enterprise workflows, and previously required separate OCR pipelines that lost table structure.",
@@ -532,6 +630,67 @@ raise StepBudgetExceeded()                     # loops that cannot end are outag
           {
             label: "YouTube search — multimodal LLM document extraction OCR",
             href: YT("multimodal LLM vision document extraction OCR tutorial"),
+          },
+        ],
+      },
+      {
+        heading: "12. Fine-tuning — and the decision before it",
+        lede: 'The question is almost never "should we fine-tune" — it is "which of four options fits this problem".',
+        body: [
+          "Customers ask for a fine-tuned model far more often than they need one, usually because it sounds like the serious answer. The useful contribution an FDE makes is ordering the options by cost and reversibility, and being clear that fine-tuning teaches a model how to behave rather than what is true — which is why it does not fix hallucination about your data.",
+        ],
+        diagram: {
+          kind: "flow",
+          caption: "Work down this list. Most problems stop at the second or third step.",
+          rows: [
+            [
+              {
+                id: "p",
+                label: "1. Prompt + examples",
+                sub: "minutes, free, reversible",
+                tone: "ok",
+              },
+              { id: "r", label: "2. RAG", sub: "grounds it in your data", tone: "accent" },
+            ],
+            [
+              { id: "t", label: "3. Tools", sub: "let it act and compute" },
+              { id: "f", label: "4. Fine-tune", sub: "style, format, narrow tasks", tone: "warn" },
+            ],
+          ],
+        },
+        table: {
+          caption: "What each option actually changes.",
+          headers: ["Option", "Fixes", "Does NOT fix", "Cost to reverse"],
+          rows: [
+            ["Prompting", "Format, tone, task framing", "Missing knowledge", "Edit a string"],
+            ["RAG", "Facts the model never saw", "Consistent output style", "Reindex"],
+            ["Tools", "Arithmetic, lookups, actions", "Judgment quality", "Remove the tool"],
+            [
+              "Fine-tuning",
+              "Style, format, narrow classification",
+              "Factual grounding — it is not a memory",
+              "Retrain; a data pipeline to maintain",
+            ],
+          ],
+        },
+        bullets: [
+          'Fine-tuning does not add reliable knowledge. If the customer\'s goal is "it should know our policies", the answer is retrieval — a fine-tuned model will produce policy-shaped text with invented specifics.',
+          "Where fine-tuning genuinely wins: a consistent house output format, a narrow classification task at volume where a small tuned model beats a large prompted one on cost and latency, and domain language a general model handles awkwardly.",
+          "It needs a labelled dataset, and the review queue from step 5 is where that dataset comes from — which is a good reason to run human-in-the-loop first and consider fine-tuning later.",
+          "Budget for the lifecycle, not the training run: every base-model upgrade means re-tuning and re-evaluating, and that recurring cost is what customers do not anticipate.",
+        ],
+        links: [
+          {
+            label: "DeepLearning.AI — Finetuning large language models",
+            href: "https://www.deeplearning.ai/short-courses/finetuning-large-language-models/",
+          },
+          {
+            label: "DeepLearning.AI — Fine-tuning and RL for LLMs: intro to post-training",
+            href: "https://www.deeplearning.ai/courses/fine-tuning-and-reinforcement-learning-for-llms-intro-to-post-training/",
+          },
+          {
+            label: 'Chain-of-Thought prompting — the paper behind "let it think"',
+            href: "https://arxiv.org/abs/2201.11903",
           },
         ],
       },

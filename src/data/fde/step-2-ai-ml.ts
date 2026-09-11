@@ -167,12 +167,32 @@ len(enc.encode(open("contract.txt").read()))   # MEASURE before you design chunk
             href: "https://www.youtube.com/@3blue1brown",
           },
           {
+            label: "Transformer Explainer — interactive, in-browser",
+            href: "https://poloclub.github.io/transformer-explainer/",
+          },
+          {
+            label: "MLU-Explain — interactive visual explanations of core ML",
+            href: "https://mlu-explain.github.io",
+          },
+          {
             label: "The Illustrated Transformer — Jay Alammar",
             href: "https://jalammar.github.io/illustrated-transformer/",
           },
           {
             label: "Attention Is All You Need (the original paper)",
             href: "https://arxiv.org/abs/1706.03762",
+          },
+          {
+            label: "Language Models are Few-Shot Learners — GPT-3, why prompting works",
+            href: "https://arxiv.org/abs/2005.14165",
+          },
+          {
+            label: "Chain-of-Thought Prompting Elicits Reasoning in LLMs",
+            href: "https://arxiv.org/abs/2201.11903",
+          },
+          {
+            label: "BERT — bidirectional pre-training, the encoder side of the family",
+            href: "https://arxiv.org/pdf/1810.04805",
           },
         ],
       },

@@ -111,6 +111,10 @@ export const fdeLayer: Concept[] = [
         ],
         links: [
           {
+            label: "Coursera — GenAI for executives: integration strategy",
+            href: "https://www.coursera.org/learn/generative-ai-for-executives-and-business-leaders-integration-strategy",
+          },
+          {
             label: "YouTube search — customer discovery interview techniques",
             href: YT("customer discovery interview techniques mom test"),
           },
@@ -353,6 +357,10 @@ print(f"would need review: {sum(r.confidence != 'high' for r in results)}%")
           "Feed what generalises back to the platform — recognising which parts of a bespoke deployment are a repeatable pattern is explicitly part of how these teams are structured.",
         ],
         links: [
+          {
+            label: "Google Cloud — three proven strategies for optimising AI costs",
+            href: "https://cloud.google.com/transform/three-proven-strategies-for-optimizing-ai-costs",
+          },
           {
             label: "YouTube search — measuring ROI of AI projects",
             href: YT("measuring business impact ROI AI project baseline metrics"),
