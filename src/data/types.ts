@@ -186,6 +186,8 @@ export type FollowUp = {
   a: string;
 };
 
+export type LinkRef = { label: string; href: string };
+
 export type Section = {
   heading: string;
   /** Short line under the heading, used by the table of contents and page scanning. */
@@ -201,9 +203,9 @@ export type Section = {
   code?: CodeBlock | CodeBlock[];
   diagram?: Diagram | Diagram[];
   callout?: { kind: CalloutKind; title?: string; text: string };
+  /** Per-concept references — videos and docs for this section specifically. */
+  links?: LinkRef[];
 };
-
-export type LinkRef = { label: string; href: string };
 
 export type Concept = {
   slug: string;

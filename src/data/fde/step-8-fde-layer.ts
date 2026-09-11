@@ -1,29 +1,31 @@
 import type { Concept } from "@/data/types";
 
+const YT = (q: string) => `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
+
 export const fdeLayer: Concept[] = [
   {
     slug: "fde-layer",
     title: "The FDE Layer",
     subtitle:
-      "Discovery, requirements, business process, solution architecture, prototyping, integration, deployment, monitoring, support, iteration, impact",
+      "Customer problem discovery, requirements, business process, solution architecture, rapid prototyping, AI engineering, enterprise integration, deployment, monitoring, debugging & support, iteration, business impact",
     level: "advanced",
-    minutes: 32,
-    tags: ["discovery", "requirements", "prototyping", "deployment", "business impact"],
+    minutes: 44,
+    tags: ["discovery", "requirements", "prototyping", "deployment", "support", "business impact"],
     summary:
-      "Steps 1 to 7 make you an AI engineer who can build and run things. This step is what makes you a Forward Deployed Engineer: the same person who maps the problem on day one is the person who answers the page six months later. The distinguishing skill is not technical depth — it is choosing the right problem, in someone else's organisation, and being accountable for the outcome rather than the deliverable.",
+      "Steps 1 to 7 make you an AI engineer who can build and run things. This step is what makes you a Forward Deployed Engineer: the same person who maps the problem on day one answers the page six months later. Each of the twelve activities from the roadmap is broken out below.",
     keyPoints: [
-      "End-to-end accountability is the defining trait: discovery, build, deploy, support and measurement are one person's remit.",
-      "The first job is finding a problem worth solving, which is usually not the one the customer initially asks for.",
-      "A prototype exists to kill or confirm an idea in days, not to be the foundation of the product.",
-      "If you cannot measure the business impact, the project will be cancelled in the next budget cycle regardless of how good it is.",
+      "End-to-end accountability is the defining trait — discovery, build, deploy, support and measurement are one person's remit.",
+      "The first job is finding a problem worth solving, usually not the one the customer first asks for.",
+      "A prototype exists to kill or confirm an idea in days, not to become the product.",
+      "If you cannot measure business impact, the project is cancelled in the next budget cycle regardless of quality.",
     ],
     prerequisites: ["/fde/system-design-for-ai", "/fde/enterprise-integration"],
     sections: [
       {
-        heading: "What the role actually is",
-        lede: "A pattern Palantir established and the frontier labs have adopted, with models in place of ontologies.",
+        heading: "0. What the role actually is",
+        lede: "A pattern Palantir established and the frontier labs have adopted.",
         body: [
-          "A Forward Deployed Engineer embeds with a customer, works out what problem is genuinely worth solving, builds the solution inside their environment, deploys it, and stays accountable for whether it works. The role combines engineering with domain understanding and direct contact with the people who will use the system. Palantir built the template; OpenAI, Anthropic and Google now run comparable functions, embedding engineers with strategic customers to apply generative AI and prove the business case.",
+          "A Forward Deployed Engineer embeds with a customer, works out what problem is worth solving, builds it inside their environment, deploys it, and stays accountable for whether it works. Palantir built the template — strong engineers embedded with customers, building bespoke software, then folding what generalises back into the platform. OpenAI, Anthropic and Google now run comparable functions with frontier models in place of ontologies.",
         ],
         diagram: {
           kind: "compare",
@@ -32,14 +34,14 @@ export const fdeLayer: Concept[] = [
             {
               title: "Product engineer",
               sub: "builds for many users",
-              good: ["Deep focus on one codebase", "Requirements arrive filtered through product"],
+              good: ["Deep focus on one codebase", "Requirements filtered through product"],
               bad: ["Rarely meets a user", "Insulated from whether it created value"],
               verdict: "Optimises a product surface.",
             },
             {
               title: "Consultant",
               sub: "advises, then leaves",
-              good: ["Broad exposure across organisations", "Strong at framing and communication"],
+              good: ["Broad exposure", "Strong at framing and communication"],
               bad: ["Recommends rather than ships", "Not there when it breaks"],
               verdict: "Optimises a recommendation.",
             },
@@ -48,37 +50,39 @@ export const fdeLayer: Concept[] = [
               sub: "finds the problem, ships it, owns it",
               tone: "ok",
               good: [
-                "Sees the real problem directly, unfiltered",
+                "Sees the real problem unfiltered",
                 "Can change the solution the moment reality disagrees",
-                "Learns what generalises and feeds it back to the platform",
+                "Learns what generalises and feeds it back",
               ],
               bad: [
-                "Context switching across customers and domains",
-                "Carries production accountability in someone else's environment",
+                "Context switching across customers",
+                "Production accountability in someone else's environment",
               ],
               verdict: "Optimises the customer's outcome — which is why the role exists.",
             },
           ],
         },
-        callout: {
-          kind: "insight",
-          title: "Why the role appeared now",
-          text: "Foundation models are general-purpose, and general-purpose capability does not convert into enterprise value on its own. Somebody has to sit inside the customer's context, find the workflow where the capability actually helps, wire it into systems built long before any of this existed, and prove it moved a number. That gap is the FDE's job, and it is why the role commands the compensation it does.",
-        },
+        links: [
+          {
+            label: "Forward Deployed Engineer — overview",
+            href: "https://en.wikipedia.org/wiki/Forward_Deployed_Engineer",
+          },
+          {
+            label: "YouTube search — forward deployed engineer role explained",
+            href: YT("forward deployed engineer role palantir openai explained"),
+          },
+        ],
       },
       {
-        heading: "Discovery: finding a problem worth solving",
-        lede: "The request you receive is usually a solution someone already picked. Your job is to get back to the problem.",
-        body: [
-          "Customers rarely arrive with a problem statement; they arrive with 'we want a chatbot for our documentation'. Taking that literally produces a technically successful project that nobody uses. The work of discovery is to trace the request back to the business pain, and then to check whether the pain is worth money and whether AI is the right instrument.",
-        ],
+        heading: "1. Customer problem discovery",
+        lede: "The request you receive is usually a solution someone already picked.",
         table: {
           caption: "Questions that move from a requested feature to a real problem.",
           headers: ["Question", "What it uncovers"],
           rows: [
             [
               "Walk me through how this is done today",
-              "The actual process, including the undocumented parts",
+              "The actual process, including undocumented parts",
             ],
             [
               "Who does it, and how long does it take?",
@@ -86,7 +90,7 @@ export const fdeLayer: Concept[] = [
             ],
             [
               "What happens when it goes wrong?",
-              "Error tolerance, and therefore how much autonomy is acceptable",
+              "Error tolerance, and how much autonomy is acceptable",
             ],
             ["How often does that happen?", "Whether the pain is real or remembered"],
             [
@@ -101,17 +105,71 @@ export const fdeLayer: Concept[] = [
           ],
         },
         bullets: [
-          "Watch the work being done rather than relying on descriptions of it. The gap between the documented process and the actual one is where most of the opportunity lives — and where the requirements you were given turn out to be wrong.",
-          "Good AI candidates share a shape: high volume, unstructured input, fuzzy rules, currently done by expensive people, and tolerant of review. Look for that shape rather than for places to apply a model.",
-          "Say no to bad fits early and explain why. Declining a poorly-suited project builds more credibility than delivering a technically impressive system nobody adopts.",
-          "The last question matters more than it appears. A system that makes a team's work visible, or threatens headcount, faces resistance that no amount of accuracy overcomes.",
+          "Watch the work being done rather than relying on descriptions. The gap between documented and actual process is where the opportunity lives.",
+          "Good AI candidates share a shape: high volume, unstructured input, fuzzy rules, expensive people, tolerant of review.",
+          "Saying no to a bad fit early builds more credibility than delivering something impressive nobody adopts.",
+        ],
+        links: [
+          {
+            label: "YouTube search — customer discovery interview techniques",
+            href: YT("customer discovery interview techniques mom test"),
+          },
         ],
       },
       {
-        heading: "Prototyping: buy information, not code",
+        heading: "2. Requirement gathering",
+        lede: "Turn the discovered problem into constraints you can design against.",
+        bullets: [
+          "Get numbers, not adjectives: volume per day, acceptable latency, accuracy bar, cost ceiling, and what 'wrong' costs.",
+          "Agree the definition of correct in writing, with their domain experts. Arguing about what counts as an error after launch is unwinnable.",
+          "Capture the non-functional constraints early — residency, retention, approval path — because those change the architecture, not just the backlog.",
+          "Write down what is explicitly out of scope. It is the cheapest protection against scope creep in a customer engagement.",
+        ],
+        links: [
+          {
+            label: "YouTube search — gathering requirements technical projects",
+            href: YT("requirements gathering technical project stakeholder"),
+          },
+        ],
+      },
+      {
+        heading: "3. Business process understanding",
+        lede: "You cannot automate a process you have not watched.",
+        bullets: [
+          "Map the current process end to end, including the spreadsheet nobody mentions and the person who checks it manually every Friday.",
+          "Find the exception paths: the 'normal' flow is often 60% of volume, and the exceptions are where the cost and the risk sit.",
+          "Identify who owns each step. Automating across two teams' boundary is an organisational negotiation as much as an engineering task.",
+          "Note where a decision currently requires judgement — those are the human-in-the-loop seams from step 5.",
+        ],
+        links: [
+          {
+            label: "YouTube search — business process mapping for engineers",
+            href: YT("business process mapping value stream for engineers"),
+          },
+        ],
+      },
+      {
+        heading: "4. Solution architecture",
+        lede: "Design against their constraints, not the ideal ones.",
+        bullets: [
+          "Start from where it must run and what it may touch — steps 4 and 6 are the real constraints, not model choice.",
+          "Prefer the simplest architecture that clears the accuracy bar. Every extra component is something their team must operate after you leave.",
+          "Design the human seam explicitly: what is automated, what is reviewed, what escalates, and who owns the queue.",
+          "Produce one diagram their architect can take into a review board. That artefact frequently matters more than the code.",
+        ],
+        links: [
+          { label: "Site: system design for AI (step 7)", href: "/fde/system-design-for-ai" },
+          {
+            label: "ByteByteGo — architecture communication",
+            href: "https://www.youtube.com/@ByteByteGo",
+          },
+        ],
+      },
+      {
+        heading: "5. Rapid prototyping",
         lede: "A prototype is an experiment with a hypothesis and a deadline, not version one.",
         code: {
-          title: "Structure a prototype around the question that could kill the project",
+          title: "Example — structure a prototype around the question that could kill the project",
           lang: "python",
           source: `# WEEK 1 PROTOTYPE — the goal is a DECISION, not a system.
 #
@@ -123,37 +181,67 @@ export const fdeLayer: Concept[] = [
 # Deliberately NOT skipped: real customer documents, including the messy ones.
 
 results = []
-for path in REAL_CUSTOMER_INVOICES[:100]:       # their data, not a clean sample
+for path in REAL_CUSTOMER_INVOICES[:100]:      # their data, not a clean sample
     extracted = llm_extract(read(path), schema=ExtractedInvoice)
-    truth = GROUND_TRUTH[path]                  # labelled with them, in the room
+    truth = GROUND_TRUTH[path]                 # labelled WITH them, in the room
     results.append(score_fields(extracted, truth))
 
 print(f"field accuracy: {mean(results):.1%}")
 print(f"would need review: {sum(r.confidence != 'high' for r in results)}%")
 
-# The output is not a demo. It is a number that answers:
-#   - does this clear the bar?
-#   - which fields fail, and are those the ones that matter?
-#   - what does the review queue actually look like at their volume?
-#
-# If it fails, you have spent a week instead of a quarter — that is the win.`,
+# The output is a NUMBER that answers: does this clear the bar? which fields
+# fail? what does the review queue look like at their volume?
+# If it fails, you spent a week instead of a quarter — that is the win.`,
         },
         bullets: [
-          "Insist on real data for the prototype, including the awkward cases. A demo built on clean samples proves nothing and sets an expectation you cannot meet in production.",
-          "Define the kill criterion before you start, with the customer. Agreeing the bar in advance turns a disappointing result into a shared decision instead of an argument.",
-          "Label ground truth alongside the customer's domain experts. It gives you an eval set, and it surfaces disagreements about what 'correct' even means — which are often the real requirement.",
-          "Be explicit that prototype code is disposable. The most expensive outcome in this role is a week-one prototype that becomes production by accident, with none of steps 4 to 6 applied.",
+          "Insist on real data including the awkward cases. A demo on clean samples proves nothing and sets an expectation you cannot meet.",
+          "Define the kill criterion before starting, with the customer — it turns a disappointing result into a shared decision rather than an argument.",
+          "Be explicit that prototype code is disposable. The most expensive outcome is a week-one prototype becoming production by accident.",
+        ],
+        links: [
+          {
+            label: "YouTube search — rapid prototyping MVP validation",
+            href: YT("rapid prototyping MVP hypothesis validation engineering"),
+          },
         ],
       },
       {
-        heading: "Deployment, support and iteration",
-        lede: "Shipping is the start of the engagement, not the end of it.",
+        heading: "6. AI engineering (applied)",
+        lede: "Steps 3 and 4, executed inside the customer's constraints.",
+        bullets: [
+          "The engineering is the same; the constraints are not. Their cloud, their identity provider, their egress rules and their review queue shape every decision.",
+          "Build the eval set from their real cases as you go — it is the artefact that lets you change anything safely later.",
+          "Keep prompts, configuration and mappings in the repository and versioned, because their team inherits all of it.",
+        ],
+        links: [
+          { label: "Site: AI engineering (step 3)", href: "/fde/ai-engineering" },
+          {
+            label: "Site: production AI engineering (step 4)",
+            href: "/fde/production-ai-engineering",
+          },
+        ],
+      },
+      {
+        heading: "7. Enterprise integration (applied)",
+        lede: "Step 6 executed — and usually the longest pole in the schedule.",
+        bullets: [
+          "Start the access requests on day one: credentials, network rules and security review routinely take longer than the build.",
+          "Integrate against a read model rather than calling their systems of record on the request path.",
+          "Every write must be idempotent, permissioned, audited and attributed to the assistant.",
+        ],
+        links: [
+          { label: "Site: enterprise integration (step 6)", href: "/fde/enterprise-integration" },
+        ],
+      },
+      {
+        heading: "8. Deployment in the customer environment",
+        lede: "Widen autonomy as evidence accumulates — never on day one.",
         diagram: {
           kind: "flow",
-          caption: "Widen autonomy as evidence accumulates — never on day one.",
+          caption: "Each stage earns the next.",
           rows: [
             [
-              { id: "shadow", label: "Shadow mode", sub: "runs, output not used", tone: "accent" },
+              { id: "shadow", label: "Shadow mode", sub: "runs, output unused", tone: "accent" },
               { id: "assist", label: "Assist", sub: "human decides every case" },
               { id: "conf", label: "Confidence routing", sub: "auto the easy cases", tone: "ok" },
             ],
@@ -164,8 +252,23 @@ print(f"would need review: {sum(r.confidence != 'high' for r in results)}%")
             ],
           ],
         },
+        bullets: [
+          "Shadow mode is the highest-value deployment stage: real traffic, real accuracy measurement, zero risk if it is wrong.",
+          "Deploy behind a flag you can turn off without a release. In someone else's environment, a fast rollback is worth more than a fast deploy.",
+          "Hand over runbooks as you go, not at the end — their on-call team will be paged before your engagement finishes.",
+        ],
+        links: [
+          {
+            label: "YouTube search — progressive delivery canary shadow deployment",
+            href: YT("shadow mode canary progressive delivery deployment strategy"),
+          },
+        ],
+      },
+      {
+        heading: "9. Production monitoring",
+        lede: "What to watch after go-live, and what each signal actually means.",
         table: {
-          caption: "What to watch after go-live, and what each signal actually means.",
+          caption: "Signals and their real meaning.",
           headers: ["Signal", "Means"],
           rows: [
             [
@@ -179,21 +282,45 @@ print(f"would need review: {sum(r.confidence != 'high' for r in results)}%")
             ["Silence from users", "Usually disengagement, not satisfaction — go and ask"],
           ],
         },
-        bullets: [
-          "Deploy in shadow mode first wherever it is possible. Running against real traffic without acting on the output gives a genuine accuracy measurement and costs nothing if it is wrong.",
-          "The review queue is the product's feedback loop: every correction is a labelled example, an eval case, and evidence about where the system is weak.",
-          "Go and watch people use it a fortnight after launch. What they actually do diverges from what they report, and the divergence is where the next iteration comes from.",
-          "Adoption, not accuracy, is the metric that decides renewal. A system at 95% accuracy that people use beats one at 99% that they route around.",
+        links: [
+          {
+            label: "Site: observability and monitoring (step 5)",
+            href: "/fde/ai-reliability-genaiops",
+          },
         ],
       },
       {
-        heading: "Measuring business impact",
-        lede: "The number that decides whether this survives the next budget review.",
-        body: [
-          "Technical metrics — latency, accuracy, token cost — matter to you and to nobody in the room where funding is decided. The FDE's final responsibility is translating the system's behaviour into the customer's own terms: hours returned, cost avoided, cycle time reduced, revenue protected. This requires a baseline captured before launch, which is why the measurement plan belongs in discovery rather than at the end.",
+        heading: "10. Debugging & support",
+        lede: "You are the on-call for something running inside someone else's walls.",
+        bullets: [
+          "The trace is the whole toolkit — prompt version, retrieved chunks, tool calls, tokens. If it is not in the trace, you cannot answer the question.",
+          "Reproduce from the trace rather than asking the customer to reproduce. Asking a user to recreate a bad answer rarely works and costs goodwill.",
+          "Keep a documented escalation path for when the failure is the provider's, not yours — and be able to show which it was.",
+          "Log every support finding back into the eval suite so the same class of bug cannot silently return.",
         ],
+        links: [{ label: "Site: tracing and observability", href: "/fde/ai-reliability-genaiops" }],
+      },
+      {
+        heading: "11. Iteration based on feedback",
+        lede: "The review queue is the product's feedback loop.",
+        bullets: [
+          "Every correction in the review queue is a labelled example, an eval case, and evidence about where the system is weak.",
+          "Go and watch people use it a fortnight after launch. What they do diverges from what they report, and the divergence is the next iteration.",
+          "Prioritise by frequency × cost of the failure, not by how interesting the fix is.",
+          "Re-tune the confidence threshold periodically — the right cut point moves as the data and the users change.",
+        ],
+        links: [
+          {
+            label: "YouTube search — feedback loops product iteration",
+            href: YT("product feedback loop iteration user research"),
+          },
+        ],
+      },
+      {
+        heading: "12. Measure business impact",
+        lede: "The number that decides whether this survives the next budget review.",
         table: {
-          caption: "Translating engineering outcomes into the language of the budget holder.",
+          caption: "Translating engineering outcomes into the budget holder's language.",
           headers: ["What you measure", "What they hear", "Requires"],
           rows: [
             [
@@ -201,7 +328,7 @@ print(f"would need review: {sum(r.confidence != 'high' for r in results)}%")
               "Capacity of 8 additional staff",
               "Baseline timing before launch",
             ],
-            ["78% auto-resolved", "$1.4M of annual cost avoided", "Agreed cost per manual case"],
+            ["78% auto-resolved", "$1.4M annual cost avoided", "Agreed cost per manual case"],
             [
               "Cycle time 3 days → 4 hours",
               "Faster cash collection",
@@ -215,17 +342,22 @@ print(f"would need review: {sum(r.confidence != 'high' for r in results)}%")
             ["Model accuracy 94%", "Nothing", "— avoid presenting this alone"],
           ],
         },
-        bullets: [
-          "Capture the baseline during discovery. Without a credible before, every after is an anecdote — and this is the most common reason a genuinely successful project loses its funding.",
-          "Agree the measurement definition with the customer in advance, in writing. Arguing about what counts as an error after launch is unwinnable.",
-          "Report honestly, including what did not work. An FDE who says 'this part failed and here is why' is trusted with the next, larger project; one who reports only wins is not believed on either.",
-          "Feed what generalises back to the platform. Recognising which parts of a bespoke deployment are actually a repeatable pattern is what turns one customer's solution into a product — and it is explicitly part of how these teams are structured.",
-        ],
         callout: {
           kind: "interview",
           title: "The whole role in one sentence",
           text: "Solve real problems, deliver real impact, and stay accountable for both. Steps 1 to 7 are how you build the thing; this step is choosing the right thing to build, proving it worked in the customer's own numbers, and being the person who picks up the phone when it does not.",
         },
+        bullets: [
+          "Capture the baseline during discovery. Without a credible before, every after is an anecdote — the most common reason a successful project loses funding.",
+          "Report honestly, including what did not work. An FDE who says 'this part failed and here is why' is trusted with the next, larger project.",
+          "Feed what generalises back to the platform — recognising which parts of a bespoke deployment are a repeatable pattern is explicitly part of how these teams are structured.",
+        ],
+        links: [
+          {
+            label: "YouTube search — measuring ROI of AI projects",
+            href: YT("measuring business impact ROI AI project baseline metrics"),
+          },
+        ],
       },
     ],
     related: [
@@ -238,10 +370,7 @@ print(f"would need review: {sum(r.confidence != 'high' for r in results)}%")
         label: "Forward Deployed Engineer — overview",
         href: "https://en.wikipedia.org/wiki/Forward_Deployed_Engineer",
       },
-      {
-        label: "Anthropic — Applied AI and forward deployed engineering",
-        href: "https://www.anthropic.com/careers",
-      },
+      { label: "Anthropic — careers and Applied AI", href: "https://www.anthropic.com/careers" },
     ],
   },
 ];

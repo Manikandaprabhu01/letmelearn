@@ -1,5 +1,7 @@
 import type { Concept } from "@/data/types";
 
+const YT = (q: string) => `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
+
 export const fdeSystemDesign: Concept[] = [
   {
     slug: "system-design-for-ai",
@@ -7,20 +9,28 @@ export const fdeSystemDesign: Concept[] = [
     subtitle:
       "RAG architectures, agent architectures, microservices, event-driven systems, multi-tenant AI, distributed systems, queues, model routing",
     level: "advanced",
-    minutes: 30,
-    tags: ["rag", "agents", "multi-tenancy", "event-driven", "model routing"],
+    minutes: 42,
+    tags: [
+      "rag",
+      "agents",
+      "microservices",
+      "event-driven",
+      "multi-tenant",
+      "queues",
+      "model routing",
+    ],
     summary:
-      "Everything in the rest of this site applies here — queues, caching, sharding, idempotency, consistency — with a handful of properties that classical system design never had to accommodate: a dependency that is slow, costly, non-deterministic and outside your control. This step is about composing the pieces into architectures that survive multi-tenancy, provider outages and a cost model where one user's request can be a thousand times more expensive than another's.",
+      "Everything in the rest of this site applies here — queues, caching, sharding, idempotency — with one dependency classical system design never had: slow, costly, non-deterministic and outside your control. Each of the eight architectural concepts is broken out with the decision it turns on.",
     keyPoints: [
-      "Pick the simplest retrieval architecture that answers the question; complexity in RAG is usually a retrieval failure being papered over.",
-      "Prefer a deterministic workflow to an agent whenever the steps are knowable — cheaper, testable and explainable.",
+      "Pick the simplest retrieval architecture that answers the question; complexity usually papers over a retrieval failure.",
+      "Prefer a deterministic workflow to an agent whenever the steps are knowable.",
       "Multi-tenancy in AI adds isolation dimensions classical systems do not have: index, cache, prompt and budget.",
       "Model routing is the main cost and reliability lever once traffic is real.",
     ],
     prerequisites: ["/fde/ai-engineering", "/fde/production-ai-engineering"],
     sections: [
       {
-        heading: "Choosing a RAG architecture",
+        heading: "1. RAG architectures",
         lede: "Start simple. Each step up costs latency and money, so earn it with evidence.",
         diagram: {
           kind: "compare",
@@ -29,13 +39,9 @@ export const fdeSystemDesign: Concept[] = [
             {
               title: "Naive RAG",
               sub: "embed → search → stuff → answer",
-              good: ["Simple, fast, cheap", "Genuinely sufficient for a large share of use cases"],
-              bad: [
-                "Misses exact identifiers",
-                "No handling of follow-up questions",
-                "Poor on multi-hop questions",
-              ],
-              verdict: "The correct starting point — always build this first and measure it.",
+              good: ["Simple, fast, cheap", "Genuinely sufficient for many use cases"],
+              bad: ["Misses exact identifiers", "No follow-up handling", "Poor on multi-hop"],
+              verdict: "The correct starting point — build and measure this first.",
             },
             {
               title: "Hybrid + rerank",
@@ -44,88 +50,134 @@ export const fdeSystemDesign: Concept[] = [
               good: [
                 "Fixes identifier lookup and rare terms",
                 "Reranking lifts precision substantially",
-                "Still one model call for generation",
+                "Still one generation call",
               ],
               bad: ["More moving parts", "Reranking adds latency and cost"],
               verdict: "The production default for most enterprise deployments.",
             },
             {
               title: "Agentic RAG",
-              sub: "the model plans retrieval, iterates",
+              sub: "the model plans retrieval and iterates",
               good: [
                 "Handles multi-hop and comparative questions",
-                "Can decompose and re-query when the first attempt fails",
+                "Can re-query when the first attempt fails",
               ],
               bad: [
-                "Several model calls — multiples of the cost and latency",
-                "Much harder to evaluate and debug",
+                "Several model calls — multiples of cost and latency",
+                "Much harder to evaluate",
                 "Can loop",
               ],
-              verdict:
-                "Only when evals prove single-shot retrieval genuinely cannot answer the questions users ask.",
+              verdict: "Only when evals prove single-shot retrieval cannot answer real questions.",
             },
           ],
         },
         bullets: [
-          "The most common architectural mistake is reaching for agentic retrieval to fix what is actually a chunking or hybrid-search problem. Fix retrieval quality first; it is cheaper and it is usually the real fault.",
-          "Query rewriting is the cheapest large win available — resolving pronouns and expanding acronyms before embedding costs one small model call and lifts recall noticeably.",
-          "Reranking with a cross-encoder over fifty candidates to pick five is a reliable quality improvement at modest cost, and it is what makes small context windows viable.",
-          "Route by question type: aggregates and exact lookups should go to SQL, not to a vector index. A router that recognises 'how many' and hands it to a query is worth more than a better embedding model.",
+          "The most common architectural mistake is reaching for agentic retrieval to fix what is actually a chunking or hybrid-search problem.",
+          "Query rewriting is the cheapest large win: resolving pronouns and expanding acronyms before embedding costs one small call and lifts recall noticeably.",
+          "Route by question type — aggregates and exact lookups go to SQL, not a vector index.",
+        ],
+        links: [
+          {
+            label: "YouTube search — advanced RAG architecture patterns",
+            href: YT("advanced RAG architecture reranking agentic RAG patterns"),
+          },
+          { label: "Site: RAG fundamentals (step 3)", href: "/fde/ai-engineering" },
         ],
       },
       {
-        heading: "Workflows versus agents",
-        lede: "The architectural decision with the largest effect on cost, testability and customer trust.",
+        heading: "2. Agent architectures",
+        lede: "The decision with the largest effect on cost, testability and customer trust.",
         table: {
           caption: "Decide by whether the steps are knowable in advance.",
           headers: ["Property", "Deterministic workflow", "Agent loop"],
           rows: [
             ["Steps", "Known at design time", "Chosen by the model at runtime"],
             ["Cost per task", "Predictable", "Variable, often 5–15× higher"],
-            ["Testability", "Ordinary integration tests", "Requires eval suites and trace review"],
+            ["Testability", "Ordinary integration tests", "Needs eval suites and trace review"],
             ["Debugging", "Read the code path", "Read the trace and infer intent"],
             ["Explaining to risk teams", "Straightforward", "Genuinely difficult"],
             ["Handles novelty", "Poorly", "Well — this is the actual justification"],
           ],
         },
         code: {
-          title: "Most 'agent' requirements are a workflow with one model call per step",
+          title: "Example — most 'agent' requirements are a workflow with one model call per step",
           lang: "python",
-          source: `# The requirement: "an agent that processes incoming invoices."
+          source: `# Requirement: "an agent that processes incoming invoices."
 # The steps are entirely knowable, so an agent adds cost and risk for nothing.
 
-async def process_invoice(document: bytes, *, acting_user: User) -> Result:
-    text = await extract_text(document)                       # OCR — no LLM needed
+async def process_invoice(document: bytes, *, acting_user) -> Result:
+    text = await extract_text(document)                        # OCR — no LLM
 
-    invoice = await llm_extract(text, schema=ExtractedInvoice) # 1 model call
+    invoice = await llm_extract(text, schema=ExtractedInvoice)  # 1 model call
     if invoice.confidence != "high":
-        return await queue_for_review(invoice, text)           # explicit HITL seam
+        return await queue_for_review(invoice, text)            # explicit HITL seam
 
-    vendor = await crm.find_vendor(invoice.vendor_tax_id)      # deterministic lookup
+    vendor = await crm.find_vendor(invoice.vendor_tax_id)       # deterministic
     if vendor is None:
         return await queue_for_review(invoice, text, reason="unknown vendor")
 
-    po = await erp.match_purchase_order(invoice, vendor)       # deterministic rules
+    po = await erp.match_purchase_order(invoice, vendor)        # deterministic rules
     if po is None or not amounts_match(po, invoice):
         return await queue_for_review(invoice, text, reason="no PO match")
 
     return await erp.post_invoice(invoice, po, as_user=acting_user)
 
-# One model call, in the one place where the input is genuinely unstructured.
-# Everything else is code: testable, debuggable, free, and explainable to an
-# auditor. Reserve the agent loop for cases where you truly cannot enumerate
-# the steps — investigating an anomaly, say, rather than processing a form.`,
+# One model call, where the input is genuinely unstructured. Everything else is
+# code: testable, debuggable, free, and explainable to an auditor.`,
         },
         bullets: [
-          "Use the model where the input is unstructured and the rules are fuzzy; use code everywhere else. This one heuristic removes most unnecessary agent designs.",
-          "Agentic systems consume several times more tokens than single calls when unoptimised, which is why cost ceilings belong in the architecture rather than in a dashboard.",
-          "A workflow with an explicit escalation path is far easier to sell into a regulated environment than an autonomous loop, and it usually delivers the same business outcome.",
-          "If an agent is genuinely warranted, bound it — step budget, cost cap, timeout, approval for writes — and instrument every step.",
+          "Use the model where the input is unstructured and the rules are fuzzy; use code everywhere else. That heuristic removes most unnecessary agent designs.",
+          "A workflow with an explicit escalation path is far easier to sell into a regulated environment and usually delivers the same outcome.",
+          "If an agent is warranted, bound it — step budget, cost cap, timeout, write approval — and instrument every step.",
+        ],
+        links: [
+          {
+            label: "Anthropic — Building effective agents",
+            href: "https://www.anthropic.com/research/building-effective-agents",
+          },
+          {
+            label: "YouTube search — agentic workflow vs agent design patterns",
+            href: YT("agentic workflow vs autonomous agent design patterns"),
+          },
         ],
       },
       {
-        heading: "Multi-tenant AI systems",
-        lede: "Isolation has more dimensions here than in classical multi-tenancy, and each one is a potential leak.",
+        heading: "3. Microservices",
+        lede: "Split by failure domain and scaling profile, not by fashion.",
+        bullets: [
+          "The natural seams in an AI system are: the API tier, the retrieval service, the model gateway, async workers and the indexing pipeline. Each has a genuinely different scaling and failure profile.",
+          "Keep the model gateway separate — it is where keys, budgets, routing and failover live, and it should be changeable without redeploying applications.",
+          "Do not split so finely that one user request fans out to eight synchronous hops; latency budget is already spent on the model.",
+          "For an FDE deployment, fewer services is usually better: every service is another thing the customer's team must operate after you leave.",
+        ],
+        links: [
+          { label: "Site: microservice boundaries and trade-offs", href: "/hld/api-gateway" },
+          {
+            label: "ByteByteGo — architecture patterns",
+            href: "https://www.youtube.com/@ByteByteGo",
+          },
+        ],
+      },
+      {
+        heading: "4. Event-driven systems",
+        lede: "Decouples slow AI work from the systems that trigger it.",
+        bullets: [
+          "Emit a document-changed event and let indexing react; emit an invoice-received event and let the pipeline react. The producer never waits for the AI work.",
+          "Events give you replay: after a bug fix, reprocess the stream rather than asking the customer to resubmit.",
+          "Order is not guaranteed and delivery is at-least-once, so consumers must be idempotent — the same discipline as webhooks in step 6.",
+          "This is what makes retrofitting AI into an existing enterprise system tractable: you subscribe to events they already emit rather than modifying their code.",
+        ],
+        links: [
+          { label: "Site: message queues and delivery semantics", href: "/hld/message-queues" },
+          {
+            label: "Site: designing a distributed message queue",
+            href: "/examples/distributed-mq",
+          },
+        ],
+      },
+      {
+        heading: "5. Multi-tenant AI systems",
+        lede: "More isolation dimensions than classical multi-tenancy — each one a potential leak.",
         table: {
           caption: "Every row is a place tenant data can cross a boundary.",
           headers: ["Dimension", "Risk if shared", "Approach"],
@@ -133,7 +185,7 @@ async def process_invoice(document: bytes, *, acting_user: User) -> Result:
             [
               "Vector index",
               "One tenant retrieves another's documents",
-              "Namespace per tenant, or tenant id filter in the query",
+              "Namespace per tenant, or tenant filter in the query",
             ],
             [
               "Semantic cache",
@@ -148,12 +200,12 @@ async def process_invoice(document: bytes, *, acting_user: User) -> Result:
             [
               "Token budget",
               "A noisy tenant exhausts shared quota",
-              "Per-tenant quotas enforced at the gateway",
+              "Per-tenant quotas at the gateway",
             ],
             [
               "Traces and logs",
               "Support sees the wrong tenant's data",
-              "Tenant-scoped access to observability",
+              "Tenant-scoped observability access",
             ],
             [
               "Fine-tuned models",
@@ -165,18 +217,46 @@ async def process_invoice(document: bytes, *, acting_user: User) -> Result:
         callout: {
           kind: "warn",
           title: "The semantic cache is the sharpest edge",
-          text: "A semantic cache keyed only on the query embedding will happily return tenant A's answer to tenant B, because the two asked a similar question. It looks like a performance optimisation and behaves like a data breach. Tenant id — and often user entitlement scope — must be part of the cache key, and personalised or entitlement-scoped responses should not be shared-cached at all.",
+          text: "A semantic cache keyed only on the query embedding will return tenant A's answer to tenant B, because the two asked a similar question. It looks like a performance optimisation and behaves like a data breach. Tenant id must be part of the cache key, and entitlement-scoped responses should not be shared-cached at all.",
         },
-        bullets: [
-          "Decide isolation strength per tenant tier. A shared index with a filter is efficient and acceptable for many customers; a regulated tenant may contractually require a separate index or even a separate deployment.",
-          "Per-tenant budgets are both a cost control and a fairness mechanism: without them, one customer's bulk job degrades everyone's latency.",
-          "Noisy-neighbour effects are more severe here because a single request can be enormous. Queue by tenant, not just by priority.",
-          "Make tenant id a required parameter throughout, not an optional context value. Optional isolation is isolation that eventually gets omitted.",
+        links: [
+          {
+            label: "YouTube search — multi-tenant SaaS architecture isolation",
+            href: YT("multi tenant SaaS architecture data isolation patterns"),
+          },
         ],
       },
       {
-        heading: "Reliability: routing, fallback and graceful degradation",
-        lede: "Your most important dependency is operated by someone else and will have bad days.",
+        heading: "6. Distributed systems fundamentals",
+        lede: "The classical material still applies — with an expensive, non-deterministic dependency added.",
+        bullets: [
+          "Idempotency matters more here than anywhere: retries are guaranteed, and each duplicate is a paid generation as well as a possible double action.",
+          "Timeouts must be set deliberately at every hop; the defaults assume millisecond work and will cut off generations.",
+          "Circuit-break a failing provider rather than retrying into it — retries during an outage add load and burn quota.",
+          "Consistency requirements are usually narrow: one entitlement check must be strong, while displayed results can be eventually consistent.",
+        ],
+        links: [
+          { label: "Site: idempotency, consistency and availability", href: "/hld/idempotency" },
+          { label: "Site: circuit breakers", href: "/hld/circuit-breaker" },
+        ],
+      },
+      {
+        heading: "7. Queues",
+        lede: "The buffer between fast producers and a slow, rate-limited backend.",
+        bullets: [
+          "Separate queues by priority and by tenant — one customer's bulk backfill must not block another's interactive request.",
+          "Size worker concurrency to the provider's token-per-minute quota, not to CPU. Beyond that you are just queueing at the provider and collecting 429s.",
+          "Dead-letter anything that exhausts retries, and alert on it. A poison message that fails forever blocks its partition.",
+          "Make queue depth the autoscaling signal; CPU is meaningless for a worker that spends its life awaiting a network call.",
+        ],
+        links: [
+          { label: "Site: message queues in depth", href: "/hld/message-queues" },
+          { label: "Site: distributed job scheduling", href: "/examples/job-scheduler" },
+        ],
+      },
+      {
+        heading: "8. Model routing",
+        lede: "The main cost and reliability lever once traffic is real.",
         diagram: {
           kind: "flow",
           caption: "Degrade in steps rather than failing outright.",
@@ -204,29 +284,29 @@ async def process_invoice(document: bytes, *, acting_user: User) -> Result:
           ],
         },
         bullets: [
-          "Model routing by task is the main cost lever: classification and extraction to a small cheap model, genuine reasoning to a frontier model. Most workloads are dominated by tasks that do not need the largest model.",
-          "Keep prompts reasonably portable so failover to a second provider is realistic. Prompts tuned to one vendor's idiosyncrasies are a lock-in you will feel during their next incident.",
-          "Circuit-break a failing provider rather than retrying into it. Retries during a provider outage add load to a system already struggling and burn your quota.",
-          "Degrade explicitly and visibly. A slightly worse answer labelled as degraded is acceptable; a confidently wrong answer produced by a fallback nobody knew fired is not.",
-          "Event-driven designs fit AI work well: emit a document-changed event, let indexing react; emit an invoice-received event, let the pipeline react. It decouples slow AI work from the systems that trigger it.",
+          "Route by task: classification and extraction to a small cheap model, genuine reasoning to a frontier model. Most workloads are dominated by tasks that do not need the largest model.",
+          "Keep prompts reasonably portable so failover to a second provider is realistic rather than theoretical.",
+          "Degrade explicitly and visibly. A slightly worse answer labelled as degraded is acceptable; a confidently wrong answer from a silent fallback is not.",
+        ],
+        links: [
+          {
+            label: "LiteLLM — routing and fallbacks",
+            href: "https://docs.litellm.ai/docs/routing",
+          },
+          {
+            label: "YouTube search — LLM model routing cost optimization architecture",
+            href: YT("LLM model routing fallback cost optimization architecture"),
+          },
         ],
       },
     ],
-    related: [
-      "/fde/fde-layer",
-      "/fde/ai-reliability-genaiops",
-      "/examples/news-feed",
-      "/hld/message-queues",
-    ],
+    related: ["/fde/fde-layer", "/fde/ai-reliability-genaiops", "/hld/message-queues"],
     furtherReading: [
       {
         label: "Anthropic — building effective agents",
         href: "https://www.anthropic.com/research/building-effective-agents",
       },
-      {
-        label: "Google — MLOps: continuous delivery and automation pipelines",
-        href: "https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning",
-      },
+      { label: "ByteByteGo — system design", href: "https://www.youtube.com/@ByteByteGo" },
     ],
   },
 ];

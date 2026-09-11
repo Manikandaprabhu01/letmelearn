@@ -204,6 +204,29 @@ export function SectionBlock({ section, index }: { section: Section; index: numb
         </aside>
       ) : null}
 
+      {section.links?.length ? (
+        <div className="mt-4">
+          <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-faint">
+            Watch / read
+          </div>
+          <ul className="mt-2 space-y-1.5">
+            {section.links.map((l) => (
+              <li key={l.href} className="flex gap-2 text-[14px] leading-6">
+                <span className="mt-[9px] size-1 shrink-0 rounded-full bg-accent/60" />
+                <a
+                  href={l.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-accent hover:underline"
+                >
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
       {section.takeaways ? (
         <div className="mt-4 rounded-lg border border-accent/25 bg-accent/6 px-4 py-3">
           <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-accent">
