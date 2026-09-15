@@ -261,6 +261,8 @@ export type PlaygroundMeta = {
   title: string;
   subtitle: string;
   tags: string[];
+  /** Section on the Labs page; see LAB_GROUPS. */
+  group?: string;
   relatedConcept?: string;
   relatedExample?: string;
 };

@@ -227,6 +227,7 @@ def advance(saga: "OrderSaga", event: dict) -> list[dict]:
         ],
       },
     ],
+    playground: "saga",
     related: [
       "/hld/transactional-outbox",
       "/hld/service-communication",

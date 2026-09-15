@@ -347,6 +347,7 @@ def answer_with_fallback(system: str, user: str) -> LLMReply:
         ],
       },
     ],
+    playground: "llm-cost",
     related: ["/python/typing-pydantic", "/python/rag", "/python/agents", "/fde/ai-engineering"],
     furtherReading: [
       { label: "Anthropic API documentation", href: "https://docs.anthropic.com/" },
@@ -709,6 +710,7 @@ print(f"recall@5 = {recall_at_k(eval_cases):.1%}")    # track this on every retr
         ],
       },
     ],
+    playground: "rag-retrieval",
     related: [
       "/python/transformers-embeddings",
       "/python/agents",

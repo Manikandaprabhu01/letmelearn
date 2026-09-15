@@ -17,7 +17,7 @@ const INCLUDED = [
   "40 HLD concepts — including 14 on microservices: sagas, service mesh, Kubernetes",
   "41 system design examples rewritten to chapter depth",
   "AI FDE Roadmap — 8 steps, 80 concepts, 130+ references",
-  "8 interactive labs, including the rate limiter and hash ring",
+  "16 interactive labs — from rate limiters to sagas, canaries and RAG retrieval",
   "Full-text search across everything",
   "Lifetime access — one payment, no renewal",
 ];

@@ -231,6 +231,7 @@ async def shed_load(request, call_next):
         ],
       },
     ],
+    playground: "bulkhead",
     related: [
       "/hld/circuit-breaker",
       "/hld/rate-limiting",
@@ -1243,6 +1244,7 @@ spec:
         ],
       },
     ],
+    playground: "canary-release",
     related: [
       "/hld/api-contracts-versioning",
       "/hld/containers-kubernetes",

@@ -176,8 +176,8 @@ function Home() {
           <div>
             <h2 className="font-display text-2xl font-medium tracking-tight">Labs</h2>
             <p className="mt-2 max-w-xl text-sm text-muted">
-              Fire a burst at a token bucket. Split a CAP cluster. Mint a Snowflake. Modeled on
-              interactive LLD playgrounds such as the five-algorithm rate limiter.
+              Fire a burst at a token bucket, trip a circuit breaker, run a saga, roll out a canary,
+              and tune RAG retrieval — break things on purpose and watch what happens.
             </p>
           </div>
           <Link

@@ -686,6 +686,7 @@ if __name__ == "__main__":             # required: child processes re-import thi
         ],
       },
     ],
+    playground: "async-concurrency",
     related: ["/python/fastapi", "/python/llm-apis", "/hld/rate-limiting", "/java/multithreading"],
     furtherReading: [
       { label: "Python docs — asyncio", href: "https://docs.python.org/3/library/asyncio.html" },
