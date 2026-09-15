@@ -26,6 +26,8 @@ import { Route as LldIndexRouteImport } from './routes/lld/index'
 import { Route as LldSlugRouteImport } from './routes/lld/$slug'
 import { Route as PlaygroundsIndexRouteImport } from './routes/playgrounds/index'
 import { Route as PlaygroundsSlugRouteImport } from './routes/playgrounds/$slug'
+import { Route as PythonIndexRouteImport } from './routes/python/index'
+import { Route as PythonSlugRouteImport } from './routes/python/$slug'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -113,6 +115,16 @@ const PlaygroundsSlugRoute = PlaygroundsSlugRouteImport.update({
   path: '/playgrounds/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PythonIndexRoute = PythonIndexRouteImport.update({
+  id: '/python/',
+  path: '/python/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PythonSlugRoute = PythonSlugRouteImport.update({
+  id: '/python/$slug',
+  path: '/python/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -131,12 +143,14 @@ export interface FileRoutesByFullPath {
   '/java/$slug': typeof JavaSlugRoute
   '/lld/$slug': typeof LldSlugRoute
   '/playgrounds/$slug': typeof PlaygroundsSlugRoute
+  '/python/$slug': typeof PythonSlugRoute
   '/examples/': typeof ExamplesIndexRoute
   '/fde/': typeof FdeIndexRoute
   '/hld/': typeof HldIndexRoute
   '/java/': typeof JavaIndexRoute
   '/lld/': typeof LldIndexRoute
   '/playgrounds/': typeof PlaygroundsIndexRoute
+  '/python/': typeof PythonIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -151,12 +165,14 @@ export interface FileRoutesByTo {
   '/java/$slug': typeof JavaSlugRoute
   '/lld/$slug': typeof LldSlugRoute
   '/playgrounds/$slug': typeof PlaygroundsSlugRoute
+  '/python/$slug': typeof PythonSlugRoute
   '/examples': typeof ExamplesIndexRoute
   '/fde': typeof FdeIndexRoute
   '/hld': typeof HldIndexRoute
   '/java': typeof JavaIndexRoute
   '/lld': typeof LldIndexRoute
   '/playgrounds': typeof PlaygroundsIndexRoute
+  '/python': typeof PythonIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -172,12 +188,14 @@ export interface FileRoutesById {
   '/java/$slug': typeof JavaSlugRoute
   '/lld/$slug': typeof LldSlugRoute
   '/playgrounds/$slug': typeof PlaygroundsSlugRoute
+  '/python/$slug': typeof PythonSlugRoute
   '/examples/': typeof ExamplesIndexRoute
   '/fde/': typeof FdeIndexRoute
   '/hld/': typeof HldIndexRoute
   '/java/': typeof JavaIndexRoute
   '/lld/': typeof LldIndexRoute
   '/playgrounds/': typeof PlaygroundsIndexRoute
+  '/python/': typeof PythonIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -194,12 +212,14 @@ export interface FileRouteTypes {
     | '/java/$slug'
     | '/lld/$slug'
     | '/playgrounds/$slug'
+    | '/python/$slug'
     | '/examples/'
     | '/fde/'
     | '/hld/'
     | '/java/'
     | '/lld/'
     | '/playgrounds/'
+    | '/python/'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -214,12 +234,14 @@ export interface FileRouteTypes {
     | '/java/$slug'
     | '/lld/$slug'
     | '/playgrounds/$slug'
+    | '/python/$slug'
     | '/examples'
     | '/fde'
     | '/hld'
     | '/java'
     | '/lld'
     | '/playgrounds'
+    | '/python'
     | '/api/auth/$'
   id:
     | '__root__'
@@ -234,12 +256,14 @@ export interface FileRouteTypes {
     | '/java/$slug'
     | '/lld/$slug'
     | '/playgrounds/$slug'
+    | '/python/$slug'
     | '/examples/'
     | '/fde/'
     | '/hld/'
     | '/java/'
     | '/lld/'
     | '/playgrounds/'
+    | '/python/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -255,12 +279,14 @@ export interface RootRouteChildren {
   JavaSlugRoute: typeof JavaSlugRoute
   LldSlugRoute: typeof LldSlugRoute
   PlaygroundsSlugRoute: typeof PlaygroundsSlugRoute
+  PythonSlugRoute: typeof PythonSlugRoute
   ExamplesIndexRoute: typeof ExamplesIndexRoute
   FdeIndexRoute: typeof FdeIndexRoute
   HldIndexRoute: typeof HldIndexRoute
   JavaIndexRoute: typeof JavaIndexRoute
   LldIndexRoute: typeof LldIndexRoute
   PlaygroundsIndexRoute: typeof PlaygroundsIndexRoute
+  PythonIndexRoute: typeof PythonIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -385,6 +411,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlaygroundsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/python/': {
+      id: '/python/'
+      path: '/python'
+      fullPath: '/python/'
+      preLoaderRoute: typeof PythonIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/python/$slug': {
+      id: '/python/$slug'
+      path: '/python/$slug'
+      fullPath: '/python/$slug'
+      preLoaderRoute: typeof PythonSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -407,12 +447,14 @@ const rootRouteChildren: RootRouteChildren = {
   JavaSlugRoute: JavaSlugRoute,
   LldSlugRoute: LldSlugRoute,
   PlaygroundsSlugRoute: PlaygroundsSlugRoute,
+  PythonSlugRoute: PythonSlugRoute,
   ExamplesIndexRoute: ExamplesIndexRoute,
   FdeIndexRoute: FdeIndexRoute,
   HldIndexRoute: HldIndexRoute,
   JavaIndexRoute: JavaIndexRoute,
   LldIndexRoute: LldIndexRoute,
   PlaygroundsIndexRoute: PlaygroundsIndexRoute,
+  PythonIndexRoute: PythonIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

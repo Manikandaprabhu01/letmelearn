@@ -11,11 +11,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/pricing")({ component: PricingPage });
 
 const INCLUDED = [
-  "26 HLD concepts — load balancing, CAP, sharding, consensus",
+  "Java & Spring Boot — 20 chapters from basics to Docker",
+  "Python End-to-End for AI — 20 chapters from basics to RAG, agents and FastAPI",
   "19 LLD concepts — SOLID, patterns, concurrency, machine coding",
+  "40 HLD concepts — including 14 on microservices: sagas, service mesh, Kubernetes",
   "41 system design examples rewritten to chapter depth",
   "AI FDE Roadmap — 8 steps, 80 concepts, 130+ references",
-  "Java & Spring Boot — 20 chapters from basics to Docker",
   "8 interactive labs, including the rate limiter and hash ring",
   "Full-text search across everything",
   "Lifetime access — one payment, no renewal",

@@ -3,6 +3,7 @@ import { fdeConcepts } from "@/data/fde";
 import { javaConcepts } from "@/data/java";
 import { hldConcepts } from "@/data/hld";
 import { lldConcepts } from "@/data/lld";
+import { pythonConcepts } from "@/data/python";
 import { playgrounds } from "@/data/playgrounds";
 
 export type CatalogHit = {
@@ -14,11 +15,18 @@ export type CatalogHit = {
 };
 
 export const catalog: CatalogHit[] = [
-  ...hldConcepts.map((c) => ({
-    path: `/hld/${c.slug}`,
+  ...javaConcepts.map((c) => ({
+    path: `/java/${c.slug}`,
     title: c.title,
     subtitle: c.subtitle,
-    kind: "HLD",
+    kind: "Java",
+    tags: c.tags,
+  })),
+  ...pythonConcepts.map((c) => ({
+    path: `/python/${c.slug}`,
+    title: c.title,
+    subtitle: c.subtitle,
+    kind: "Python",
     tags: c.tags,
   })),
   ...lldConcepts.map((c) => ({
@@ -28,18 +36,11 @@ export const catalog: CatalogHit[] = [
     kind: "LLD",
     tags: c.tags,
   })),
-  ...fdeConcepts.map((c) => ({
-    path: `/fde/${c.slug}`,
+  ...hldConcepts.map((c) => ({
+    path: `/hld/${c.slug}`,
     title: c.title,
     subtitle: c.subtitle,
-    kind: "AI FDE",
-    tags: c.tags,
-  })),
-  ...javaConcepts.map((c) => ({
-    path: `/java/${c.slug}`,
-    title: c.title,
-    subtitle: c.subtitle,
-    kind: "Java",
+    kind: "HLD",
     tags: c.tags,
   })),
   ...examples.map((c) => ({
@@ -47,6 +48,13 @@ export const catalog: CatalogHit[] = [
     title: c.title,
     subtitle: c.summary,
     kind: c.source,
+    tags: c.tags,
+  })),
+  ...fdeConcepts.map((c) => ({
+    path: `/fde/${c.slug}`,
+    title: c.title,
+    subtitle: c.subtitle,
+    kind: "AI FDE",
     tags: c.tags,
   })),
   ...playgrounds.map((c) => ({

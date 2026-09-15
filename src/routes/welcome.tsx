@@ -11,32 +11,46 @@ export const Route = createFileRoute("/welcome")({ component: Welcome });
 
 const TRACKS = [
   {
-    kicker: "System design",
-    title: "HLD & LLD concepts",
-    body: "45 concepts with worked numbers, failure tables and interview follow-ups — from load balancing and CAP to SOLID and concurrency.",
-    to: "/hld" as const,
-    stat: "45 concepts",
-  },
-  {
-    kicker: "Worked examples",
-    title: "41 design examples",
-    body: "Every Alex Xu example rewritten to chapter depth: clarifying questions, back-of-envelope maths, architecture boards and model answers.",
-    to: "/examples" as const,
-    stat: "41 examples",
-  },
-  {
-    kicker: "AI engineering",
-    title: "AI FDE Roadmap",
-    body: "Eight steps from software foundations to the customer-facing layer — RAG, agents, MCP, evals, guardrails and enterprise integration.",
-    to: "/fde" as const,
-    stat: "80 concepts",
-  },
-  {
     kicker: "Backend",
     title: "Java & Spring Boot",
     body: "Twenty chapters aimed at the mistakes that cause production incidents — the proxy model, N+1, OOMKilled, prompt-to-SQL injection.",
     to: "/java" as const,
     stat: "20 chapters",
+  },
+  {
+    kicker: "AI engineering",
+    title: "Python End-to-End for AI",
+    body: "From Python basics through NumPy, pandas and PyTorch to LLM APIs, RAG, agents and a deployed FastAPI service.",
+    to: "/python" as const,
+    stat: "20 chapters",
+  },
+  {
+    kicker: "Low-level design",
+    title: "LLD concepts",
+    body: "SOLID, design patterns, concurrency and machine-coding problems, with class diagrams and interview follow-ups.",
+    to: "/lld" as const,
+    stat: "19 concepts",
+  },
+  {
+    kicker: "High-level design",
+    title: "HLD & Microservices",
+    body: "Caching, CAP, sharding and queues, then 14 microservices pages — sagas, outbox, service mesh, Kubernetes, canaries.",
+    to: "/hld" as const,
+    stat: "40 concepts",
+  },
+  {
+    kicker: "Worked examples",
+    title: "System Design Examples",
+    body: "Every Alex Xu example rewritten to chapter depth: clarifying questions, back-of-envelope maths, architecture boards and model answers.",
+    to: "/examples" as const,
+    stat: "41 examples",
+  },
+  {
+    kicker: "Customer-facing AI",
+    title: "AI FDE Roadmap",
+    body: "Eight steps from software foundations to the customer-facing layer — RAG, agents, MCP, evals, guardrails and enterprise integration.",
+    to: "/fde" as const,
+    stat: "80 concepts",
   },
 ];
 
@@ -99,9 +113,9 @@ function WelcomeBody({ signedIn }: { signedIn: boolean }) {
             then run the labs.
           </h1>
           <p className="mt-6 max-w-2xl text-[17px] leading-8 text-muted">
-            HLD and LLD concepts, every worked example from Alex Xu&rsquo;s System Design Interview
-            volumes, an AI Forward Deployed Engineer roadmap and a Java &amp; Spring Boot track —
-            written the way the interview actually goes.
+            Java &amp; Spring Boot, Python end to end for AI, LLD, HLD with microservices, every
+            worked example from Alex Xu&rsquo;s System Design Interview volumes, and an AI Forward
+            Deployed Engineer roadmap — written the way the interview actually goes.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-3">
             <Link to="/pricing">
@@ -130,7 +144,7 @@ function WelcomeBody({ signedIn }: { signedIn: boolean }) {
       {/* Tracks */}
       <section className="px-6 py-20 sm:px-10">
         <div className="mx-auto max-w-5xl">
-          <h2 className="font-display text-2xl tracking-tight sm:text-3xl">Four tracks</h2>
+          <h2 className="font-display text-2xl tracking-tight sm:text-3xl">Six tracks</h2>
           <p className="mt-2 max-w-2xl text-[15px] leading-7 text-muted">
             Each page ends where the next begins — concepts link to the examples that use them, and
             examples link to the labs that let you try them.

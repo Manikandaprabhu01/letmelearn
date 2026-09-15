@@ -3,6 +3,7 @@ import { fdeConcepts } from "@/data/fde";
 import { hldConcepts } from "@/data/hld";
 import { javaConcepts } from "@/data/java";
 import { lldConcepts } from "@/data/lld";
+import { pythonConcepts } from "@/data/python";
 
 /**
  * What stays readable without paying.
@@ -22,6 +23,7 @@ const FREE_SLUGS: ReadonlySet<string> = new Set(
     examples[0]?.slug,
     fdeConcepts[0]?.slug,
     javaConcepts[0]?.slug,
+    pythonConcepts[0]?.slug,
   ].filter((slug): slug is string => Boolean(slug)),
 );
 

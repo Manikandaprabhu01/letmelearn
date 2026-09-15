@@ -13,10 +13,11 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/login")({ component: LoginPage });
 
 const INCLUDED = [
-  "26 HLD concepts and 19 LLD concepts",
+  "Java & Spring Boot — 20 chapters",
+  "Python End-to-End for AI — 20 chapters",
+  "19 LLD concepts and 40 HLD concepts, including microservices",
   "41 system design examples at chapter depth",
   "The AI FDE Roadmap — 8 steps, 80 concepts",
-  "Java & Spring Boot — 20 chapters",
   "8 interactive labs",
 ];
 

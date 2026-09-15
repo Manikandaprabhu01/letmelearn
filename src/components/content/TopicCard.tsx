@@ -9,6 +9,7 @@ type SlugTo =
   | "/lld/$slug"
   | "/fde/$slug"
   | "/java/$slug"
+  | "/python/$slug"
   | "/examples/$slug"
   | "/playgrounds/$slug";
 

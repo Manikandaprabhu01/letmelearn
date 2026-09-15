@@ -6,6 +6,7 @@ import { hldConcepts } from "@/data/hld";
 import { javaConcepts } from "@/data/java";
 import { lldConcepts } from "@/data/lld";
 import { playgrounds } from "@/data/playgrounds";
+import { pythonConcepts } from "@/data/python";
 import { useProgress } from "@/lib/progress";
 
 export const Route = createFileRoute("/")({ component: Home });
@@ -30,7 +31,7 @@ const STEPS = [
 ];
 
 /**
- * Every id a "Mark studied" button can write, across all six tracks.
+ * Every id a "Mark studied" button can write, across all seven tracks.
  *
  * The stat counts against this set rather than the raw store: the store keeps
  * whatever was ever marked, including pages since renamed or removed, and the
@@ -43,6 +44,7 @@ const STUDY_IDS: ReadonlySet<string> = new Set([
   ...examples.map((e) => `ex:${e.slug}`),
   ...fdeConcepts.map((c) => `fde:${c.slug}`),
   ...javaConcepts.map((c) => `java:${c.slug}`),
+  ...pythonConcepts.map((c) => `py:${c.slug}`),
   ...playgrounds.map((p) => `lab:${p.slug}`),
 ]);
 
@@ -63,30 +65,37 @@ function Home() {
           Learn the map, then run the labs.
         </h1>
         <p className="relative mt-5 max-w-xl text-[16px] leading-7 text-muted">
-          HLD concepts, LLD object models, every worked example from Alex Xu's System Design
-          Interview Volume 1 and Volume 2, an AI Forward Deployed Engineer roadmap and a Java &amp;
-          Spring Boot track — plus the public awesome-system-design-resources list and interactive
-          labs.
+          Java &amp; Spring Boot, Python end to end for AI, LLD, HLD with microservices, every
+          worked example from Alex Xu&apos;s System Design Interview volumes, and an AI Forward
+          Deployed Engineer roadmap — plus interactive labs.
         </p>
         <div className="relative mt-8 flex flex-wrap gap-6 text-sm">
-          <Stat n={hldConcepts.length} label="HLD concepts" />
+          <Stat n={javaConcepts.length} label="Java chapters" />
+          <Stat n={pythonConcepts.length} label="Python chapters" />
           <Stat n={lldConcepts.length} label="LLD concepts" />
+          <Stat n={hldConcepts.length} label="HLD concepts" />
           <Stat n={examples.length} label="Worked examples" />
           <Stat n={fdeConcepts.length} label="FDE steps" />
-          <Stat n={javaConcepts.length} label="Java chapters" />
           <Stat n={playgrounds.length} label="Labs" />
           <Stat n={done} label={`Studied of ${total}`} />
         </div>
       </section>
 
-      {/* Six doors so the grid fills evenly at both 2 and 3 columns — an odd
-          count leaves a bare cell showing the border colour. */}
+      {/* One door per track, in menu order. Six keeps the grid even at 2 and 3
+          columns — an odd count leaves a bare cell showing the border colour. Labs
+          has its own section further down. */}
       <section className="grid gap-px border-b border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
         <Door
-          to="/hld"
+          to="/java"
           kicker="Menu"
-          title="HLD Concepts"
-          body="Load balancers, caches, CAP, sharding, queues, quorum — the vocabulary of large systems."
+          title="Java & Spring Boot"
+          body="Twenty chapters from the language core to Spring Boot, aimed at the bugs that cause real incidents."
+        />
+        <Door
+          to="/python"
+          kicker="Menu"
+          title="Python End-to-End for AI"
+          body="Twenty chapters from Python basics to NumPy, PyTorch, LLM APIs, RAG, agents and a deployed FastAPI service."
         />
         <Door
           to="/lld"
@@ -95,16 +104,10 @@ function Home() {
           body="SOLID, strategy, LRU, parking lot, thread-safety. Class design that survives a whiteboard."
         />
         <Door
-          to="/fde"
+          to="/hld"
           kicker="Menu"
-          title="AI FDE Roadmap"
-          body="Eight steps from software foundations to the customer-facing layer — RAG, agents, MCP, evals and guardrails."
-        />
-        <Door
-          to="/java"
-          kicker="Menu"
-          title="Java & Spring Boot"
-          body="Twenty chapters from the language core to Spring Boot, aimed at the bugs that cause real incidents."
+          title="HLD & Microservices"
+          body="Caches, CAP, sharding and queues, then sagas, service meshes, Kubernetes and safe deployments."
         />
         <Door
           to="/examples"
@@ -113,10 +116,10 @@ function Home() {
           body="Rate limiter through stock exchange, then Instagram, Uber, Docs, Zoom — Volume 1, Volume 2, and the awesome list."
         />
         <Door
-          to="/playgrounds"
+          to="/fde"
           kicker="Menu"
-          title="Labs"
-          body="Fire a burst at a token bucket, split a CAP cluster, mint a Snowflake — eight hands-on simulators."
+          title="AI FDE Roadmap"
+          body="Eight steps from software foundations to the customer-facing layer — RAG, agents, MCP, evals and guardrails."
         />
       </section>
 
