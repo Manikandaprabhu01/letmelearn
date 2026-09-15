@@ -1,6 +1,7 @@
 import { examples } from "@/data/examples";
 import { fdeConcepts } from "@/data/fde";
 import { hldConcepts } from "@/data/hld";
+import { COMPANY_INDEX } from "@/data/interview/company-index";
 import { javaConcepts } from "@/data/java";
 import { lldConcepts } from "@/data/lld";
 import { pythonConcepts } from "@/data/python";
@@ -30,4 +31,12 @@ const FREE_SLUGS: ReadonlySet<string> = new Set(
 /** True when this slug is one of the free samples. */
 export function isFreeSample(slug: string): boolean {
   return FREE_SLUGS.has(slug);
+}
+
+/**
+ * The Interview Prep Console's free sample: its first bank, answers included.
+ * Every question bank is readable; the answer sheets are what is gated.
+ */
+export function isFreeInterviewCompany(id: string): boolean {
+  return id === COMPANY_INDEX[0]?.id;
 }

@@ -1,5 +1,12 @@
 import { examples } from "@/data/examples";
 import { fdeConcepts } from "@/data/fde";
+import {
+  COMPANY_COUNT,
+  COMPANY_INDEX,
+  LIBRARY_ANSWER_COUNT,
+  QUESTION_COUNT,
+  getSector,
+} from "@/data/interview/meta";
 import { javaConcepts } from "@/data/java";
 import { hldConcepts } from "@/data/hld";
 import { lldConcepts } from "@/data/lld";
@@ -71,6 +78,27 @@ export const catalog: CatalogHit[] = [
     kind: "Sources",
     tags: ["awesome", "papers", "github", "algomaster"],
   },
+  {
+    path: "/interview-prep",
+    title: "Interview Prep Console",
+    subtitle: `Question banks and answer sheets for ${COMPANY_COUNT} companies — ${QUESTION_COUNT} questions, ${LIBRARY_ANSWER_COUNT} worked answers`,
+    kind: "Interview prep",
+    tags: ["interview", "questions", "answers", "companies"],
+  },
+  {
+    path: "/interview-prep/freshworks-lead",
+    title: "Freshworks Lead SE question bank",
+    subtitle: "101 questions from 26 candidate reports, by round, with a full answer sheet",
+    kind: "Interview prep",
+    tags: ["freshworks", "lead", "deep dive"],
+  },
+  ...COMPANY_INDEX.map((c) => ({
+    path: `/interview-prep/${c.id}`,
+    title: c.sector === "core" ? c.name : `${c.name} interview questions`,
+    subtitle: c.tag,
+    kind: "Interview prep",
+    tags: [getSector(c.sector).name, `${c.questions} questions`],
+  })),
 ];
 
 export function lookupPath(path: string) {

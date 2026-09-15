@@ -9,6 +9,7 @@ import { authClient } from "@/lib/auth/client";
 import { SignInButtons, SignedIn, SignedOut, UserButton } from "@/lib/auth/gates";
 import { getSignInMethods, type SignInMethods } from "@/lib/signin/methods";
 import { cn } from "@/lib/utils";
+import { COMPANY_COUNT } from "@/data/interview/meta";
 
 export const Route = createFileRoute("/login")({ component: LoginPage });
 
@@ -19,6 +20,7 @@ const INCLUDED = [
   "41 system design examples at chapter depth",
   "The AI FDE Roadmap — 8 steps, 80 concepts",
   "16 interactive labs",
+  `Interview Prep Console — ${COMPANY_COUNT} companies with answer sheets`,
 ];
 
 type Mode = "sign-in" | "sign-up";

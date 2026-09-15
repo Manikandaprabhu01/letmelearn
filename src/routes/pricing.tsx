@@ -7,6 +7,7 @@ import { SignedIn, SignedOut } from "@/lib/auth/gates";
 import { formatPaise, priceFor } from "@/lib/billing/pricing";
 import { useCheckout } from "@/lib/billing/use-checkout";
 import { cn } from "@/lib/utils";
+import { COMPANY_COUNT, LIBRARY_ANSWER_COUNT, QUESTION_COUNT } from "@/data/interview/meta";
 
 export const Route = createFileRoute("/pricing")({ component: PricingPage });
 
@@ -18,6 +19,7 @@ const INCLUDED = [
   "41 system design examples rewritten to chapter depth",
   "AI FDE Roadmap — 8 steps, 80 concepts, 130+ references",
   "16 interactive labs — from rate limiters to sagas, canaries and RAG retrieval",
+  `Interview Prep Console — ${COMPANY_COUNT} companies, ${QUESTION_COUNT} questions, ${LIBRARY_ANSWER_COUNT} worked answers`,
   "Full-text search across everything",
   "Lifetime access — one payment, no renewal",
 ];

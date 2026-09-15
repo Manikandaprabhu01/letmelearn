@@ -11,7 +11,8 @@ type SlugTo =
   | "/java/$slug"
   | "/python/$slug"
   | "/examples/$slug"
-  | "/playgrounds/$slug";
+  | "/playgrounds/$slug"
+  | "/interview-prep/$slug";
 
 export function TopicCard({
   to,

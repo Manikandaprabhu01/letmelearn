@@ -12,7 +12,9 @@ export function AppLink({
   onClick?: () => void;
   children: ReactNode;
 }) {
-  const m = path.match(/^\/(hld|lld|examples|playgrounds|fde|java|python)\/([^/]+)$/);
+  const m = path.match(
+    /^\/(hld|lld|examples|playgrounds|fde|java|python|interview-prep)\/([^/]+)$/,
+  );
   if (m) {
     const to = `/${m[1]}/$slug` as
       | "/hld/$slug"
@@ -21,7 +23,8 @@ export function AppLink({
       | "/playgrounds/$slug"
       | "/fde/$slug"
       | "/java/$slug"
-      | "/python/$slug";
+      | "/python/$slug"
+      | "/interview-prep/$slug";
     return (
       <Link to={to} params={{ slug: m[2] }} className={className} onClick={onClick}>
         {children}

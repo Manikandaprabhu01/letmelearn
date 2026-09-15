@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { examples } from "@/data/examples";
 import { fdeConcepts } from "@/data/fde";
 import { hldConcepts } from "@/data/hld";
+import { COMPANY_COUNT, COMPANY_INDEX } from "@/data/interview/meta";
 import { javaConcepts } from "@/data/java";
 import { lldConcepts } from "@/data/lld";
 import { playgrounds } from "@/data/playgrounds";
@@ -31,7 +32,8 @@ const STEPS = [
 ];
 
 /**
- * Every id a "Mark studied" button can write, across all seven tracks.
+ * Every id a "Mark studied" button can write, across every track, the labs and
+ * the interview prep console.
  *
  * The stat counts against this set rather than the raw store: the store keeps
  * whatever was ever marked, including pages since renamed or removed, and the
@@ -46,6 +48,8 @@ const STUDY_IDS: ReadonlySet<string> = new Set([
   ...javaConcepts.map((c) => `java:${c.slug}`),
   ...pythonConcepts.map((c) => `py:${c.slug}`),
   ...playgrounds.map((p) => `lab:${p.slug}`),
+  ...COMPANY_INDEX.map((c) => `ip:${c.id}`),
+  "ip:freshworks-lead",
 ]);
 
 function Home() {
@@ -77,6 +81,7 @@ function Home() {
           <Stat n={examples.length} label="Worked examples" />
           <Stat n={fdeConcepts.length} label="FDE steps" />
           <Stat n={playgrounds.length} label="Labs" />
+          <Stat n={COMPANY_COUNT} label="Interview banks" />
           <Stat n={done} label={`Studied of ${total}`} />
         </div>
       </section>
@@ -121,6 +126,34 @@ function Home() {
           title="AI FDE Roadmap"
           body="Eight steps from software foundations to the customer-facing layer — RAG, agents, MCP, evals and guardrails."
         />
+      </section>
+
+      <section className="border-b border-border px-5 py-10 sm:px-8 lg:px-12">
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">
+          Interview prep
+        </p>
+        <h2 className="mt-2 max-w-2xl font-display text-2xl font-medium tracking-tight">
+          Know the loop before you walk in
+        </h2>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
+          Question banks and answer sheets for {COMPANY_COUNT} companies — Google to Goldman Sachs,
+          Flipkart to Razorpay — with each loop&apos;s rounds, the level ladder, and worked answers
+          filtered from SDE to Principal.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3 text-sm">
+          <Link
+            to="/interview-prep"
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-surface px-3 py-2 hover:border-border-strong"
+          >
+            Open the console <ArrowRight className="size-4" />
+          </Link>
+          <Link
+            to="/interview-prep/freshworks-lead"
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-surface px-3 py-2 hover:border-border-strong"
+          >
+            Freshworks Lead SE deep dive <ArrowRight className="size-4" />
+          </Link>
+        </div>
       </section>
 
       <section className="border-b border-border px-5 py-10 sm:px-8 lg:px-12">
