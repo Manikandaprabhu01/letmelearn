@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { examples } from "@/data/examples";
+import { fdeConcepts } from "@/data/fde";
 import { hldConcepts } from "@/data/hld";
+import { javaConcepts } from "@/data/java";
 import { lldConcepts } from "@/data/lld";
 import { playgrounds } from "@/data/playgrounds";
 import { useProgress } from "@/lib/progress";
@@ -27,9 +29,28 @@ const STEPS = [
   { n: "04", title: "Wrap", body: "Bottlenecks, failure modes, what another hour would buy." },
 ];
 
+/**
+ * Every id a "Mark studied" button can write, across all six tracks.
+ *
+ * The stat counts against this set rather than the raw store: the store keeps
+ * whatever was ever marked, including pages since renamed or removed, and the
+ * old total left out the FDE and Java tracks entirely — so marking those made
+ * the count drift past the real denominator.
+ */
+const STUDY_IDS: ReadonlySet<string> = new Set([
+  ...hldConcepts.map((c) => `hld:${c.slug}`),
+  ...lldConcepts.map((c) => `lld:${c.slug}`),
+  ...examples.map((e) => `ex:${e.slug}`),
+  ...fdeConcepts.map((c) => `fde:${c.slug}`),
+  ...javaConcepts.map((c) => `java:${c.slug}`),
+  ...playgrounds.map((p) => `lab:${p.slug}`),
+]);
+
 function Home() {
-  const done = useProgress((s) => Object.keys(s.done).length);
-  const total = hldConcepts.length + lldConcepts.length + examples.length + playgrounds.length;
+  const done = useProgress(
+    (s) => Object.entries(s.done).filter(([id, value]) => value && STUDY_IDS.has(id)).length,
+  );
+  const total = STUDY_IDS.size;
 
   return (
     <main>
@@ -42,21 +63,25 @@ function Home() {
           Learn the map, then run the labs.
         </h1>
         <p className="relative mt-5 max-w-xl text-[16px] leading-7 text-muted">
-          HLD concepts, LLD object models, and every worked example from Alex Xu's System Design
-          Interview Volume 1 and Volume 2 — plus source 6, the public
-          awesome-system-design-resources list, and interactive playgrounds in the spirit of the
-          rate-limiter visualizer.
+          HLD concepts, LLD object models, every worked example from Alex Xu's System Design
+          Interview Volume 1 and Volume 2, an AI Forward Deployed Engineer roadmap and a Java &amp;
+          Spring Boot track — plus the public awesome-system-design-resources list and interactive
+          labs.
         </p>
         <div className="relative mt-8 flex flex-wrap gap-6 text-sm">
           <Stat n={hldConcepts.length} label="HLD concepts" />
           <Stat n={lldConcepts.length} label="LLD concepts" />
           <Stat n={examples.length} label="Worked examples" />
+          <Stat n={fdeConcepts.length} label="FDE steps" />
+          <Stat n={javaConcepts.length} label="Java chapters" />
           <Stat n={playgrounds.length} label="Labs" />
           <Stat n={done} label={`Studied of ${total}`} />
         </div>
       </section>
 
-      <section className="grid gap-px border-b border-border bg-border sm:grid-cols-3">
+      {/* Six doors so the grid fills evenly at both 2 and 3 columns — an odd
+          count leaves a bare cell showing the border colour. */}
+      <section className="grid gap-px border-b border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
         <Door
           to="/hld"
           kicker="Menu"
@@ -70,17 +95,37 @@ function Home() {
           body="SOLID, strategy, LRU, parking lot, thread-safety. Class design that survives a whiteboard."
         />
         <Door
+          to="/fde"
+          kicker="Menu"
+          title="AI FDE Roadmap"
+          body="Eight steps from software foundations to the customer-facing layer — RAG, agents, MCP, evals and guardrails."
+        />
+        <Door
+          to="/java"
+          kicker="Menu"
+          title="Java & Spring Boot"
+          body="Twenty chapters from the language core to Spring Boot, aimed at the bugs that cause real incidents."
+        />
+        <Door
           to="/examples"
           kicker="Menu"
           title="System Design Examples"
           body="Rate limiter through stock exchange, then Instagram, Uber, Docs, Zoom — Volume 1, Volume 2, and the awesome list."
         />
+        <Door
+          to="/playgrounds"
+          kicker="Menu"
+          title="Labs"
+          body="Fire a burst at a token bucket, split a CAP cluster, mint a Snowflake — eight hands-on simulators."
+        />
       </section>
 
       <section className="border-b border-border px-5 py-10 sm:px-8 lg:px-12">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Source 6</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">
+          Further reading
+        </p>
         <h2 className="mt-2 max-w-2xl font-display text-2xl font-medium tracking-tight">
-          The public awesome list, in the atlas
+          The public awesome list, mapped to the library
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
           ashishps1/awesome-system-design-resources — Easy / Medium / Hard prompts, the

@@ -89,6 +89,53 @@ export async function probeSignInRedirect(base, fetchImpl = fetch) {
   return { ok: true, redirectOrigin, detail: `callback returns to ${redirectOrigin}` };
 }
 
+/**
+ * Probe email/password sign-in with a wrong password for an address that cannot
+ * exist. It creates nothing and signs nobody in, yet the answer separates the
+ * three states that matter:
+ *   401 INVALID_EMAIL_OR_PASSWORD -> email/password is on, and this origin is trusted
+ *   403 INVALID_ORIGIN            -> BETTER_AUTH_URL does not match the site
+ *   404                           -> email/password is off, or the deploy is stale
+ * @param {string} base
+ * @returns {Promise<{ ok: boolean, detail: string }>}
+ */
+export async function probeEmailSignIn(base, fetchImpl = fetch) {
+  const origin = new URL(base).origin;
+  let res;
+  let body = null;
+  try {
+    res = await fetchImpl(new URL("/api/auth/sign-in/email", base), {
+      method: "POST",
+      headers: { "content-type": "application/json", origin },
+      body: JSON.stringify({
+        email: "deploy-check@invalid.example",
+        password: "deploy-check-not-a-real-password",
+      }),
+    });
+    body = await res.json().catch(() => null);
+  } catch (err) {
+    return { ok: false, detail: `request failed: ${err instanceof Error ? err.message : err}` };
+  }
+  const code = body && typeof body === "object" ? body.code : undefined;
+  if (res.status === 401 && code === "INVALID_EMAIL_OR_PASSWORD") {
+    return { ok: true, detail: "enabled, and requests from this origin are trusted" };
+  }
+  if (res.status === 403 || code === "INVALID_ORIGIN") {
+    return {
+      ok: false,
+      detail:
+        "rejected as an untrusted origin. Set BETTER_AUTH_URL to this site's origin and redeploy.",
+    };
+  }
+  if (res.status === 404) {
+    return { ok: false, detail: "not found: email/password is off, or the deploy is stale" };
+  }
+  if (res.status === 429) {
+    return { ok: false, detail: "rate-limited. Wait a minute and re-run." };
+  }
+  return { ok: false, detail: `unexpected ${res.status}${code ? ` ${code}` : ""}` };
+}
+
 async function main() {
   const base = process.argv[2];
   if (!base) {
@@ -120,6 +167,11 @@ async function main() {
 
   const redirect = await probeSignInRedirect(base);
   results.push({ name: "sign-in redirect_uri points at this site", ...redirect });
+
+  results.push({
+    name: "email/password sign-in reachable from this site",
+    ...(await probeEmailSignIn(base)),
+  });
 
   let failed = 0;
   for (const r of results) {

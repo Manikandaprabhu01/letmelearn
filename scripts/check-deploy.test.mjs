@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { probeSignInRedirect } from "./check-deploy.mjs";
+import { probeEmailSignIn, probeSignInRedirect } from "./check-deploy.mjs";
 
 const SITE = "https://letmelearn.vercel.app";
 
@@ -54,4 +54,35 @@ test("reports an authorize URL with no redirect_uri", async () => {
   );
   assert.equal(result.ok, false);
   assert.match(result.detail, /no redirect_uri/);
+});
+
+/** A stub for /api/auth/sign-in/email answering with a status and body. */
+function emailStub(status, body) {
+  return async () => ({ status, json: async () => body });
+}
+
+test("email probe passes on a wrong-password 401 — enabled and origin trusted", async () => {
+  const result = await probeEmailSignIn(
+    SITE,
+    emailStub(401, { code: "INVALID_EMAIL_OR_PASSWORD", message: "Invalid email or password" }),
+  );
+  assert.equal(result.ok, true);
+});
+
+test("email probe names BETTER_AUTH_URL when the origin is untrusted", async () => {
+  const result = await probeEmailSignIn(SITE, emailStub(403, { code: "INVALID_ORIGIN" }));
+  assert.equal(result.ok, false);
+  assert.match(result.detail, /BETTER_AUTH_URL/);
+});
+
+test("email probe reports email/password off or a stale deploy on 404", async () => {
+  const result = await probeEmailSignIn(SITE, emailStub(404, null));
+  assert.equal(result.ok, false);
+  assert.match(result.detail, /off, or the deploy is stale/);
+});
+
+test("email probe never mistakes a 200 for success", async () => {
+  // A 200 would mean the throwaway credentials signed someone in — never a pass.
+  const result = await probeEmailSignIn(SITE, emailStub(200, { token: "x" }));
+  assert.equal(result.ok, false);
 });
