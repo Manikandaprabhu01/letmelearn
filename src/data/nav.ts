@@ -6,9 +6,9 @@ export const NAV = [
   { to: "/hld", label: "HLD & Microservices", match: "prefix" as const },
   { to: "/examples", label: "System Design Examples", match: "prefix" as const },
   { to: "/fde", label: "AI FDE Roadmap", match: "prefix" as const },
+  { to: "/interview-prep", label: "Interview Prep Console", match: "prefix" as const },
   { to: "/playgrounds", label: "Labs", match: "prefix" as const },
   { to: "/resources", label: "Sources", match: "prefix" as const },
-  { to: "/interview-prep", label: "Interview Prep Console", match: "prefix" as const },
 ] as const;
 
 export const APP_NAME = "LetMeLearn";

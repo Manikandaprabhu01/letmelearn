@@ -19,8 +19,8 @@ const INCLUDED = [
   "19 LLD concepts and 40 HLD concepts, including microservices",
   "41 system design examples at chapter depth",
   "The AI FDE Roadmap — 8 steps, 80 concepts",
-  "16 interactive labs",
   `Interview Prep Console — ${COMPANY_COUNT} companies with answer sheets`,
+  "16 interactive labs",
 ];
 
 type Mode = "sign-in" | "sign-up";

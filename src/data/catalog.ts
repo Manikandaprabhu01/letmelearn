@@ -64,20 +64,6 @@ export const catalog: CatalogHit[] = [
     kind: "AI FDE",
     tags: c.tags,
   })),
-  ...playgrounds.map((c) => ({
-    path: `/playgrounds/${c.slug}`,
-    title: c.title,
-    subtitle: c.subtitle,
-    kind: "Lab",
-    tags: c.tags,
-  })),
-  {
-    path: "/resources",
-    title: "Awesome system design resources",
-    subtitle: "Source 6 — interview problems, papers, and channels from ashishps1's list",
-    kind: "Sources",
-    tags: ["awesome", "papers", "github", "algomaster"],
-  },
   {
     path: "/interview-prep",
     title: "Interview Prep Console",
@@ -99,6 +85,20 @@ export const catalog: CatalogHit[] = [
     kind: "Interview prep",
     tags: [getSector(c.sector).name, `${c.questions} questions`],
   })),
+  ...playgrounds.map((c) => ({
+    path: `/playgrounds/${c.slug}`,
+    title: c.title,
+    subtitle: c.subtitle,
+    kind: "Lab",
+    tags: c.tags,
+  })),
+  {
+    path: "/resources",
+    title: "Awesome system design resources",
+    subtitle: "Source 6 — interview problems, papers, and channels from ashishps1's list",
+    kind: "Sources",
+    tags: ["awesome", "papers", "github", "algomaster"],
+  },
 ];
 
 export function lookupPath(path: string) {
