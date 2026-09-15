@@ -6,17 +6,18 @@ export const javaFoundations: Concept[] = [
   {
     slug: "how-to-use-this-guide",
     title: "How to Use This Guide",
-    subtitle: "Chapter 0 — the path through twenty chapters, and what to skip",
+    subtitle: "Chapter 0 — the path through thirty-four chapters, and what to skip",
     level: "foundational",
     minutes: 10,
     tags: ["orientation", "roadmap"],
     summary:
-      "Twenty chapters is a lot, and reading them in order front to back is the slowest route to being useful. This page is the map: which chapters are load-bearing, which are reference material you look up when you hit them, and the order that gets you writing production Spring Boot services fastest.",
+      "Thirty-four chapters is a lot, and reading them in order front to back is the slowest route to being useful. This page is the map: which chapters are load-bearing, which are reference material you look up when you hit them, and the order that gets you writing production Spring Boot services fastest.",
     keyPoints: [
       "Chapters 1, 2, 6 and 14 are the core — everything else assumes them.",
       "Chapters 3 and 4 are where real backend bugs come from: concurrency and error handling.",
       "Chapters 13 and 18 are the ones that pay the bills; get there as fast as the fundamentals allow.",
       "Chapters 5, 9, 10 and 11 are reference — read when a task demands them, not before.",
+      "Chapters 20–33 go deep on Spring Boot in production — start with 24 (transactions), 25 (JPA) and 28 (threads) once your first service ships.",
     ],
     sections: [
       {
@@ -40,6 +41,11 @@ export const javaFoundations: Concept[] = [
               "3 — Framework and ship",
               "13 Web Dev, 18 Spring, 16 Security, 19 Docker, 17 Cloud",
               "Deliver a running service",
+            ],
+            [
+              "4 — Spring Boot in depth",
+              "24 Transactions, 25 JPA, 28 Threads, 31 Resilience, 32 Observability — then the rest of 20–33",
+              "Run it well in production",
             ],
             [
               "Reference",

@@ -13,9 +13,9 @@ const TRACKS = [
   {
     kicker: "Backend",
     title: "Java & Spring Boot",
-    body: "Twenty chapters aimed at the mistakes that cause production incidents — the proxy model, N+1, OOMKilled, prompt-to-SQL injection.",
+    body: "Thirty-four chapters aimed at the mistakes that cause production incidents — the proxy model, N+1, pool exhaustion, retry storms, OOMKilled — with 14 on Spring Boot internals.",
     to: "/java" as const,
-    stat: "20 chapters",
+    stat: "34 chapters",
   },
   {
     kicker: "AI engineering",

@@ -12,7 +12,7 @@ import { COMPANY_COUNT, LIBRARY_ANSWER_COUNT, QUESTION_COUNT } from "@/data/inte
 export const Route = createFileRoute("/pricing")({ component: PricingPage });
 
 const INCLUDED = [
-  "Java & Spring Boot — 20 chapters from basics to Docker",
+  "Java & Spring Boot — 34 chapters, from basics to Spring Boot internals in production",
   "Python End-to-End for AI — 20 chapters from basics to RAG, agents and FastAPI",
   "19 LLD concepts — SOLID, patterns, concurrency, machine coding",
   "40 HLD concepts — including 14 on microservices: sagas, service mesh, Kubernetes",

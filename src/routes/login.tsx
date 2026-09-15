@@ -14,7 +14,7 @@ import { COMPANY_COUNT } from "@/data/interview/meta";
 export const Route = createFileRoute("/login")({ component: LoginPage });
 
 const INCLUDED = [
-  "Java & Spring Boot — 20 chapters",
+  "Java & Spring Boot — 34 chapters, 14 of them on Spring Boot internals",
   "Python End-to-End for AI — 20 chapters",
   "19 LLD concepts and 40 HLD concepts, including microservices",
   "41 system design examples at chapter depth",

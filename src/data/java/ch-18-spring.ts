@@ -233,7 +233,14 @@ Page<Order> page = repository.findByStatus(Status.OPEN, PageRequest.of(0, 50));`
         ],
       },
     ],
-    related: ["/java/web-development", "/java/jdbc", "/java/testing", "/java/security"],
+    related: [
+      "/java/spring-boot-startup",
+      "/java/spring-aop",
+      "/java/spring-transactions",
+      "/java/jpa-hibernate",
+      "/java/web-development",
+      "/java/security",
+    ],
     furtherReading: [
       {
         label: "Spring Boot — official documentation",

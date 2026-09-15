@@ -94,7 +94,7 @@ function Home() {
           to="/java"
           kicker="Menu"
           title="Java & Spring Boot"
-          body="Twenty chapters from the language core to Spring Boot, aimed at the bugs that cause real incidents."
+          body="Thirty-four chapters from the language core to Spring Boot internals — transactions, JPA, security, Kafka and observability."
         />
         <Door
           to="/python"
