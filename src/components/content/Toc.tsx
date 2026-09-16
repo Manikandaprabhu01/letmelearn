@@ -35,9 +35,7 @@ export function Toc({ entries }: { entries: TocEntry[] }) {
 
   return (
     <nav aria-label="On this page" className="text-sm">
-      <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-faint">
-        On this page
-      </div>
+      <div className="eyebrow">On this page</div>
       <ul className="mt-3 space-y-1 border-l border-border">
         {entries.map((e) => {
           const showGroup = e.group && e.group !== lastGroup;
@@ -54,7 +52,7 @@ export function Toc({ entries }: { entries: TocEntry[] }) {
                 className={cn(
                   "-ml-px block border-l py-1 pl-3 text-[13px] leading-5 transition-colors",
                   active === e.id
-                    ? "border-accent text-fg"
+                    ? "border-cta text-fg"
                     : "border-transparent text-muted hover:border-border-strong hover:text-fg",
                 )}
               >

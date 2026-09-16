@@ -36,7 +36,7 @@ function PricingPage() {
   return (
     <main className="px-5 py-12 sm:px-8 lg:px-12">
       <div className="mx-auto max-w-5xl">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Pricing</p>
+        <p className="eyebrow">Pricing</p>
         <h1 className="mt-2 font-display text-3xl font-medium tracking-tight sm:text-4xl">
           One payment. Everything, for good.
         </h1>
@@ -101,10 +101,7 @@ function PricingPage() {
                   setApplied(code);
                 }}
               >
-                <label
-                  htmlFor="promo"
-                  className="text-[11px] uppercase tracking-[0.14em] text-faint"
-                >
+                <label htmlFor="promo" className="eyebrow">
                   Discount code
                 </label>
                 <div className="mt-1.5 flex gap-2">

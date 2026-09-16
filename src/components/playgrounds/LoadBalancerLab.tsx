@@ -35,9 +35,13 @@ export function LoadBalancerLab() {
   const send = () => {
     const id = pick(servers);
     setLast(id);
-    setServers((ss) => ss.map((s) => (s.id === id ? { ...s, inflight: s.inflight + 1, hits: s.hits + 1 } : s)));
+    setServers((ss) =>
+      ss.map((s) => (s.id === id ? { ...s, inflight: s.inflight + 1, hits: s.hits + 1 } : s)),
+    );
     window.setTimeout(() => {
-      setServers((ss) => ss.map((s) => (s.id === id ? { ...s, inflight: Math.max(0, s.inflight - 1) } : s)));
+      setServers((ss) =>
+        ss.map((s) => (s.id === id ? { ...s, inflight: Math.max(0, s.inflight - 1) } : s)),
+      );
     }, 900);
   };
 
@@ -50,8 +54,8 @@ export function LoadBalancerLab() {
   return (
     <div className="space-y-6">
       <p className="max-w-prose text-sm leading-6 text-muted">
-        Three backends, one balancer. Round robin shares equally. Least-connections chases load. Hash sticks a key to a
-        box — until the fleet size changes.
+        Three backends, one balancer. Round robin shares equally. Least-connections chases load.
+        Hash sticks a key to a box — until the fleet size changes.
       </p>
       <div className="flex flex-wrap gap-2">
         {(
@@ -61,7 +65,11 @@ export function LoadBalancerLab() {
             ["hash", "Hash"],
           ] as const
         ).map(([id, label]) => (
-          <Button key={id} variant={algo === id ? "primary" : "secondary"} onClick={() => setAlgo(id)}>
+          <Button
+            key={id}
+            variant={algo === id ? "primary" : "secondary"}
+            onClick={() => setAlgo(id)}
+          >
             {label}
           </Button>
         ))}
@@ -89,7 +97,7 @@ export function LoadBalancerLab() {
             className={`rounded-lg border p-4 ${last === s.id ? "border-accent bg-accent/10" : "border-border bg-surface"}`}
           >
             <div className="font-mono text-sm">{s.id}</div>
-            <div className="mt-2 text-[11px] uppercase tracking-[0.14em] text-faint">In flight</div>
+            <div className="mt-2 eyebrow">In flight</div>
             <div className="font-mono text-2xl tabular-nums">{s.inflight}</div>
             <div className="mt-2 text-xs text-muted">{s.hits} total hits</div>
           </div>

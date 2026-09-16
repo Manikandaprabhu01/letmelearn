@@ -87,9 +87,7 @@ function LoginPage() {
 
       {/* Right: what an account gets you */}
       <aside className="hidden flex-col justify-center border-l border-border bg-inset px-16 lg:flex">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">
-          What is inside
-        </p>
+        <p className="eyebrow">What is inside</p>
         <h2 className="mt-3 max-w-sm font-display text-2xl leading-snug tracking-tight">
           Learn the map, then run the labs.
         </h2>

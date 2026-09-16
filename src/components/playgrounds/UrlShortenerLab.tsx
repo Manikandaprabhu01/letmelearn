@@ -33,13 +33,13 @@ export function UrlShortenerLab() {
   return (
     <div className="space-y-6">
       <p className="max-w-prose text-sm leading-6 text-muted">
-        A global counter (or Snowflake) converted to base62 is collision-free and compact. 62^7 ≈ 3.5 trillion codes —
-        enough for 100 million new URLs a day for decades.
+        A global counter (or Snowflake) converted to base62 is collision-free and compact. 62^7 ≈
+        3.5 trillion codes — enough for 100 million new URLs a day for decades.
       </p>
       <div className="rounded-lg border border-border bg-inset p-5">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-faint">Counter</div>
+        <div className="eyebrow">Counter</div>
         <div className="mt-1 font-mono text-2xl tabular-nums">{counter.toLocaleString()}</div>
-        <div className="mt-4 text-[11px] uppercase tracking-[0.14em] text-faint">Base62 code</div>
+        <div className="mt-4 eyebrow">Base62 code</div>
         <div className="mt-1 font-mono text-3xl tracking-wide text-accent">{code}</div>
         <div className="mt-2 text-sm text-muted">https://ltc.es/{code}</div>
         <div className="mt-4 flex flex-wrap gap-2">
@@ -60,7 +60,9 @@ export function UrlShortenerLab() {
       </label>
       {custom ? (
         <p className="font-mono text-sm">
-          {decoded === null ? "Invalid character (use 0-9 a-z A-Z)" : `counter = ${decoded.toLocaleString()}`}
+          {decoded === null
+            ? "Invalid character (use 0-9 a-z A-Z)"
+            : `counter = ${decoded.toLocaleString()}`}
         </p>
       ) : null}
       <div className="overflow-x-auto rounded-lg border border-border text-sm">
@@ -80,7 +82,9 @@ export function UrlShortenerLab() {
                 <tr key={len} className="border-t border-border">
                   <td className="px-3 py-2 font-medium text-fg">{len}</td>
                   <td className="px-3 py-2 font-mono text-xs">{space.toExponential(2)}</td>
-                  <td className="px-3 py-2">{days < 365 ? `${days.toFixed(0)} days` : `${(days / 365).toFixed(0)} years`}</td>
+                  <td className="px-3 py-2">
+                    {days < 365 ? `${days.toFixed(0)} days` : `${(days / 365).toFixed(0)} years`}
+                  </td>
                 </tr>
               );
             })}

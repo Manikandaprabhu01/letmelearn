@@ -15,7 +15,7 @@ function Prerequisites({ paths }: { paths: string[] }) {
   if (!items.length) return null;
   return (
     <p className="text-sm text-muted">
-      <span className="text-[11px] uppercase tracking-[0.14em] text-faint">Read first </span>
+      <span className="eyebrow">Read first </span>
       {items.map((item, i) => (
         <span key={item.path}>
           {i > 0 ? <span className="text-faint"> · </span> : null}
@@ -53,21 +53,19 @@ export function ConceptView({
         <div className="lg:flex lg:gap-12">
           <div className="min-w-0 flex-1 space-y-10">
             <div className="space-y-4">
-              <p className="max-w-prose text-[16px] leading-7 text-fg">{concept.summary}</p>
+              <p className="max-w-[68ch] text-[17px] leading-8 text-fg">{concept.summary}</p>
               {concept.prerequisites?.length ? (
                 <Prerequisites paths={concept.prerequisites} />
               ) : null}
             </div>
 
             {concept.keyPoints?.length ? (
-              <aside className="rounded-lg border border-accent/25 bg-accent/6 px-4 py-4 sm:px-5">
-                <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">
-                  The 60-second version
-                </div>
+              <aside className="rounded-lg bg-surface px-4 py-4 shadow-panel sm:px-5">
+                <div className="eyebrow">The 60-second version</div>
                 <ul className="mt-3 space-y-2">
                   {concept.keyPoints.map((p) => (
                     <li key={p} className="flex gap-2.5 text-[14.5px] leading-6 text-muted">
-                      <span className="mt-[9px] size-1 shrink-0 rounded-full bg-accent" />
+                      <span className="mt-[9px] size-1 shrink-0 rounded-full bg-cta" />
                       <span>{p}</span>
                     </li>
                   ))}
@@ -90,9 +88,7 @@ export function ConceptView({
 
             {concept.furtherReading.length ? (
               <div>
-                <h2 className="text-[11px] font-medium uppercase tracking-[0.16em] text-faint">
-                  Sources
-                </h2>
+                <h2 className="eyebrow">Sources</h2>
                 <ul className="mt-3 space-y-2">
                   {concept.furtherReading.map((l) => (
                     <li key={l.href}>

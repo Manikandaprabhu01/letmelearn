@@ -175,9 +175,7 @@ export function AsyncConcurrencyLab() {
 
       <div className="rounded-lg border border-border bg-inset p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="text-[11px] uppercase tracking-[0.14em] text-faint">
-            Timeline of the first {shown.length} calls
-          </div>
+          <div className="eyebrow">Timeline of the first {shown.length} calls</div>
           <div className="flex flex-wrap gap-3 text-[11px] text-faint">
             <Legend className="bg-raised" label="waiting for a slot" />
             <Legend

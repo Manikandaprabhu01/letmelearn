@@ -295,7 +295,7 @@ function Timeline({
 }) {
   return (
     <div>
-      <div className="mb-2 text-[11px] uppercase tracking-[0.14em] text-faint">{title}</div>
+      <div className="mb-2 eyebrow">{title}</div>
       <div className="flex h-20 items-end gap-[3px]">
         {seconds.map((s) => {
           const r = ratio(s);

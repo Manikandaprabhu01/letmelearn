@@ -7,7 +7,7 @@ function CompilerPage() {
   return (
     <main>
       <header className="border-b border-border px-5 py-8 sm:px-8 lg:px-12">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Menu</p>
+        <p className="eyebrow">Menu</p>
         <h1 className="mt-2 font-display text-3xl font-medium tracking-tight sm:text-4xl">
           Code Compiler
         </h1>

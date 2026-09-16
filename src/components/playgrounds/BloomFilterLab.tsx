@@ -163,7 +163,7 @@ export function BloomFilterLab() {
       </div>
 
       <div className="rounded-lg border border-border bg-inset p-4">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-[11px] uppercase tracking-[0.14em] text-faint">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2 eyebrow">
           <span>
             Bit array · {setCount} of {m} set ({Math.round((setCount / m) * 100)}%)
           </span>

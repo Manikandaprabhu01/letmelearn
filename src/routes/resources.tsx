@@ -31,12 +31,15 @@ const BANDS: { id: AwesomeBand; label: string; hint: string }[] = [
 function ResourcesPage() {
   return (
     <main className="px-5 py-10 sm:px-8 lg:px-12">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Sources</p>
-      <h1 className="mt-2 font-display text-3xl font-medium tracking-tight sm:text-4xl">Where this atlas points</h1>
+      <p className="eyebrow">Sources</p>
+      <h1 className="mt-2 font-display text-3xl font-medium tracking-tight sm:text-4xl">
+        Where this atlas points
+      </h1>
       <p className="mt-3 max-w-2xl text-[15px] leading-7 text-muted">
-        LetMeLearn is original teaching notes inspired by public system-design practice and the chapter maps of Alex Xu's
-        books — not a reproduction of the books. Buy them. Then use the labs here to keep the diagrams in your hands.
-        Source 6 is the public awesome list: problems, papers, and channels folded into this page.
+        LetMeLearn is original teaching notes inspired by public system-design practice and the
+        chapter maps of Alex Xu's books — not a reproduction of the books. Buy them. Then use the
+        labs here to keep the diagrams in your hands. Source 6 is the public awesome list: problems,
+        papers, and channels folded into this page.
       </p>
 
       <ol className="mt-8 space-y-3">
@@ -49,7 +52,7 @@ function ResourcesPage() {
               className="block rounded-lg border border-border bg-surface p-4 hover:border-border-strong"
             >
               <div className="flex items-baseline justify-between gap-3">
-                <div className="text-[11px] uppercase tracking-[0.14em] text-accent">
+                <div className="eyebrow">
                   {String(i + 1).padStart(2, "0")} · {KIND[r.kind]}
                 </div>
                 {r.kind === "repo" ? (
@@ -64,16 +67,22 @@ function ResourcesPage() {
       </ol>
 
       <section className="mt-16">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Source 6</p>
+        <p className="eyebrow">Source 6</p>
         <h2 className="mt-2 font-display text-2xl font-medium tracking-tight sm:text-3xl">
           Interview problems from the awesome list
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
           Every prompt in{" "}
-          <a href={awesomeRepo.href} target="_blank" rel="noreferrer" className="text-accent hover:underline">
+          <a
+            href={awesomeRepo.href}
+            target="_blank"
+            rel="noreferrer"
+            className="text-accent hover:underline"
+          >
             ashishps1/awesome-system-design-resources
           </a>
-          . Where LetMeLearn has a worked page, open that. Otherwise jump to the public walkthrough the list points at.
+          . Where LetMeLearn has a worked page, open that. Otherwise jump to the public walkthrough
+          the list points at.
         </p>
 
         {BANDS.map((band) => {
@@ -97,8 +106,8 @@ function ResourcesPage() {
       <section className="mt-16">
         <h2 className="font-display text-2xl font-medium tracking-tight">Must-read papers</h2>
         <p className="mt-2 max-w-2xl text-sm text-muted">
-          The distributed-systems canon from the same list. Dynamo and Chubby pair with LetMeLearn's KV-store and lock
-          examples.
+          The distributed-systems canon from the same list. Dynamo and Chubby pair with LetMeLearn's
+          KV-store and lock examples.
         </p>
         <ul className="mt-5 space-y-2">
           {awesomePapers.map((l) => (
@@ -144,7 +153,9 @@ function ProblemCard({
       <div className="flex items-start justify-between gap-2">
         <div className="font-medium leading-snug">{problem.title}</div>
         {problem.lattice ? (
-          <span className="shrink-0 text-[11px] uppercase tracking-[0.14em] text-ok">In LetMeLearn</span>
+          <span className="shrink-0 text-[11px] uppercase tracking-[0.14em] text-ok">
+            In LetMeLearn
+          </span>
         ) : (
           <ArrowUpRight className="size-4 shrink-0 text-faint" />
         )}

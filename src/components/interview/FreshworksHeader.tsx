@@ -18,9 +18,7 @@ export function FreshworksHeader({ view }: { view: "bank" | "answers" }) {
   return (
     <header className="border-b border-border pb-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">
-          Deep dive · Lead Software Engineer · Freshworks
-        </p>
+        <p className="eyebrow">Deep dive · Lead Software Engineer · Freshworks</p>
         <MarkDone id="ip:freshworks-lead" />
       </div>
       <h1 className="mt-3 font-display text-3xl font-medium tracking-tight sm:text-4xl">

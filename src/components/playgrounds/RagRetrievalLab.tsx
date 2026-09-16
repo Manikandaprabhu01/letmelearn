@@ -225,9 +225,7 @@ export function RagRetrievalLab() {
       </div>
 
       <div className="space-y-3">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-faint">
-          Retrieved context (top {k})
-        </div>
+        <div className="eyebrow">Retrieved context (top {k})</div>
         {results.length === 0 ? (
           <div className="rounded-lg border border-warn/40 bg-warn/10 px-4 py-3 text-sm text-warn">
             No chunk shares a keyword with this question. This is where embeddings help: they match
@@ -279,9 +277,7 @@ export function RagRetrievalLab() {
 
       <div className="rounded-lg border border-border bg-inset p-4">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <div className="text-[11px] uppercase tracking-[0.14em] text-faint">
-            Evaluation: recall@{k}
-          </div>
+          <div className="eyebrow">Evaluation: recall@{k}</div>
           <div
             className={`font-mono text-2xl ${recall >= 0.8 ? "text-ok" : recall >= 0.5 ? "text-warn" : "text-bad"}`}
           >

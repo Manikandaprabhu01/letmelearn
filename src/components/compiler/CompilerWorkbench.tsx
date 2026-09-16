@@ -301,7 +301,7 @@ function ResultTable({
       {chunk.title ? <div className="mb-1 text-[11px] text-faint">{chunk.title}</div> : null}
       <div className="overflow-x-auto rounded-md border border-border">
         <table className="w-full text-left text-[12.5px]">
-          <thead className="bg-raised text-[11px] uppercase tracking-wider text-faint">
+          <thead className="bg-raised eyebrow">
             <tr>
               {chunk.columns.map((column) => (
                 <th key={column} className="whitespace-nowrap px-3 py-2 font-medium">

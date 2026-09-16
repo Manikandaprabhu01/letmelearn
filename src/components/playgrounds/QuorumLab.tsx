@@ -15,8 +15,8 @@ export function QuorumLab() {
   return (
     <div className="space-y-6">
       <p className="max-w-prose text-sm leading-6 text-muted">
-        N copies, write W of them, read R of them. If R + W exceeds N the sets must overlap, so a reader sees the latest
-        write (ignoring sloppy quorums and concurrent writers).
+        N copies, write W of them, read R of them. If R + W exceeds N the sets must overlap, so a
+        reader sees the latest write (ignoring sloppy quorums and concurrent writers).
       </p>
       <div className="grid gap-4 sm:grid-cols-3">
         <Knob label="N replicas" value={n} min={1} max={7} onChange={setN} />
@@ -36,9 +36,21 @@ export function QuorumLab() {
         ))}
       </div>
       <div className="grid gap-3 md:grid-cols-3">
-        <Flag ok={strong} yes="Strong-enough reads (R+W exceeds N)" no="R+W at most N — a read may miss the last write" />
-        <Flag ok={writeAvail && w <= n} yes={`Writes need ${w} of ${n} up`} no="W larger than N is impossible" />
-        <Flag ok={readAvail} yes={`Reads need ${r} of ${n} up`} no="R larger than N is impossible" />
+        <Flag
+          ok={strong}
+          yes="Strong-enough reads (R+W exceeds N)"
+          no="R+W at most N — a read may miss the last write"
+        />
+        <Flag
+          ok={writeAvail && w <= n}
+          yes={`Writes need ${w} of ${n} up`}
+          no="W larger than N is impossible"
+        />
+        <Flag
+          ok={readAvail}
+          yes={`Reads need ${r} of ${n} up`}
+          no="R larger than N is impossible"
+        />
       </div>
       <div className="flex flex-wrap gap-2">
         <Button
@@ -106,7 +118,9 @@ function Knob({
 
 function Flag({ ok, yes, no }: { ok: boolean; yes: string; no: string }) {
   return (
-    <div className={`rounded-lg border px-3 py-3 text-sm ${ok ? "border-ok/40 bg-ok/10 text-ok" : "border-bad/40 bg-bad/10 text-bad"}`}>
+    <div
+      className={`rounded-lg border px-3 py-3 text-sm ${ok ? "border-ok/40 bg-ok/10 text-ok" : "border-bad/40 bg-bad/10 text-bad"}`}
+    >
       {ok ? yes : no}
     </div>
   );

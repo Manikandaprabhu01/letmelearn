@@ -1,87 +1,122 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+/* ---------------------------------------------------------------------------
+   Design system: "midnight precision instrument".
+   Adapted from the Linear design system catalogued on styles.refero.design.
 
-  --color-bg: #0b0c0e;
-  --color-surface: #13151a;
-  --color-raised: #1a1d24;
-  --color-inset: #0e1013;
-  --color-fg: #e8e6e1;
-  --color-muted: #8b8d93;
-  --color-faint: #5c5e66;
-  --color-accent: #9eb4c8;
-  --color-accent-fg: #0b0c0e;
-  --color-border: #2a2d35;
-  --color-border-strong: #3a3e48;
-  --color-ok: #7d9b84;
-  --color-warn: #c4a574;
-  --color-bad: #c4847d;
-  --color-link: #9eb4c8;
+   The rules that keep it coherent:
+     1. Darkness is the substrate, not a theme. Surfaces separate by HAIRLINE
+        BORDERS, never by drop shadows.
+     2. The interface is monochrome. One electric accent (--color-cta) marks the
+        single primary action in a view; everything else earns attention through
+        size, weight and spacing.
+     3. Type is tight: tracking goes negative as size goes up, and weight stops
+        below bold (600) so nothing shouts.
+     4. Colour is reserved for meaning — ok / warn / bad — never decoration.
+   --------------------------------------------------------------------------- */
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Canvas → card → elevated. Three steps, all near-black. */
+  --color-bg: #08090a;
+  --color-surface: #0f1011;
+  --color-raised: #161718;
+  --color-inset: #0c0d0f;
+
+  /* Paper → mist → fog → ash. */
+  --color-fg: #ffffff;
+  --color-muted: #8a8f98;
+  --color-faint: #787d87;
+
+  /* Text emphasis and links stay monochrome — see rule 2. */
+  --color-accent: #d0d6e0;
+  --color-accent-fg: #08090a;
+  --color-link: #d0d6e0;
+
+  /* The one electric accent: primary actions, focus, progress. */
+  --color-cta: #e4f222;
+  --color-cta-fg: #08090a;
+
+  --color-border: #23252a;
+  --color-border-strong: #383b3f;
+
+  --color-ok: #27a644;
+  --color-warn: #e4a11b;
+  --color-bad: #eb5757;
+  --color-info: #02b8cc;
 
   --radius-xs: 4px;
   --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-2xl: 32px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
 
-  --shadow-panel: 0 1px 0 color-mix(in oklab, var(--color-fg) 6%, transparent);
+  /* Elevation is a hairline ring, not a shadow. */
+  --shadow-panel: inset 0 0 0 1px var(--color-border);
+  --shadow-lift: 0 4px 32px rgb(8 9 10 / 0.6);
 }
 
 /* ---------------------------------------------------------------------------
-   Light theme. Tailwind v4 emits the @theme tokens as custom properties on
-   :root and every utility resolves them through var(), so overriding the same
-   names re-themes the whole app without touching a single component.
+   Light theme — the same discipline on paper: monochrome, hairline borders,
+   near-black primary action. Tailwind v4 emits the @theme tokens as custom
+   properties on :root, so redefining the names re-themes every utility.
 
-   Two rules, in this order:
-     1. Follow the OS when the user has made no explicit choice. This is pure
-        CSS, so it applies on the very first paint even with JS disabled —
-        which is what makes a flash impossible for most visitors.
-     2. An explicit [data-theme] choice always wins over the OS preference.
+     1. Follow the OS when the reader has made no explicit choice (pure CSS, so
+        it applies on the first paint even with JS disabled).
+     2. An explicit [data-theme] choice always wins.
    --------------------------------------------------------------------------- */
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
-    --color-bg: #faf9f7;
+    --color-bg: #fafafa;
     --color-surface: #ffffff;
-    --color-raised: #f1efea;
-    --color-inset: #f5f3ef;
-    --color-fg: #1c1b19;
-    --color-muted: #5c5a55;
-    --color-faint: #7a786f;
-    --color-accent: #3f5d78;
+    --color-raised: #f4f4f5;
+    --color-inset: #f7f7f8;
+    --color-fg: #171717;
+    --color-muted: #52525b;
+    --color-faint: #71717a;
+    --color-accent: #27272a;
     --color-accent-fg: #ffffff;
-    --color-border: #e2ded5;
-    --color-border-strong: #c8c3b8;
-    --color-ok: #456f52;
-    --color-warn: #8a6520;
-    --color-bad: #a24036;
-    --color-link: #3f5d78;
+    --color-link: #171717;
+    --color-cta: #171717;
+    --color-cta-fg: #ffffff;
+    --color-border: #e4e4e7;
+    --color-border-strong: #c9c9ce;
+    --color-ok: #15803d;
+    --color-warn: #a16207;
+    --color-bad: #b91c1c;
+    --color-info: #0e7490;
 
-    --shadow-panel: 0 1px 2px color-mix(in oklab, #1c1b19 8%, transparent);
+    --shadow-panel: inset 0 0 0 1px var(--color-border);
+    --shadow-lift: 0 4px 24px rgb(23 23 23 / 0.08);
   }
 }
 
 :root[data-theme="light"] {
-  --color-bg: #faf9f7;
+  --color-bg: #fafafa;
   --color-surface: #ffffff;
-  --color-raised: #f1efea;
-  --color-inset: #f5f3ef;
-  --color-fg: #1c1b19;
-  --color-muted: #5c5a55;
-  --color-faint: #7a786f;
-  --color-accent: #3f5d78;
+  --color-raised: #f4f4f5;
+  --color-inset: #f7f7f8;
+  --color-fg: #171717;
+  --color-muted: #52525b;
+  --color-faint: #71717a;
+  --color-accent: #27272a;
   --color-accent-fg: #ffffff;
-  --color-border: #e2ded5;
-  --color-border-strong: #c8c3b8;
-  --color-ok: #456f52;
-  --color-warn: #8a6520;
-  --color-bad: #a24036;
-  --color-link: #3f5d78;
+  --color-link: #171717;
+  --color-cta: #171717;
+  --color-cta-fg: #ffffff;
+  --color-border: #e4e4e7;
+  --color-border-strong: #c9c9ce;
+  --color-ok: #15803d;
+  --color-warn: #a16207;
+  --color-bad: #b91c1c;
+  --color-info: #0e7490;
 
-  --shadow-panel: 0 1px 2px color-mix(in oklab, #1c1b19 8%, transparent);
+  --shadow-panel: inset 0 0 0 1px var(--color-border);
+  --shadow-lift: 0 4px 24px rgb(23 23 23 / 0.08);
 }
 
 @layer base {
@@ -106,7 +141,11 @@
     background: var(--color-bg);
     color: var(--color-fg);
     font-family: var(--font-sans);
-    line-height: 1.55;
+    font-size: 16px;
+    line-height: 1.5;
+    /* Inter: straight-sided l, single-storey g, slashed zero — the last one
+       matters when every other page contains an id or a byte count. */
+    font-feature-settings: "cv01", "ss03", "zero";
   }
 
   button:not(:disabled),
@@ -114,12 +153,21 @@
     cursor: pointer;
   }
 
+  /* Tracking tightens as size grows — the whole reason the display type reads
+     as engineered rather than merely large. */
   h1,
   h2,
   h3,
   h4 {
+    font-family: var(--font-display);
+    font-weight: 510;
     text-wrap: balance;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.022em;
+  }
+
+  h3,
+  h4 {
+    letter-spacing: -0.012em;
   }
 
   p {
@@ -127,13 +175,14 @@
   }
 
   ::selection {
-    background: color-mix(in oklab, var(--color-accent) 35%, transparent);
+    background: color-mix(in oklab, var(--color-cta) 30%, transparent);
     color: var(--color-fg);
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid var(--color-cta);
     outline-offset: 2px;
+    border-radius: 2px;
   }
 }
 
@@ -147,19 +196,37 @@
   }
 }
 
+/* Display type: one step tighter again, and never bold. */
 .font-display {
   font-family: var(--font-display);
-  font-optical-sizing: auto;
+  font-weight: 510;
+  letter-spacing: -0.022em;
+}
+
+/* An eyebrow: mono, uppercase, small, wide — the only place tracking opens up. */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+}
+
+/* A surface: card colour plus a hairline ring, no drop shadow. */
+.panel {
+  background: var(--color-surface);
+  box-shadow: var(--shadow-panel);
 }
 
 .lattice-grid {
   background-image:
-    linear-gradient(color-mix(in oklab, var(--color-fg) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(color-mix(in oklab, var(--color-fg) 4%, transparent) 1px, transparent 1px),
     linear-gradient(
       90deg,
-      color-mix(in oklab, var(--color-fg) 5%, transparent) 1px,
+      color-mix(in oklab, var(--color-fg) 4%, transparent) 1px,
       transparent 1px
     );
-  background-size: 48px 48px;
+  background-size: 64px 64px;
   mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, black 20%, transparent 75%);
 }

@@ -62,9 +62,7 @@ function Home() {
     <main>
       <section className="relative overflow-hidden border-b border-border px-5 py-12 sm:px-8 sm:py-16 lg:px-12">
         <div className="lattice-grid pointer-events-none absolute inset-0" />
-        <p className="relative text-[11px] font-medium uppercase tracking-[0.18em] text-accent">
-          System design studio
-        </p>
+        <p className="relative eyebrow">System design studio</p>
         <h1 className="relative mt-4 max-w-2xl font-display text-4xl font-medium tracking-tight sm:text-5xl lg:text-6xl">
           Learn the map, then run the labs.
         </h1>
@@ -129,9 +127,7 @@ function Home() {
       </section>
 
       <section className="border-b border-border px-5 py-10 sm:px-8 lg:px-12">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">
-          Interview prep
-        </p>
+        <p className="eyebrow">Interview prep</p>
         <h2 className="mt-2 max-w-2xl font-display text-2xl font-medium tracking-tight">
           Know the loop before you walk in
         </h2>
@@ -157,9 +153,7 @@ function Home() {
       </section>
 
       <section className="border-b border-border px-5 py-10 sm:px-8 lg:px-12">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">
-          Further reading
-        </p>
+        <p className="eyebrow">Further reading</p>
         <h2 className="mt-2 max-w-2xl font-display text-2xl font-medium tracking-tight">
           The public awesome list, mapped to the library
         </h2>
@@ -228,9 +222,7 @@ function Home() {
               params={{ slug: p.slug }}
               className="rounded-lg border border-border bg-surface p-4 hover:border-border-strong"
             >
-              <div className="text-[11px] uppercase tracking-[0.14em] text-accent">
-                {p.tags.join(" · ")}
-              </div>
+              <div className="eyebrow">{p.tags.join(" · ")}</div>
               <div className="mt-2 font-medium">{p.title}</div>
               <p className="mt-1 text-sm text-muted">{p.subtitle}</p>
             </Link>
@@ -263,7 +255,7 @@ function Door({
 }) {
   return (
     <Link to={to} className="block bg-bg p-6 hover:bg-surface sm:p-8">
-      <div className="text-[11px] uppercase tracking-[0.14em] text-accent">{kicker}</div>
+      <div className="eyebrow">{kicker}</div>
       <h2 className="mt-3 font-display text-2xl tracking-tight">{title}</h2>
       <p className="mt-2 max-w-sm text-sm leading-6 text-muted">{body}</p>
       <span className="mt-4 inline-flex items-center gap-1 text-sm text-fg">

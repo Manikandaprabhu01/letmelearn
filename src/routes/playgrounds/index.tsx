@@ -11,7 +11,7 @@ function LabsIndex() {
 
   return (
     <main className="px-5 py-10 sm:px-8 lg:px-12">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Labs</p>
+      <p className="eyebrow">Labs</p>
       <h1 className="mt-2 font-display text-3xl font-medium tracking-tight sm:text-4xl">
         Interactive labs
       </h1>

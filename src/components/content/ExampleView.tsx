@@ -16,9 +16,7 @@ function StepLabel({ n, title }: { n: number; title: string }) {
       <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-accent/40 bg-accent/10 font-mono text-[11px] tabular-nums text-accent">
         {n}
       </span>
-      <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-faint">
-        {title}
-      </span>
+      <span className="eyebrow">{title}</span>
     </div>
   );
 }
@@ -128,9 +126,7 @@ export function ExampleView({ example, id }: { example: DesignExample; id: strin
               <H2 id="requirements">Requirements</H2>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <div className="rounded-lg border border-border bg-surface p-4">
-                  <h3 className="text-[11px] uppercase tracking-[0.14em] text-accent">
-                    Functional
-                  </h3>
+                  <h3 className="eyebrow">Functional</h3>
                   <ul className="mt-2 space-y-2 text-sm leading-6 text-muted">
                     {example.requirements.functional.map((r) => (
                       <li key={r} className="flex gap-2">
@@ -141,9 +137,7 @@ export function ExampleView({ example, id }: { example: DesignExample; id: strin
                   </ul>
                 </div>
                 <div className="rounded-lg border border-border bg-surface p-4">
-                  <h3 className="text-[11px] uppercase tracking-[0.14em] text-accent">
-                    Non-functional
-                  </h3>
+                  <h3 className="eyebrow">Non-functional</h3>
                   <ul className="mt-2 space-y-2 text-sm leading-6 text-muted">
                     {example.requirements.nonFunctional.map((r) => (
                       <li key={r} className="flex gap-2">
@@ -331,9 +325,7 @@ export function ExampleView({ example, id }: { example: DesignExample; id: strin
 
             {example.furtherReading.length ? (
               <div>
-                <h2 className="text-[11px] font-medium uppercase tracking-[0.16em] text-faint">
-                  Sources
-                </h2>
+                <h2 className="eyebrow">Sources</h2>
                 <ul className="mt-3 space-y-2">
                   {example.furtherReading.map((l) => (
                     <li key={l.href}>

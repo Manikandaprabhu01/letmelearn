@@ -42,7 +42,8 @@ export function LruLab() {
   return (
     <div className="space-y-6">
       <p className="max-w-prose text-sm leading-6 text-muted">
-        Map for O(1) lookup, doubly linked list for recency. This lab shows the list: left is MRU, right is LRU.
+        Map for O(1) lookup, doubly linked list for recency. This lab shows the list: left is MRU,
+        right is LRU.
       </p>
       <label className="block max-w-xs text-xs text-muted">
         Capacity {cap}
@@ -62,7 +63,9 @@ export function LruLab() {
       <div className="flex flex-wrap items-center gap-2">
         {list.map((n, i) => (
           <div key={n.key} className="flex items-center gap-2">
-            <div className={`rounded-md border px-4 py-3 ${i === 0 ? "border-accent bg-accent/15" : "border-border bg-raised"}`}>
+            <div
+              className={`rounded-md border px-4 py-3 ${i === 0 ? "border-accent bg-accent/15" : "border-border bg-raised"}`}
+            >
               <div className="font-mono text-lg">{n.key}</div>
               <div className="text-xs text-muted">val {n.value}</div>
               <div className="text-[10px] uppercase tracking-wider text-faint">
@@ -75,7 +78,7 @@ export function LruLab() {
       </div>
       <p className="text-sm text-muted">{msg}</p>
       <div>
-        <div className="text-[11px] uppercase tracking-[0.14em] text-faint">Get</div>
+        <div className="eyebrow">Get</div>
         <div className="mt-2 flex flex-wrap gap-2">
           {KEYS.map((k) => (
             <Button key={k} size="sm" variant="secondary" onClick={() => get(k)}>
@@ -85,7 +88,7 @@ export function LruLab() {
         </div>
       </div>
       <div>
-        <div className="text-[11px] uppercase tracking-[0.14em] text-faint">Put</div>
+        <div className="eyebrow">Put</div>
         <div className="mt-2 flex flex-wrap gap-2">
           {KEYS.map((k) => (
             <Button key={k} size="sm" onClick={() => put(k)}>

@@ -6,6 +6,14 @@ import { LogoMark } from "@/components/layout/Logo";
 import { APP_NAME } from "@/data/nav";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { formatPaise, priceFor } from "@/lib/billing/pricing";
+import { examples } from "@/data/examples";
+import { fdeConcepts } from "@/data/fde";
+import { hldConcepts } from "@/data/hld";
+import { COMPANY_COUNT, QUESTION_COUNT } from "@/data/interview/meta";
+import { javaConcepts } from "@/data/java";
+import { lldConcepts } from "@/data/lld";
+import { playgrounds } from "@/data/playgrounds";
+import { pythonConcepts } from "@/data/python";
 
 export const Route = createFileRoute("/welcome")({ component: Welcome });
 
@@ -44,6 +52,20 @@ const TRACKS = [
     body: "Every Alex Xu example rewritten to chapter depth: clarifying questions, back-of-envelope maths, architecture boards and model answers.",
     to: "/examples" as const,
     stat: "41 examples",
+  },
+  {
+    kicker: "Interview practice",
+    title: "Interview Prep Console",
+    body: "Question banks and worked answer sheets for 34 companies plus five cross-company core banks, filtered by level from SDE to Principal.",
+    to: "/interview-prep" as const,
+    stat: `${QUESTION_COUNT} questions`,
+  },
+  {
+    kicker: "Hands on",
+    title: "Labs & Code Compiler",
+    body: "Sixteen interactive labs — rate limiters, circuit breakers, sagas, canaries — and a compiler that runs Java, Python, JavaScript and SQL.",
+    to: "/playgrounds" as const,
+    stat: `${playgrounds.length} labs`,
   },
   {
     kicker: "Customer-facing AI",
@@ -104,10 +126,8 @@ function WelcomeBody({ signedIn }: { signedIn: boolean }) {
             carries a mask-image, which would fade out the hero copy with it. */}
         <div className="lattice-grid pointer-events-none absolute inset-0" />
         <div className="relative mx-auto max-w-3xl">
-          <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">
-            System design studio
-          </p>
-          <h1 className="mt-4 font-display text-4xl font-medium leading-[1.1] tracking-tight sm:text-6xl">
+          <p className="eyebrow">System design studio</p>
+          <h1 className="mt-5 font-display text-[44px] leading-[1.02] sm:text-[68px]">
             Learn the map,
             <br />
             then run the labs.
@@ -138,13 +158,30 @@ function WelcomeBody({ signedIn }: { signedIn: boolean }) {
               LEARN50
             </code>
           </p>
+
+          <dl className="mt-12 grid max-w-2xl grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-4">
+            {[
+              { n: javaConcepts.length + pythonConcepts.length, label: "Chapters" },
+              {
+                n: hldConcepts.length + lldConcepts.length + fdeConcepts.length,
+                label: "Concepts",
+              },
+              { n: examples.length, label: "Worked examples" },
+              { n: COMPANY_COUNT, label: "Interview banks" },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <dt className="font-display text-2xl tabular-nums text-fg">{stat.n}</dt>
+                <dd className="eyebrow mt-1">{stat.label}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 
       {/* Tracks */}
       <section className="px-6 py-20 sm:px-10">
         <div className="mx-auto max-w-5xl">
-          <h2 className="font-display text-2xl tracking-tight sm:text-3xl">Six tracks</h2>
+          <h2 className="font-display text-[28px] sm:text-[36px]">Everything inside</h2>
           <p className="mt-2 max-w-2xl text-[15px] leading-7 text-muted">
             Each page ends where the next begins — concepts link to the examples that use them, and
             examples link to the labs that let you try them.

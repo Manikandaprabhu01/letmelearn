@@ -8,7 +8,8 @@ import { LogoMark } from "@/components/layout/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { CommandSearch } from "@/components/search/CommandSearch";
 import { Button } from "@/components/ui/button";
-import { APP_NAME, NAV } from "@/data/nav";
+import { APP_NAME, NAV_GROUPS, NAV_HOME } from "@/data/nav";
+import { useTrackProgress } from "@/lib/track-progress";
 import { cn } from "@/lib/utils";
 
 /**
@@ -32,25 +33,68 @@ function isActive(pathname: string, to: string, match: "exact" | "prefix") {
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 
+/** One row of the menu: label, how far through it you are, and the active mark. */
+function NavItem({
+  to,
+  label,
+  active,
+  onNavigate,
+}: {
+  to: string;
+  label: string;
+  active: boolean;
+  onNavigate?: () => void;
+}) {
+  const progress = useTrackProgress(to);
+  return (
+    <Link
+      to={to}
+      onClick={onNavigate}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "relative flex items-center justify-between gap-2 rounded-sm py-1.5 pl-3 pr-2 text-[13px] transition-colors duration-150",
+        active ? "bg-raised text-fg" : "text-muted hover:bg-raised/60 hover:text-fg",
+      )}
+    >
+      {/* The single electric accent, used as a position marker. */}
+      {active ? (
+        <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-cta" aria-hidden />
+      ) : null}
+      <span className="truncate">{label}</span>
+      {progress && progress.done > 0 ? (
+        <span className="shrink-0 font-mono text-[10.5px] tabular-nums text-faint">
+          {progress.done}/{progress.total}
+        </span>
+      ) : null}
+    </Link>
+  );
+}
+
 function NavLinks({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
   return (
-    <nav className="flex flex-col gap-0.5">
-      {NAV.map((item) => {
-        const active = isActive(pathname, item.to, item.match);
-        return (
-          <Link
-            key={item.to}
-            to={item.to}
-            onClick={onNavigate}
-            className={cn(
-              "rounded-md px-3 py-2 text-sm transition-colors duration-150",
-              active ? "bg-raised text-fg" : "text-muted hover:bg-raised/60 hover:text-fg",
-            )}
-          >
-            {item.label}
-          </Link>
-        );
-      })}
+    <nav className="flex flex-col gap-6">
+      <div className="flex flex-col gap-0.5">
+        <NavItem
+          to={NAV_HOME.to}
+          label={NAV_HOME.label}
+          active={isActive(pathname, NAV_HOME.to, NAV_HOME.match)}
+          onNavigate={onNavigate}
+        />
+      </div>
+      {NAV_GROUPS.map((group) => (
+        <div key={group.label} className="flex flex-col gap-0.5">
+          <div className="eyebrow mb-1 pl-3">{group.label}</div>
+          {group.items.map((item) => (
+            <NavItem
+              key={item.to}
+              to={item.to}
+              label={item.label}
+              active={isActive(pathname, item.to, item.match)}
+              onNavigate={onNavigate}
+            />
+          ))}
+        </div>
+      ))}
     </nav>
   );
 }
@@ -83,12 +127,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const shell = (
     <div className="min-h-dvh bg-bg text-fg">
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b border-border bg-bg/90 px-3 backdrop-blur-sm lg:hidden">
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b border-border bg-bg/80 px-3 backdrop-blur-md lg:hidden">
         <div className="flex min-w-0 items-center gap-1">
           <BackButton compact />
           <Link to="/" className="flex min-w-0 items-center gap-2 text-fg">
             <LogoMark className="size-6 shrink-0" />
-            <span className="font-display text-lg tracking-tight">{APP_NAME}</span>
+            <span className="font-display text-[17px] tracking-tight">{APP_NAME}</span>
           </Link>
         </div>
         <div className="flex shrink-0 items-center gap-1">
@@ -113,23 +157,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {open ? (
-        <div className="fixed inset-0 z-20 overflow-y-auto bg-bg/95 px-4 pb-8 pt-16 lg:hidden">
+        <div className="fixed inset-0 z-20 overflow-y-auto bg-bg px-4 pb-8 pt-18 lg:hidden">
           <NavLinks pathname={pathname} onNavigate={() => setOpen(false)} />
-          <div className="mt-4 border-t border-border pt-4">
+          <div className="mt-8 border-t border-border pt-4">
             <AccountStrip />
           </div>
         </div>
       ) : null}
 
-      <div className="lg:grid lg:grid-cols-[240px_minmax(0,1fr)]">
+      <div className="lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
         <aside className="sticky top-0 hidden h-dvh border-r border-border lg:flex lg:flex-col">
-          <Link to="/" className="flex items-center gap-2.5 px-5 py-5 text-fg">
+          <Link to="/" className="flex items-center gap-2.5 px-4 py-5 text-fg">
             <LogoMark />
             <div>
-              <div className="font-display text-xl leading-none tracking-tight">{APP_NAME}</div>
-              <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-faint">
-                System design
-              </div>
+              <div className="font-display text-[19px] leading-none tracking-tight">{APP_NAME}</div>
+              <div className="eyebrow mt-1.5">System design</div>
             </div>
           </Link>
           <div className="flex-1 overflow-y-auto px-3 pb-6">
@@ -139,13 +181,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               onClick={() => setSearch(true)}
-              className="flex h-10 w-full items-center justify-between rounded-md border border-border bg-raised px-3 text-xs text-muted hover:text-fg"
+              className="flex h-9 w-full items-center justify-between rounded-sm bg-raised px-3 text-[13px] text-muted shadow-panel transition-colors duration-150 hover:text-fg"
             >
               <span className="flex items-center gap-2">
                 <Search className="size-3.5" />
                 Search
               </span>
-              <kbd className="font-mono text-[10px] text-faint">⌘K</kbd>
+              <kbd className="font-mono text-[10.5px] text-faint">⌘K</kbd>
             </button>
             <div className="mt-3">
               <AccountStrip />
@@ -153,7 +195,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </aside>
         <div className="min-w-0">
-          <div className="sticky top-0 z-20 hidden h-12 items-center justify-between border-b border-border bg-bg/90 px-5 backdrop-blur-sm lg:flex">
+          <div className="sticky top-0 z-20 hidden h-12 items-center justify-between border-b border-border bg-bg/80 px-5 backdrop-blur-md lg:flex">
             <BackButton />
             <ThemeToggle />
           </div>

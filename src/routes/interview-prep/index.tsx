@@ -48,7 +48,7 @@ function InterviewPrepHome() {
 function Overview() {
   return (
     <>
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Menu</p>
+      <p className="eyebrow">Menu</p>
       <h1 className="mt-2 font-display text-3xl font-medium tracking-tight sm:text-4xl">
         Interview Prep Console
       </h1>
@@ -79,7 +79,7 @@ function Overview() {
         className="mt-6 flex flex-col gap-3 rounded-lg border border-accent/30 bg-accent/6 p-5 transition-colors duration-150 hover:border-accent/60 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <div className="text-[11px] uppercase tracking-[0.14em] text-accent">Deep dive</div>
+          <div className="eyebrow">Deep dive</div>
           <div className="mt-1 font-display text-xl tracking-tight">Freshworks Lead SE</div>
           <p className="mt-1 max-w-xl text-sm leading-6 text-muted">
             101 questions from 26 candidate reports, grouped by round with practice ticks — and a
@@ -154,7 +154,7 @@ function SearchResults({ query }: { query: string }) {
     <section>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Search</p>
+          <p className="eyebrow">Search</p>
           <h1 className="mt-2 font-display text-2xl font-medium tracking-tight">
             {total} question{total === 1 ? "" : "s"} matching &ldquo;{query}&rdquo; at {level}
           </h1>

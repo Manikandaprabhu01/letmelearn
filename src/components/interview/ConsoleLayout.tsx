@@ -175,7 +175,7 @@ const subItem = (active: boolean) =>
 
 function GroupLabel({ children, dot }: { children: ReactNode; dot?: string }) {
   return (
-    <div className="mb-1 flex items-center gap-2 px-2.5 font-mono text-[10px] uppercase tracking-[0.12em] text-faint">
+    <div className="mb-1 flex items-center gap-2 px-2.5 eyebrow">
       {dot ? <span className={cn("size-1.5 rounded-full", dot)} aria-hidden /> : null}
       {children}
     </div>

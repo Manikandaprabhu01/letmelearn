@@ -23,7 +23,7 @@ function Table({ head, children }: { head: string[]; children: ReactNode }) {
   return (
     <div className="overflow-x-auto rounded-lg border border-border">
       <table className="w-full min-w-[640px] text-left text-sm">
-        <thead className="bg-raised text-[11px] uppercase tracking-wider text-faint">
+        <thead className="bg-raised eyebrow">
           <tr>
             {head.map((h) => (
               <th key={h} className="whitespace-nowrap px-3 py-2 font-medium">
@@ -103,7 +103,7 @@ export function CompanyBank({ company }: { company: Company }) {
         ) : (
           rounds.map((rn) => (
             <div key={rn} className="mt-6 first:mt-0">
-              <h3 className="font-mono text-[11px] uppercase tracking-[0.12em] text-accent">
+              <h3 className="font-mono eyebrow">
                 Round {rn} · {company.loop.find((r) => r.n === rn)?.name ?? `Round ${rn}`}
               </h3>
               <ul className="mt-1">

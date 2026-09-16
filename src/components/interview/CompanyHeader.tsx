@@ -11,7 +11,7 @@ export function CompanyHeader({ company, view }: { company: Company; view: "bank
   return (
     <header className="border-b border-border pb-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-medium uppercase tracking-[0.16em] text-accent">
+        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 eyebrow">
           <span className={cn("size-1.5 rounded-full", sector.dot)} aria-hidden />
           {sector.name}
           {company.loc ? (

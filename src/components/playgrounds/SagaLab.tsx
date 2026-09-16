@@ -257,7 +257,7 @@ export function SagaLab() {
                 active ? "border-accent bg-accent/10" : "border-border bg-surface"
               }`}
             >
-              <div className="text-[11px] uppercase tracking-[0.14em] text-faint">{service}</div>
+              <div className="eyebrow">{service}</div>
               <div className="mt-1 text-sm text-fg">{statuses[service]}</div>
             </div>
           );
@@ -266,7 +266,7 @@ export function SagaLab() {
 
       <div className="rounded-lg border border-border bg-inset p-4">
         <div className="flex items-center justify-between gap-3">
-          <div className="text-[11px] uppercase tracking-[0.14em] text-faint">Orchestrator log</div>
+          <div className="eyebrow">Orchestrator log</div>
           <span className="rounded-md border border-border bg-raised px-2 py-1 font-mono text-xs text-fg">
             saga: {current?.sagaState ?? "NOT STARTED"}
           </span>

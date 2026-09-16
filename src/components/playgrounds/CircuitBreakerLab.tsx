@@ -284,9 +284,7 @@ export function CircuitBreakerLab() {
           </div>
 
           <div>
-            <div className="mb-2 text-[11px] uppercase tracking-[0.14em] text-faint">
-              Last {OUTCOMES_SHOWN} requests
-            </div>
+            <div className="mb-2 eyebrow">Last {OUTCOMES_SHOWN} requests</div>
             <div className="flex flex-wrap gap-1">
               {view.outcomes.map((o, i) => (
                 <span key={i} title={o} className={`h-5 w-2.5 rounded-sm ${CELL[o]}`} />
@@ -323,7 +321,7 @@ export function CircuitBreakerLab() {
         </div>
 
         <div className="rounded-lg border border-border bg-surface p-4">
-          <div className="text-[11px] uppercase tracking-[0.14em] text-faint">State changes</div>
+          <div className="eyebrow">State changes</div>
           <ul className="mt-3 space-y-2">
             {view.events.map((e, i) => (
               <li key={`${e.t}-${i}`} className="text-sm leading-5">

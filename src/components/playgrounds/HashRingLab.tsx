@@ -23,7 +23,9 @@ export function HashRingLab() {
   const [next, setNext] = useState("D");
 
   const ownerOf = (deg: number) => {
-    const pts = nodes.flatMap((n) => n.vnodes.map((d) => ({ d, id: n.id }))).sort((a, b) => a.d - b.d);
+    const pts = nodes
+      .flatMap((n) => n.vnodes.map((d) => ({ d, id: n.id })))
+      .sort((a, b) => a.d - b.d);
     if (!pts.length) return "?";
     const hit = pts.find((p) => p.d >= deg) ?? pts[0];
     return hit.id;
@@ -57,12 +59,20 @@ export function HashRingLab() {
   return (
     <div className="space-y-6">
       <p className="max-w-prose text-sm leading-6 text-muted">
-        Keys and virtual nodes sit on a 360° ring. A key belongs to the next vnode clockwise. Add a server and only the
-        keys on its new arcs should move.
+        Keys and virtual nodes sit on a 360° ring. A key belongs to the next vnode clockwise. Add a
+        server and only the keys on its new arcs should move.
       </p>
       <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-start">
         <svg viewBox="0 0 260 260" className="w-full max-w-sm text-fg">
-          <circle cx="130" cy="130" r="96" fill="none" stroke="currentColor" strokeOpacity="0.2" strokeWidth="2" />
+          <circle
+            cx="130"
+            cy="130"
+            r="96"
+            fill="none"
+            stroke="currentColor"
+            strokeOpacity="0.2"
+            strokeWidth="2"
+          />
           {assignments.map((a) => {
             const r = 78;
             const x = 130 + r * Math.cos(((a.deg - 90) * Math.PI) / 180);

@@ -35,7 +35,11 @@ export function BackButton({ compact = false }: { compact?: boolean }) {
       aria-label="Go back"
       aria-disabled={nowhere}
       tabIndex={nowhere ? -1 : 0}
-      className={cn("text-fg", compact ? "size-10" : "h-10 px-2.5", nowhere && "pointer-events-none opacity-50")}
+      className={cn(
+        "text-fg",
+        compact ? "size-10" : "h-10 px-2.5",
+        nowhere && "pointer-events-none opacity-50",
+      )}
     >
       <ArrowLeft className="size-4" />
       {compact ? <span className="sr-only">Back</span> : <span>Back</span>}

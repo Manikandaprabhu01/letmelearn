@@ -212,9 +212,7 @@ export function LlmCostLab() {
       </div>
 
       <div className="rounded-lg border border-border bg-inset p-5">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-faint">
-          Where the money goes, per request
-        </div>
+        <div className="eyebrow">Where the money goes, per request</div>
         <div className="mt-3 flex h-8 overflow-hidden rounded-md">
           {segments.map((s) => (
             <div
@@ -243,7 +241,7 @@ export function LlmCostLab() {
       </div>
 
       <div className="rounded-lg border border-border bg-surface p-5">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-faint">Cost levers</div>
+        <div className="eyebrow">Cost levers</div>
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           <div className="space-y-2">
             <label className="flex items-center gap-2 text-sm text-muted">
@@ -314,9 +312,7 @@ export function LlmCostLab() {
       </div>
 
       <div className="rounded-lg border border-border bg-surface p-5">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-faint">
-          Rough token estimate
-        </div>
+        <div className="eyebrow">Rough token estimate</div>
         <textarea
           value={sample}
           onChange={(e) => setSample(e.target.value)}

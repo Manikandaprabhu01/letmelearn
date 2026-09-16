@@ -210,7 +210,7 @@ export function FreshworksBank() {
           ) : (
             r.groups.map((g) => (
               <div key={g.type} className="mt-6">
-                <h3 className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+                <h3 className="eyebrow">
                   {g.title} <span className="text-faint">{g.items.length}</span>
                 </h3>
                 <ul className="mt-1">

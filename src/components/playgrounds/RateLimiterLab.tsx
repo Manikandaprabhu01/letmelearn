@@ -4,11 +4,31 @@ import { Button } from "@/components/ui/button";
 type Algo = "token" | "leaky" | "fixed" | "slog" | "scounter";
 
 const ALGOS: { id: Algo; name: string; blurb: string }[] = [
-  { id: "token", name: "Token bucket", blurb: "Burst up to capacity. Tokens refill at a steady rate. Empty bucket = drop." },
-  { id: "leaky", name: "Leaky bucket", blurb: "Requests add water. A constant leak drains it. Overflow = drop. Smooth output." },
-  { id: "fixed", name: "Fixed window", blurb: "Count requests in the current second. Resets on the boundary — 2× spike possible." },
-  { id: "slog", name: "Sliding log", blurb: "Keep timestamps. Allow if fewer than limit in the last window. Precise, heavier." },
-  { id: "scounter", name: "Sliding counter", blurb: "Weight the previous window + current. O(1) memory, almost as fair as the log." },
+  {
+    id: "token",
+    name: "Token bucket",
+    blurb: "Burst up to capacity. Tokens refill at a steady rate. Empty bucket = drop.",
+  },
+  {
+    id: "leaky",
+    name: "Leaky bucket",
+    blurb: "Requests add water. A constant leak drains it. Overflow = drop. Smooth output.",
+  },
+  {
+    id: "fixed",
+    name: "Fixed window",
+    blurb: "Count requests in the current second. Resets on the boundary — 2× spike possible.",
+  },
+  {
+    id: "slog",
+    name: "Sliding log",
+    blurb: "Keep timestamps. Allow if fewer than limit in the last window. Precise, heavier.",
+  },
+  {
+    id: "scounter",
+    name: "Sliding counter",
+    blurb: "Weight the previous window + current. O(1) memory, almost as fair as the log.",
+  },
 ];
 
 type Decision = { t: number; ok: boolean };
@@ -169,7 +189,8 @@ export function RateLimiterLab() {
 
   const pct = useMemo(() => {
     const max = capacity || 1;
-    const v = algo === "leaky" || algo === "fixed" || algo === "slog" || algo === "scounter" ? fill : fill;
+    const v =
+      algo === "leaky" || algo === "fixed" || algo === "slog" || algo === "scounter" ? fill : fill;
     return clamp((v / max) * 100, 0, 100);
   }, [fill, capacity, algo]);
 
@@ -184,7 +205,9 @@ export function RateLimiterLab() {
             type="button"
             onClick={() => setAlgo(a.id)}
             className={`rounded-md border px-3 py-2 text-sm ${
-              algo === a.id ? "border-accent bg-accent/15 text-fg" : "border-border text-muted hover:text-fg"
+              algo === a.id
+                ? "border-accent bg-accent/15 text-fg"
+                : "border-border text-muted hover:text-fg"
             }`}
           >
             {a.name}
@@ -197,7 +220,7 @@ export function RateLimiterLab() {
         <div className="rounded-lg border border-border bg-inset p-5">
           <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-end sm:justify-center">
             <div className="flex flex-col items-center">
-              <div className="text-[11px] uppercase tracking-[0.14em] text-faint">
+              <div className="eyebrow">
                 {algo === "token" ? "Tokens" : algo === "leaky" ? "Water" : "In window"}
               </div>
               <div
@@ -217,7 +240,7 @@ export function RateLimiterLab() {
               <div className="mt-2 font-mono text-xs text-muted">max {capacity}</div>
             </div>
             <div className="w-full min-w-0 flex-1">
-              <div className="text-[11px] uppercase tracking-[0.14em] text-faint">Last requests</div>
+              <div className="eyebrow">Last requests</div>
               <div className="mt-3 flex min-h-6 flex-wrap gap-1">
                 {log.length === 0 ? (
                   <span className="text-sm text-muted">Fire a request to fill the tape.</span>
@@ -253,7 +276,9 @@ export function RateLimiterLab() {
             <span className="font-mono text-fg">{capacity}</span>
           </label>
           <label className="block text-xs text-muted">
-            {algo === "fixed" || algo === "slog" || algo === "scounter" ? "Window is 1s. Limit above." : "Refill / leak per second"}
+            {algo === "fixed" || algo === "slog" || algo === "scounter"
+              ? "Window is 1s. Limit above."
+              : "Refill / leak per second"}
             <input
               type="range"
               min={0.5}
@@ -286,7 +311,9 @@ export function RateLimiterLab() {
               Reset
             </Button>
           </div>
-          <p className="text-[11px] text-faint">Sim clock {nowMs.toFixed(0)} ms. Try a burst, then idle, then a burst again.</p>
+          <p className="text-[11px] text-faint">
+            Sim clock {nowMs.toFixed(0)} ms. Try a burst, then idle, then a burst again.
+          </p>
         </div>
       </div>
 
@@ -301,11 +328,36 @@ export function RateLimiterLab() {
             </tr>
           </thead>
           <tbody className="text-muted">
-            <tr className="border-t border-border"><td className="px-3 py-2 text-fg">Token bucket</td><td className="px-3 py-2">Yes, up to capacity</td><td className="px-3 py-2">Sustained rate after burst</td><td className="px-3 py-2">O(1) / key</td></tr>
-            <tr className="border-t border-border"><td className="px-3 py-2 text-fg">Leaky bucket</td><td className="px-3 py-2">No (queued / dropped)</td><td className="px-3 py-2">Constant drain</td><td className="px-3 py-2">O(1)</td></tr>
-            <tr className="border-t border-border"><td className="px-3 py-2 text-fg">Fixed window</td><td className="px-3 py-2">2× at boundary</td><td className="px-3 py-2">Choppy</td><td className="px-3 py-2">O(1)</td></tr>
-            <tr className="border-t border-border"><td className="px-3 py-2 text-fg">Sliding log</td><td className="px-3 py-2">Accurate</td><td className="px-3 py-2">Accurate</td><td className="px-3 py-2">O(requests)</td></tr>
-            <tr className="border-t border-border"><td className="px-3 py-2 text-fg">Sliding counter</td><td className="px-3 py-2">Mostly accurate</td><td className="px-3 py-2">Good</td><td className="px-3 py-2">O(1)</td></tr>
+            <tr className="border-t border-border">
+              <td className="px-3 py-2 text-fg">Token bucket</td>
+              <td className="px-3 py-2">Yes, up to capacity</td>
+              <td className="px-3 py-2">Sustained rate after burst</td>
+              <td className="px-3 py-2">O(1) / key</td>
+            </tr>
+            <tr className="border-t border-border">
+              <td className="px-3 py-2 text-fg">Leaky bucket</td>
+              <td className="px-3 py-2">No (queued / dropped)</td>
+              <td className="px-3 py-2">Constant drain</td>
+              <td className="px-3 py-2">O(1)</td>
+            </tr>
+            <tr className="border-t border-border">
+              <td className="px-3 py-2 text-fg">Fixed window</td>
+              <td className="px-3 py-2">2× at boundary</td>
+              <td className="px-3 py-2">Choppy</td>
+              <td className="px-3 py-2">O(1)</td>
+            </tr>
+            <tr className="border-t border-border">
+              <td className="px-3 py-2 text-fg">Sliding log</td>
+              <td className="px-3 py-2">Accurate</td>
+              <td className="px-3 py-2">Accurate</td>
+              <td className="px-3 py-2">O(requests)</td>
+            </tr>
+            <tr className="border-t border-border">
+              <td className="px-3 py-2 text-fg">Sliding counter</td>
+              <td className="px-3 py-2">Mostly accurate</td>
+              <td className="px-3 py-2">Good</td>
+              <td className="px-3 py-2">O(1)</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -316,8 +368,12 @@ export function RateLimiterLab() {
 function Stat({ label, value, tone }: { label: string; value: number; tone: "ok" | "bad" }) {
   return (
     <div className="rounded-md border border-border bg-raised px-3 py-2">
-      <div className="text-[11px] uppercase tracking-[0.14em] text-faint">{label}</div>
-      <div className={`mt-1 font-mono text-2xl tabular-nums ${tone === "ok" ? "text-ok" : "text-bad"}`}>{value}</div>
+      <div className="eyebrow">{label}</div>
+      <div
+        className={`mt-1 font-mono text-2xl tabular-nums ${tone === "ok" ? "text-ok" : "text-bad"}`}
+      >
+        {value}
+      </div>
     </div>
   );
 }

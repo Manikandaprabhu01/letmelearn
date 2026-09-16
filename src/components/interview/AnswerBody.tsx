@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 function Block({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mt-6 first:mt-4">
-      <h3 className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-accent">{title}</h3>
+      <h3 className="eyebrow">{title}</h3>
       <div className="mt-2">{children}</div>
     </section>
   );
@@ -136,7 +136,7 @@ function Table({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
   return (
     <div className="overflow-x-auto rounded-lg border border-border">
       <table className="w-full min-w-[560px] text-left text-sm">
-        <thead className="bg-raised text-[11px] uppercase tracking-wider text-faint">
+        <thead className="bg-raised eyebrow">
           <tr>
             {head.map((h) => (
               <th key={h} className="px-3 py-2 font-medium">

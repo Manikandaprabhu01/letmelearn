@@ -7,7 +7,7 @@ export const Route = createFileRoute("/python/")({ component: PythonIndex });
 function PythonIndex() {
   return (
     <main className="px-5 py-10 sm:px-8 lg:px-12">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Menu</p>
+      <p className="eyebrow">Menu</p>
       <h1 className="mt-2 font-display text-3xl font-medium tracking-tight sm:text-4xl">
         Python End-to-End for AI
       </h1>
