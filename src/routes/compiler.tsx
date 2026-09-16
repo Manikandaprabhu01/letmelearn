@@ -14,7 +14,7 @@ function CompilerPage() {
         <p className="mt-3 max-w-2xl text-[15px] leading-7 text-muted">
           A scratchpad for the code in the chapters. Python, JavaScript, TypeScript and SQL run in a
           sandboxed frame in this tab — nothing leaves your machine. Java is compiled and run by a
-          sandboxed runner service. Each language keeps its own draft in this browser.
+          public compiler service. Each language keeps its own draft in this browser.
         </p>
       </header>
       <CompilerWorkbench />
