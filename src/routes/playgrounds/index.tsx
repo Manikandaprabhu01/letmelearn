@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { TopicCard } from "@/components/content/TopicCard";
 import { LAB_GROUPS, playgrounds } from "@/data/playgrounds";
 import type { PlaygroundMeta } from "@/data/types";
@@ -30,6 +30,15 @@ function LabsIndex() {
         />
       ))}
       {ungrouped.length > 0 ? <LabSection title="More labs" blurb="" labs={ungrouped} /> : null}
+
+      <p className="mt-12 border-t border-border pt-5 text-sm leading-6 text-muted">
+        Want to run code rather than a simulation? The{" "}
+        <Link to="/compiler" className="text-accent hover:underline">
+          Code Compiler
+        </Link>{" "}
+        runs Java, Python, JavaScript, TypeScript and SQL, with each track&apos;s examples loaded
+        in.
+      </p>
     </main>
   );
 }

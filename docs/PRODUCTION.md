@@ -21,15 +21,17 @@ screen names xAI, and without per-app broker credentials it only returns to
 Set these for **Production**. Make `DATABASE_URL` available to the **Build**
 step as well: `npm run build` applies the migrations with it.
 
-| Variable               | Required | Value                                                            |
-| ---------------------- | -------- | ---------------------------------------------------------------- |
-| `BETTER_AUTH_URL`      | yes      | `https://letmelearn.vercel.app`, exactly, no trailing slash      |
-| `BETTER_AUTH_SECRET`   | yes      | output of `openssl rand -base64 32`; keep it out of chat and git |
-| `DATABASE_URL`         | yes      | Postgres connection string (for example Neon, pooled)            |
-| `GOOGLE_CLIENT_ID`     | optional | from Google Cloud, step 2                                        |
-| `GOOGLE_CLIENT_SECRET` | optional | from Google Cloud, step 2                                        |
-| `RAZORPAY_KEY_ID`      | optional | Razorpay dashboard. Without it the paywall stays off             |
-| `RAZORPAY_KEY_SECRET`  | optional | Razorpay dashboard. Never exposed to the browser                 |
+| Variable                    | Required | Value                                                                                                                                                   |
+| --------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `BETTER_AUTH_URL`           | yes      | `https://letmelearn.vercel.app`, exactly, no trailing slash                                                                                             |
+| `BETTER_AUTH_SECRET`        | yes      | output of `openssl rand -base64 32`; keep it out of chat and git                                                                                        |
+| `DATABASE_URL`              | yes      | Postgres connection string (for example Neon, pooled)                                                                                                   |
+| `GOOGLE_CLIENT_ID`          | optional | from Google Cloud, step 2                                                                                                                               |
+| `GOOGLE_CLIENT_SECRET`      | optional | from Google Cloud, step 2                                                                                                                               |
+| `RAZORPAY_KEY_ID`           | optional | Razorpay dashboard. Without it the paywall stays off                                                                                                    |
+| `RAZORPAY_KEY_SECRET`       | optional | Razorpay dashboard. Never exposed to the browser                                                                                                        |
+| `CODE_RUNNER_BASE_URL`      | No       | Compiler Explorer instance the Code Compiler uses for Java. Defaults to `https://godbolt.org`; point it at your own instance to keep snippets in-house. |
+| `CODE_RUNNER_JAVA_COMPILER` | No       | Compiler id on that instance. Defaults to `java2501` (JDK 25).                                                                                          |
 
 Why each required one matters:
 

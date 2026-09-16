@@ -93,6 +93,14 @@ export const catalog: CatalogHit[] = [
     tags: c.tags,
   })),
   {
+    path: "/compiler",
+    title: "Code Compiler",
+    subtitle:
+      "Run Java, Python, JavaScript, TypeScript and SQL snippets, with the chapters' examples loaded in",
+    kind: "Compiler",
+    tags: ["compiler", "run code", "playground", "sql", "repl"],
+  },
+  {
     path: "/resources",
     title: "Awesome system design resources",
     subtitle: "Source 6 — interview problems, papers, and channels from ashishps1's list",
