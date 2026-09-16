@@ -6,18 +6,19 @@ export const javaFoundations: Concept[] = [
   {
     slug: "how-to-use-this-guide",
     title: "How to Use This Guide",
-    subtitle: "Chapter 0 — the path through thirty-four chapters, and what to skip",
+    subtitle: "Chapter 0 — the path through forty-nine chapters, and what to skip",
     level: "foundational",
     minutes: 10,
     tags: ["orientation", "roadmap"],
     summary:
-      "Thirty-four chapters is a lot, and reading them in order front to back is the slowest route to being useful. This page is the map: which chapters are load-bearing, which are reference material you look up when you hit them, and the order that gets you writing production Spring Boot services fastest.",
+      "Forty-nine chapters is a lot, and reading them in order front to back is the slowest route to being useful. This page is the map: which chapters are load-bearing, which are reference material you look up when you hit them, and the order that gets you writing production Spring Boot services fastest.",
     keyPoints: [
       "Chapters 1, 2, 6 and 14 are the core — everything else assumes them.",
       "Chapters 3 and 4 are where real backend bugs come from: concurrency and error handling.",
       "Chapters 13 and 18 are the ones that pay the bills; get there as fast as the fundamentals allow.",
       "Chapters 5, 9, 10 and 11 are reference — read when a task demands them, not before.",
       "Chapters 20–33 go deep on Spring Boot in production — start with 24 (transactions), 25 (JPA) and 28 (threads) once your first service ships.",
+      "Chapters 34–48 are the language itself in depth: objects and generics, collections internals and pitfalls, and what each Java release from 8 to 26 added.",
     ],
     sections: [
       {
@@ -46,6 +47,11 @@ export const javaFoundations: Concept[] = [
               "4 — Spring Boot in depth",
               "24 Transactions, 25 JPA, 28 Threads, 31 Resilience, 32 Observability — then the rest of 20–33",
               "Run it well in production",
+            ],
+            [
+              "5 — The language in depth",
+              "34–38 OOP, 39–43 Collections, 44–48 the Java releases",
+              "Know why, not just how",
             ],
             [
               "Reference",
@@ -78,7 +84,7 @@ export const javaFoundations: Concept[] = [
         ],
       },
     ],
-    related: ["/java/basics", "/java/oop", "/java/spring-framework"],
+    related: ["/java/basics", "/java/oop", "/java/objects-encapsulation", "/java/spring-framework"],
     furtherReading: [
       { label: "Oracle — Java SE documentation", href: "https://docs.oracle.com/en/java/" },
       { label: "Baeldung — Java and Spring tutorials", href: "https://www.baeldung.com/" },
@@ -425,7 +431,13 @@ record UserRecord(String email) { }        // equals, hashCode, toString: free`,
         ],
       },
     ],
-    related: ["/java/basics", "/java/design-patterns", "/lld/solid"],
+    related: [
+      "/java/objects-encapsulation",
+      "/java/inheritance-polymorphism",
+      "/java/sealed-records",
+      "/java/object-contracts",
+      "/lld/solid",
+    ],
     furtherReading: [
       { label: "Baeldung — Java OOP", href: "https://www.baeldung.com/java-oop" },
       {

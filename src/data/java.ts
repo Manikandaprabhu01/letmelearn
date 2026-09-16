@@ -21,6 +21,21 @@ import { springKafka } from "@/data/java/spring/ch-30-kafka";
 import { springHttpResilience } from "@/data/java/spring/ch-31-http-resilience";
 import { springObservability } from "@/data/java/spring/ch-32-observability";
 import { springTesting } from "@/data/java/spring/ch-33-testing";
+import { javaObjects } from "@/data/java/language/ch-34-objects";
+import { javaInheritance } from "@/data/java/language/ch-35-inheritance";
+import { javaSealedRecords } from "@/data/java/language/ch-36-sealed-records";
+import { javaObjectContracts } from "@/data/java/language/ch-37-object-contracts";
+import { javaGenerics } from "@/data/java/language/ch-38-generics";
+import { javaCollectionsInternals } from "@/data/java/language/ch-39-collections-internals";
+import { javaCollectionsChoosing } from "@/data/java/language/ch-40-collections-choosing";
+import { javaCollectionsPitfalls } from "@/data/java/language/ch-41-collections-pitfalls";
+import { javaConcurrentCollections } from "@/data/java/language/ch-42-concurrent-collections";
+import { javaStreamsCollectors } from "@/data/java/language/ch-43-streams-collectors";
+import { javaEightFeatures } from "@/data/java/language/ch-44-java-8";
+import { javaNineToSeventeen } from "@/data/java/language/ch-45-java-9-to-17";
+import { javaSeventeenToTwentyOne } from "@/data/java/language/ch-46-java-17-to-21";
+import { javaTwentyTwoToTwentySix } from "@/data/java/language/ch-47-java-22-to-26";
+import { javaJdkMigration } from "@/data/java/language/ch-48-jdk-migration";
 import type { Concept } from "@/data/types";
 
 const all: Concept[] = [
@@ -47,6 +62,21 @@ const all: Concept[] = [
   springHttpResilience,
   springObservability,
   springTesting,
+  javaObjects,
+  javaInheritance,
+  javaSealedRecords,
+  javaObjectContracts,
+  javaGenerics,
+  javaCollectionsInternals,
+  javaCollectionsChoosing,
+  javaCollectionsPitfalls,
+  javaConcurrentCollections,
+  javaStreamsCollectors,
+  javaEightFeatures,
+  javaNineToSeventeen,
+  javaSeventeenToTwentyOne,
+  javaTwentyTwoToTwentySix,
+  javaJdkMigration,
 ];
 
 /**
@@ -90,6 +120,21 @@ const CHAPTER_ORDER = [
   "spring-http-resilience",
   "spring-observability",
   "spring-testing",
+  "objects-encapsulation",
+  "inheritance-polymorphism",
+  "sealed-records",
+  "object-contracts",
+  "generics-in-depth",
+  "collections-internals",
+  "collections-choosing",
+  "collections-pitfalls",
+  "concurrent-collections",
+  "streams-collectors",
+  "java-8-features",
+  "java-9-to-17",
+  "java-17-to-21",
+  "java-22-to-26",
+  "jdk-migration",
 ] as const;
 
 export const javaConcepts: Concept[] = CHAPTER_ORDER.map((slug) => {
@@ -128,5 +173,26 @@ export const JAVA_PARTS: { title: string; blurb: string; from: number; to: numbe
       "How Spring Boot behaves in production: startup, beans, configuration, proxies, transactions, JPA, MVC, security, threads, caching, Kafka, resilience, observability and testing.",
     from: 20,
     to: 33,
+  },
+  {
+    title: "Part 3 — Object-oriented Java in depth",
+    blurb:
+      "What an object costs, encapsulation that holds, dispatch and inheritance, sealed types and records, the contracts collections rely on, and generics.",
+    from: 34,
+    to: 38,
+  },
+  {
+    title: "Part 4 — Collections in depth",
+    blurb:
+      "How each structure works in memory, choosing by the operation you need, the pitfalls that reach production, concurrency, and streams with collectors.",
+    from: 39,
+    to: 43,
+  },
+  {
+    title: "Part 5 — The Java releases, 8 to 26",
+    blurb:
+      "What each version added and what it is for: lambdas and java.time, modules and records, virtual threads and pattern matching, scoped values and faster startup — and how to migrate.",
+    from: 44,
+    to: 48,
   },
 ];

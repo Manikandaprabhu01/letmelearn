@@ -119,7 +119,7 @@ fill(new ArrayList<Number>());        // List<Number> works thanks to super`,
         ],
       },
     ],
-    related: ["/java/multithreading", "/java/docker"],
+    related: ["/java/generics-in-depth", "/java/multithreading", "/java/docker"],
     furtherReading: [{ label: "Baeldung — JVM", href: "https://www.baeldung.com/jvm-parameters" }],
   },
 

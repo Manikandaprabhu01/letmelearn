@@ -174,7 +174,13 @@ class LruCache<K, V> extends LinkedHashMap<K, V> {
         ],
       },
     ],
-    related: ["/java/java-8", "/java/oop", "/lld/lru-cache"],
+    related: [
+      "/java/collections-internals",
+      "/java/collections-choosing",
+      "/java/collections-pitfalls",
+      "/java/concurrent-collections",
+      "/lld/lru-cache",
+    ],
     furtherReading: [
       { label: "Baeldung — collections", href: "https://www.baeldung.com/java-collections" },
     ],

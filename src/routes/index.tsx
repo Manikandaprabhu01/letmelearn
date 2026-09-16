@@ -94,7 +94,7 @@ function Home() {
           to="/java"
           kicker="Menu"
           title="Java & Spring Boot"
-          body="Thirty-four chapters from the language core to Spring Boot internals — transactions, JPA, security, Kafka and observability."
+          body="Forty-nine chapters: the language core, Spring Boot internals, OOP and collections in depth, and every Java release from 8 to 26."
         />
         <Door
           to="/python"

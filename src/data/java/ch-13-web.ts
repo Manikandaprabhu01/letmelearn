@@ -284,7 +284,12 @@ String describe(PaymentResult result) {
         ],
       },
     ],
-    related: ["/java/collections", "/java/oop"],
+    related: [
+      "/java/java-8-features",
+      "/java/streams-collectors",
+      "/java/java-9-to-17",
+      "/java/java-17-to-21",
+    ],
     furtherReading: [
       {
         label: "Baeldung — Java 8 and beyond",
