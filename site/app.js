@@ -683,7 +683,7 @@
   function moveCursor(delta) {
     var items = results.querySelectorAll("a");
     if (!items.length) return;
-    items[cursor] && items[cursor].classList.remove("on");
+    if (items[cursor]) items[cursor].classList.remove("on");
     cursor = (cursor + delta + items.length) % items.length;
     items[cursor].classList.add("on");
     items[cursor].scrollIntoView({ block: "nearest" });

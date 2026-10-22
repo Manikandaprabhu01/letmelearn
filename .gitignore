@@ -1,4 +1,9 @@
 node_modules/
+
+# Vercel build output — MUST NOT be committed. A tracked
+# .vercel/output makes Vercel treat every deploy as prebuilt and skip
+# the build, serving a frozen snapshot instead of the current source.
+.vercel/
 .project_id
 .github_repo
 .env

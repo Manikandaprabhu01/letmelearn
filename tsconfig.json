@@ -32,5 +32,10 @@
   "include": [
     "src",
     "server"
+  ],
+  // Runs inside a sandboxed iframe, not in this program: its globals come from
+  // CDN runtimes (Pyodide, sql.js, TypeScript) and it is inlined as raw text.
+  "exclude": [
+    "src/lib/compiler/runner.js"
   ]
 }

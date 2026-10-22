@@ -507,6 +507,7 @@ async function withRetry<T>(fn: () => Promise<T>, deadline: number) {
         ],
       },
     ],
+    playground: "circuit-breaker",
     related: ["/hld/availability", "/lld/decorator", "/hld/rate-limiting", "/hld/observability"],
     furtherReading: [
       { label: "roadmap.sh — system design", href: "https://roadmap.sh/system-design" },
@@ -959,6 +960,7 @@ async function getUser(id: string) {
         ],
       },
     ],
+    playground: "bloom-filter",
     related: [
       "/hld/caching",
       "/examples/url-shortener",

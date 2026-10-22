@@ -13,8 +13,16 @@ export const vol2Examples: DesignExample[] = [
     summary:
       "Volume 2 chapter 1. 'Restaurants near me' is a geofence query. Quadtrees, geohashes, or an S2/H3 index turn 'points within radius' into a small set of cells you can fetch from a sharded store.",
     requirements: {
-      functional: ["Search businesses by lat/lng + radius + filters", "Add/update a business location", "Rank by distance and rating"],
-      nonFunctional: ["Read-heavy", "Stale location of a shop by minutes is OK", "Worldwide coverage"],
+      functional: [
+        "Search businesses by lat/lng + radius + filters",
+        "Add/update a business location",
+        "Rank by distance and rating",
+      ],
+      nonFunctional: [
+        "Read-heavy",
+        "Stale location of a shop by minutes is OK",
+        "Worldwide coverage",
+      ],
     },
     architecture: [
       {
@@ -22,7 +30,10 @@ export const vol2Examples: DesignExample[] = [
         table: {
           headers: ["Index", "Idea"],
           rows: [
-            ["Geohash", "Base32 encoding of a bounding box. Prefix = coarser cell. Neighbors are a bit fiddly at edges."],
+            [
+              "Geohash",
+              "Base32 encoding of a bounding box. Prefix = coarser cell. Neighbors are a bit fiddly at edges.",
+            ],
             ["Quadtree", "Split space into four until a cell holds few enough points."],
             ["Google S2 / H3", "Spherical cells. Production default for serious geo."],
           ],
@@ -54,7 +65,11 @@ export const vol2Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "Coarser cells", pickWhen: "You want fewer round-trips", cost: "Over-fetch, more filtering" },
+      {
+        choice: "Coarser cells",
+        pickWhen: "You want fewer round-trips",
+        cost: "Over-fetch, more filtering",
+      },
       { choice: "Finer cells", pickWhen: "Dense downtown", cost: "More cells to cover a radius" },
     ],
     related: ["/examples/nearby-friends", "/examples/google-maps", "/hld/sharding"],
@@ -72,8 +87,15 @@ export const vol2Examples: DesignExample[] = [
     summary:
       "Volume 2 chapter 2. Unlike Yelp, the points move. Periodic location pings, a realtime index, and push when a friend enters your radius. Presence + geo + fan-out.",
     requirements: {
-      functional: ["Friends see each other when nearby", "Opt-in, with recency", "Battery-aware updates"],
-      nonFunctional: ["Updates every few seconds when moving", "Privacy: only friends, not the world"],
+      functional: [
+        "Friends see each other when nearby",
+        "Opt-in, with recency",
+        "Battery-aware updates",
+      ],
+      nonFunctional: [
+        "Updates every few seconds when moving",
+        "Privacy: only friends, not the world",
+      ],
     },
     architecture: [
       {
@@ -99,7 +121,12 @@ export const vol2Examples: DesignExample[] = [
       { choice: "Fixed 5s pings", pickWhen: "Safety use cases", cost: "Battery and write QPS" },
     ],
     related: ["/examples/proximity", "/examples/chat", "/hld/websockets"],
-    furtherReading: [{ label: "Volume 2 nearby friends (concept)", href: "https://blog.bytebytego.com/p/system-design-interview-books-volume" }],
+    furtherReading: [
+      {
+        label: "Volume 2 nearby friends (concept)",
+        href: "https://blog.bytebytego.com/p/system-design-interview-books-volume",
+      },
+    ],
   },
   {
     slug: "google-maps",
@@ -113,8 +140,17 @@ export const vol2Examples: DesignExample[] = [
     summary:
       "Volume 2 chapter 3. Tiles for rendering, a road graph for routing, traffic as live edge weights, and geocoding. Do not design all of it — pick tiles + routing as the deep dive.",
     requirements: {
-      functional: ["Render maps at many zooms", "Navigate A → B with ETAs", "Search places", "Live traffic"],
-      nonFunctional: ["Tile hits from a CDN", "Routing under a second for city-scale", "Traffic freshness of minutes"],
+      functional: [
+        "Render maps at many zooms",
+        "Navigate A → B with ETAs",
+        "Search places",
+        "Live traffic",
+      ],
+      nonFunctional: [
+        "Tile hits from a CDN",
+        "Routing under a second for city-scale",
+        "Traffic freshness of minutes",
+      ],
     },
     architecture: [
       {
@@ -124,7 +160,10 @@ export const vol2Examples: DesignExample[] = [
           layers: [
             { title: "Client", items: ["Viewport", "Tile cache", "Nav SDK"] },
             { title: "Render path", items: ["Tile service", "CDN", "Vector tiles"] },
-            { title: "Routing path", items: ["Road graph", "Contraction hierarchies / A*", "Traffic aggregator"] },
+            {
+              title: "Routing path",
+              items: ["Road graph", "Contraction hierarchies / A*", "Traffic aggregator"],
+            },
           ],
         },
         bullets: [
@@ -161,7 +200,12 @@ export const vol2Examples: DesignExample[] = [
     summary:
       "Volume 2 chapter 4. Topics, partitions, replicas, a controller, consumer groups, and the ISR. If you can draw Kafka from memory you can design half the async systems in both books.",
     requirements: {
-      functional: ["Publish to a topic", "Consume with a group", "Replay from an offset", "Order per partition key"],
+      functional: [
+        "Publish to a topic",
+        "Consume with a group",
+        "Replay from an offset",
+        "Order per partition key",
+      ],
       nonFunctional: ["High throughput", "Durable (acks=all)", "Horizontal scale via partitions"],
     },
     architecture: [
@@ -192,11 +236,21 @@ export const vol2Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "More partitions", pickWhen: "Need more consumer parallelism", cost: "More files, longer recovery, slower elections" },
-      { choice: "SQS-style competing queue", pickWhen: "No replay, simpler ops", cost: "No independent consumer groups" },
+      {
+        choice: "More partitions",
+        pickWhen: "Need more consumer parallelism",
+        cost: "More files, longer recovery, slower elections",
+      },
+      {
+        choice: "SQS-style competing queue",
+        pickWhen: "No replay, simpler ops",
+        cost: "No independent consumer groups",
+      },
     ],
     related: ["/hld/message-queues", "/examples/ad-click", "/examples/notification"],
-    furtherReading: [{ label: "Kafka design (official)", href: "https://kafka.apache.org/documentation/#design" }],
+    furtherReading: [
+      { label: "Kafka design (official)", href: "https://kafka.apache.org/documentation/#design" },
+    ],
   },
   {
     slug: "metrics",
@@ -210,8 +264,17 @@ export const vol2Examples: DesignExample[] = [
     summary:
       "Volume 2 chapter 5. Collect time series, write them cheaply, query them, alert on them, down-sample them. Cardinality is the villain.",
     requirements: {
-      functional: ["Ingest metrics from services", "Graph and query", "Alert on rules", "Dashboards"],
-      nonFunctional: ["Millions of active series", "Alert lag of seconds to a minute", "Retain raw briefly, rollups for years"],
+      functional: [
+        "Ingest metrics from services",
+        "Graph and query",
+        "Alert on rules",
+        "Dashboards",
+      ],
+      nonFunctional: [
+        "Millions of active series",
+        "Alert lag of seconds to a minute",
+        "Retain raw briefly, rollups for years",
+      ],
     },
     architecture: [
       {
@@ -243,11 +306,20 @@ export const vol2Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "Pull scrape", pickWhen: "Long-lived, discoverable targets", cost: "Ephemeral jobs need a push gateway" },
+      {
+        choice: "Pull scrape",
+        pickWhen: "Long-lived, discoverable targets",
+        cost: "Ephemeral jobs need a push gateway",
+      },
       { choice: "Push", pickWhen: "Clients behind NAT, lambdas", cost: "You own backpressure" },
     ],
     related: ["/hld/observability", "/examples/ad-click", "/hld/sharding"],
-    furtherReading: [{ label: "Prometheus storage", href: "https://prometheus.io/docs/prometheus/latest/storage/" }],
+    furtherReading: [
+      {
+        label: "Prometheus storage",
+        href: "https://prometheus.io/docs/prometheus/latest/storage/",
+      },
+    ],
   },
   {
     slug: "ad-click",
@@ -261,8 +333,17 @@ export const vol2Examples: DesignExample[] = [
     summary:
       "Volume 2 chapter 6. Billions of impression and click events, aggregated along many dimensions (campaign, country, hour) with exactly-once money semantics and fraud filters.",
     requirements: {
-      functional: ["Ingest impression/click events", "Aggregate by campaign / time / geo", "Support late events", "Fraud filter"],
-      nonFunctional: ["Exactly-once billing effects", "Minutes of freshness for dashboards", "Hours of retention for raw, years for rollups"],
+      functional: [
+        "Ingest impression/click events",
+        "Aggregate by campaign / time / geo",
+        "Support late events",
+        "Fraud filter",
+      ],
+      nonFunctional: [
+        "Exactly-once billing effects",
+        "Minutes of freshness for dashboards",
+        "Hours of retention for raw, years for rollups",
+      ],
     },
     architecture: [
       {
@@ -299,7 +380,12 @@ export const vol2Examples: DesignExample[] = [
       { choice: "Batch only", pickWhen: "Daily invoices", cost: "No live ops view" },
     ],
     related: ["/examples/distributed-mq", "/examples/metrics", "/hld/message-queues"],
-    furtherReading: [{ label: "Streaming 101 (Akidau)", href: "https://www.oreilly.com/radar/the-world-beyond-batch-streaming-101/" }],
+    furtherReading: [
+      {
+        label: "Streaming 101 (Akidau)",
+        href: "https://www.oreilly.com/radar/the-world-beyond-batch-streaming-101/",
+      },
+    ],
   },
   {
     slug: "hotel-reservation",
@@ -314,7 +400,11 @@ export const vol2Examples: DesignExample[] = [
       "Volume 2 chapter 7. Inventory is a room-night. Oversell is the bug. Lock the inventory row (or use a conditional write) between hold and pay, with a TTL so abandoned carts release rooms.",
     requirements: {
       functional: ["Search availability", "Hold a room", "Pay and confirm", "Cancel / refund"],
-      nonFunctional: ["No double-book of the same room-night", "Search can be slightly stale", "Payment is a saga"],
+      nonFunctional: [
+        "No double-book of the same room-night",
+        "Search can be slightly stale",
+        "Payment is a saga",
+      ],
     },
     dataModel: [
       { entity: "Hotel", fields: ["id", "geo", "stars"] },
@@ -348,10 +438,19 @@ export const vol2Examples: DesignExample[] = [
     ],
     tradeoffs: [
       { choice: "Overbooking factor", pickWhen: "No-show rates are known", cost: "Walking guests" },
-      { choice: "Strict remaining=0", pickWhen: "Boutique hotels, unique rooms", cost: "Lower occupancy" },
+      {
+        choice: "Strict remaining=0",
+        pickWhen: "Boutique hotels, unique rooms",
+        cost: "Lower occupancy",
+      },
     ],
     related: ["/examples/payment", "/lld/concurrency", "/hld/consistency"],
-    furtherReading: [{ label: "roadmap.sh — e-commerce checkout", href: "https://roadmap.sh/questions/system-design" }],
+    furtherReading: [
+      {
+        label: "roadmap.sh — e-commerce checkout",
+        href: "https://roadmap.sh/questions/system-design",
+      },
+    ],
   },
   {
     slug: "email-service",
@@ -365,8 +464,18 @@ export const vol2Examples: DesignExample[] = [
     summary:
       "Volume 2 chapter 8. SMTP in, IMAP/web out, a metadata store, a blob store for bodies, spam, and fan-out to many devices. Mail is a large, append-mostly object with search.",
     requirements: {
-      functional: ["Send and receive", "Folders / labels", "Search", "Attachments", "Multiple devices"],
-      nonFunctional: ["Durability (losing mail is a scandal)", "Spam filtering before inbox", "Search freshness of seconds to minutes"],
+      functional: [
+        "Send and receive",
+        "Folders / labels",
+        "Search",
+        "Attachments",
+        "Multiple devices",
+      ],
+      nonFunctional: [
+        "Durability (losing mail is a scandal)",
+        "Spam filtering before inbox",
+        "Search freshness of seconds to minutes",
+      ],
     },
     architecture: [
       {
@@ -399,11 +508,17 @@ export const vol2Examples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "Per-user shard", pickWhen: "Natural isolation, easy deletion", cost: "Hot users (mailing-list bombs)" },
+      {
+        choice: "Per-user shard",
+        pickWhen: "Natural isolation, easy deletion",
+        cost: "Hot users (mailing-list bombs)",
+      },
       { choice: "Shared search cluster", pickWhen: "Ops simplicity", cost: "Noisy neighbor" },
     ],
     related: ["/examples/object-storage", "/examples/notification", "/hld/bloom-filters"],
-    furtherReading: [{ label: "SMTP", href: "https://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol" }],
+    furtherReading: [
+      { label: "SMTP", href: "https://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol" },
+    ],
   },
   {
     slug: "object-storage",
@@ -417,8 +532,17 @@ export const vol2Examples: DesignExample[] = [
     summary:
       "Volume 2 chapter 9. Put/get/list objects in buckets. Metadata in a strongly consistent index, data in erasure-coded or replicated chunks across a storage fleet, with a placement service.",
     requirements: {
-      functional: ["PUT / GET / DELETE object", "List prefix", "Presigned URLs", "Versioning, multipart"],
-      nonFunctional: ["11 nines class durability (the famous S3 number)", "Huge objects via multipart", "Cheap sequential IO"],
+      functional: [
+        "PUT / GET / DELETE object",
+        "List prefix",
+        "Presigned URLs",
+        "Versioning, multipart",
+      ],
+      nonFunctional: [
+        "11 nines class durability (the famous S3 number)",
+        "Huge objects via multipart",
+        "Cheap sequential IO",
+      ],
     },
     architecture: [
       {
@@ -452,7 +576,9 @@ export const vol2Examples: DesignExample[] = [
       { choice: "3× replica", pickWhen: "Hot, small, simple", cost: "Storage bill" },
     ],
     related: ["/examples/google-drive", "/examples/youtube", "/hld/quorum"],
-    furtherReading: [{ label: "S3 design talks / AWS architecture (ideas)", href: "https://aws.amazon.com/s3/" }],
+    furtherReading: [
+      { label: "S3 design talks / AWS architecture (ideas)", href: "https://aws.amazon.com/s3/" },
+    ],
   },
   {
     slug: "leaderboard",
@@ -493,10 +619,16 @@ ZREVRANK lb:weekly:42 "player:9"`,
     ],
     tradeoffs: [
       { choice: "Redis only", pickWhen: "Top-N of a modest set", cost: "RAM, persistence story" },
-      { choice: "DB + cached top", pickWhen: "Huge tails", cost: "Rank of a random player is slower" },
+      {
+        choice: "DB + cached top",
+        pickWhen: "Huge tails",
+        cost: "Rank of a random player is slower",
+      },
     ],
     related: ["/hld/caching", "/examples/unique-id", "/hld/sharding"],
-    furtherReading: [{ label: "Redis sorted sets", href: "https://redis.io/docs/data-types/sorted-sets/" }],
+    furtherReading: [
+      { label: "Redis sorted sets", href: "https://redis.io/docs/data-types/sorted-sets/" },
+    ],
   },
   {
     slug: "payment",
@@ -510,11 +642,24 @@ ZREVRANK lb:weekly:42 "player:9"`,
     summary:
       "Volume 2 chapter 11. Charge a card, talk to a processor, keep a ledger. Idempotency keys, state machines, and 'never lose or double-charge' beat fancy diagrams.",
     requirements: {
-      functional: ["Authorize, capture, refund, void", "Idempotent retries", "Webhooks to merchants", "Reconciliation"],
-      nonFunctional: ["Exactly-once money effects", "PCI scope as small as possible", "Processor outages queued, not forgotten"],
+      functional: [
+        "Authorize, capture, refund, void",
+        "Idempotent retries",
+        "Webhooks to merchants",
+        "Reconciliation",
+      ],
+      nonFunctional: [
+        "Exactly-once money effects",
+        "PCI scope as small as possible",
+        "Processor outages queued, not forgotten",
+      ],
     },
     apis: [
-      { method: "POST", path: "/v1/charges", desc: "Idempotency-Key header. { amount, currency, source }" },
+      {
+        method: "POST",
+        path: "/v1/charges",
+        desc: "Idempotency-Key header. { amount, currency, source }",
+      },
       { method: "POST", path: "/v1/refunds", desc: "Refund a captured charge" },
     ],
     architecture: [
@@ -542,11 +687,17 @@ ZREVRANK lb:weekly:42 "player:9"`,
       },
     ],
     tradeoffs: [
-      { choice: "Authorize then capture", pickWhen: "Merchants fulfill later", cost: "Auth expiry, more states" },
+      {
+        choice: "Authorize then capture",
+        pickWhen: "Merchants fulfill later",
+        cost: "Auth expiry, more states",
+      },
       { choice: "Immediate capture", pickWhen: "Digital goods", cost: "Refunds instead of voids" },
     ],
     related: ["/examples/digital-wallet", "/examples/hotel-reservation", "/lld/adapter"],
-    furtherReading: [{ label: "roadmap.sh — payments", href: "https://roadmap.sh/questions/system-design" }],
+    furtherReading: [
+      { label: "roadmap.sh — payments", href: "https://roadmap.sh/questions/system-design" },
+    ],
   },
   {
     slug: "digital-wallet",
@@ -560,7 +711,12 @@ ZREVRANK lb:weekly:42 "player:9"`,
     summary:
       "Volume 2 chapter 12. A ledger of accounts, transfers that double-entry, holds for pending payments, and end-to-end idempotency. The wallet is a money graph, not a 'balance column'.",
     requirements: {
-      functional: ["Top up, withdraw, P2P transfer", "Pay a merchant", "See history and balance", "Holds / escrows"],
+      functional: [
+        "Top up, withdraw, P2P transfer",
+        "Pay a merchant",
+        "See history and balance",
+        "Holds / escrows",
+      ],
       nonFunctional: ["No lost money", "No double spend", "Audit trail"],
     },
     dataModel: [
@@ -592,10 +748,19 @@ assert(available >= 0) // after applying`,
     ],
     tradeoffs: [
       { choice: "Single-row balance", pickWhen: "Toy scale", cost: "No audit, lost updates" },
-      { choice: "Journal + snapshot", pickWhen: "Real money", cost: "More writes, need compaction of old lines" },
+      {
+        choice: "Journal + snapshot",
+        pickWhen: "Real money",
+        cost: "More writes, need compaction of old lines",
+      },
     ],
     related: ["/examples/payment", "/examples/stock-exchange", "/hld/consistency"],
-    furtherReading: [{ label: "Double-entry bookkeeping", href: "https://en.wikipedia.org/wiki/Double-entry_bookkeeping" }],
+    furtherReading: [
+      {
+        label: "Double-entry bookkeeping",
+        href: "https://en.wikipedia.org/wiki/Double-entry_bookkeeping",
+      },
+    ],
   },
   {
     slug: "stock-exchange",
@@ -609,8 +774,17 @@ assert(available >= 0) // after applying`,
     summary:
       "Volume 2 chapter 13. The matching engine is a single-threaded, in-memory order book per symbol. Deterministic, sequenced, and persisted as a log. Everything else (gateways, market data, clearing) is around it.",
     requirements: {
-      functional: ["Limit and market orders", "Cancel", "Trades emit to both sides", "Market data (L2 book)"],
-      nonFunctional: ["Microseconds to a few ms matching", "Fair FIFO (or configured) at a price level", "Recover from the log"],
+      functional: [
+        "Limit and market orders",
+        "Cancel",
+        "Trades emit to both sides",
+        "Market data (L2 book)",
+      ],
+      nonFunctional: [
+        "Microseconds to a few ms matching",
+        "Fair FIFO (or configured) at a price level",
+        "Recover from the log",
+      ],
     },
     architecture: [
       {
@@ -648,10 +822,23 @@ assert(available >= 0) // after applying`,
       },
     ],
     tradeoffs: [
-      { choice: "Single-thread matcher", pickWhen: "Correctness and latency (always)", cost: "Per-symbol ceiling" },
-      { choice: "Crypto-style chain settlement", pickWhen: "On-chain products", cost: "Not an exchange matching-engine design" },
+      {
+        choice: "Single-thread matcher",
+        pickWhen: "Correctness and latency (always)",
+        cost: "Per-symbol ceiling",
+      },
+      {
+        choice: "Crypto-style chain settlement",
+        pickWhen: "On-chain products",
+        cost: "Not an exchange matching-engine design",
+      },
     ],
     related: ["/lld/observer", "/examples/digital-wallet", "/hld/consistency"],
-    furtherReading: [{ label: "How matching engines work (ideas)", href: "https://en.wikipedia.org/wiki/Order_matching_system" }],
+    furtherReading: [
+      {
+        label: "How matching engines work (ideas)",
+        href: "https://en.wikipedia.org/wiki/Order_matching_system",
+      },
+    ],
   },
 ];

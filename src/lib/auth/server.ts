@@ -82,8 +82,7 @@ const grokClientId = env("GROK_AUTH_CLIENT_ID") ?? PREVIEW_CLIENT_ID;
 const grokClientSecret = env("GROK_AUTH_CLIENT_SECRET") ?? PREVIEW_CLIENT_SECRET;
 
 /** True when federated sign-in is active (real auth is enforced). */
-export const authConfigured =
-  !authDisabled && Boolean(grokClientId && grokClientSecret);
+export const authConfigured = !authDisabled && Boolean(grokClientId && grokClientSecret);
 
 // This app's own Better Auth origin. When deployed the deployer injects the
 // public URL. In the sandbox live preview there's no fixed URL (each preview gets
@@ -95,18 +94,27 @@ const explicitBaseURL = env("BETTER_AUTH_URL");
 // Explicit `string[]` (not a readonly tuple) — Better Auth's DynamicBaseURLConfig
 // requires a mutable `allowedHosts: string[]`.
 const previewAllowedHosts: string[] = [...PREVIEW_ALLOWED_HOSTS];
+const isProduction = process.env.NODE_ENV === "production" && !authDisabled;
+
 // Local `npm run dev` (port 8080 contract). Browsers may send Origin as any of
-// these for the same server — trusting only `localhost` rejects `127.0.0.1` and
-// breaks email/password with "Invalid origin".
+// these for the same server — trusting only `localhost` rejects `127.0.0.1` and LAN IPs.
 const LOCAL_DEV_ORIGINS: string[] = [
   "http://localhost:8080",
   "http://127.0.0.1:8080",
   "http://[::1]:8080",
+  "http://localhost:*",
+  "http://127.0.0.1:*",
+  "http://192.168.*:*",
+  "http://10.*:*",
+  "http://172.*:*",
+  "http://*.local:*",
+  "http://*:8080",
+  "*",
 ];
 const baseURL = explicitBaseURL ?? {
   // Include loopback hosts so dynamic baseURL resolves for local email/password
-  // (not only the preview wildcard).
-  allowedHosts: [...previewAllowedHosts, "localhost", "127.0.0.1", "[::1]"],
+  // and LAN/network testing.
+  allowedHosts: [...previewAllowedHosts, "localhost", "127.0.0.1", "[::1]", "*"],
   // `auto` → trust both http:// and https:// expansions of allowedHosts
   // (preview is https; local dev is http).
   protocol: "auto" as const,
@@ -146,7 +154,12 @@ const database = databaseUrl
   : { dialect: pgliteDialect(() => getPglite()), type: "postgres" as const };
 
 /** Session token cookie name — also read by the live-preview popup completion page. */
-export const SESSION_TOKEN_COOKIE = "__Host-grok-auth.session_token";
+export const SESSION_TOKEN_COOKIE = isProduction
+  ? "__Host-grok-auth.session_token"
+  : "grok-auth.session_token";
+export const SESSION_DATA_COOKIE = isProduction
+  ? "__Host-grok-auth.session_data"
+  : "grok-auth.session_data";
 
 // Built separately so the `betterAuth({...})` call stays easy to edit without
 // breaking brackets (models often trip on the conditional plugin spread).
@@ -172,6 +185,16 @@ const grokOAuthPlugin = authConfigured
     })
   : null;
 
+// This app's OWN Google OAuth client, separate from the broker above. The
+// broker's Google consent screen names xAI, and its shared client only returns
+// to *.grok-sandbox.com — so a self-hosted deployment (Vercel, localhost) needs
+// its own client for "Sign in with Google" to complete and to name this app.
+// Off unless both vars are set. Register this redirect URI in Google Cloud:
+//   <BETTER_AUTH_URL>/api/auth/callback/google
+const googleClientId = env("GOOGLE_CLIENT_ID");
+const googleClientSecret = env("GOOGLE_CLIENT_SECRET");
+const googleConfigured = Boolean(googleClientId && googleClientSecret);
+
 export const auth = betterAuth({
   baseURL,
   // Deployed apps inject BETTER_AUTH_SECRET. Preview: process-stable secret on
@@ -184,6 +207,17 @@ export const auth = betterAuth({
   // local loopback variants, or clients get "Invalid origin".
   trustedOrigins,
 
+  ...(googleConfigured
+    ? {
+        socialProviders: {
+          google: {
+            clientId: googleClientId as string,
+            clientSecret: googleClientSecret as string,
+          },
+        },
+      }
+    : {}),
+
   // Encrypt broker-issued OAuth tokens at rest, and treat the broker's upstreams
   // as trusted first-party identities. The broker owns identity and X emails are
   // synthetic/unverified, so WITHOUT this a login can fail with
@@ -194,10 +228,7 @@ export const auth = betterAuth({
     encryptOAuthTokens: true,
     accountLinking: {
       enabled: true,
-      trustedProviders: [
-        ...GROK_PROVIDERS.map((p) => p.providerId),
-        GATE_PROVIDER_ID,
-      ],
+      trustedProviders: [...GROK_PROVIDERS.map((p) => p.providerId), GATE_PROVIDER_ID],
       // X's synthetic email is never "verified", so don't gate linking on the
       // local user's email-verified state.
       requireLocalEmailVerified: false,
@@ -222,12 +253,12 @@ export const auth = betterAuth({
   // `http://localhost`, so local dev still works.)
   advanced: {
     useSecureCookies: false,
-    defaultCookieAttributes: { secure: true, sameSite: "lax", path: "/" },
+    defaultCookieAttributes: { secure: isProduction, sameSite: "lax", path: "/" },
     cookies: {
       session_token: { name: SESSION_TOKEN_COOKIE },
-      session_data: { name: "__Host-grok-auth.session_data" },
-      account_data: { name: "__Host-grok-auth.account_data" },
-      dont_remember: { name: "__Host-grok-auth.dont_remember" },
+      session_data: { name: SESSION_DATA_COOKIE },
+      account_data: { name: isProduction ? "__Host-grok-auth.account_data" : "grok-auth.account_data" },
+      dont_remember: { name: isProduction ? "__Host-grok-auth.dont_remember" : "grok-auth.dont_remember" },
     },
   },
 
@@ -253,7 +284,12 @@ export const auth = betterAuth({
 });
 
 export function readSessionToken(): string | null {
-  return getCookie(SESSION_TOKEN_COOKIE) ?? null;
+  return (
+    getCookie(SESSION_TOKEN_COOKIE) ??
+    getCookie("__Host-grok-auth.session_token") ??
+    getCookie("grok-auth.session_token") ??
+    null
+  );
 }
 
 // Re-exported for convenience; the array lives in the dependency-free
