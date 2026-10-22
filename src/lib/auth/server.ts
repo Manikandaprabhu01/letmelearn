@@ -30,7 +30,6 @@
  * a verified id via `@/lib/auth/middleware`.
  */
 import { betterAuth } from "better-auth";
-import { memoryAdapter } from "better-auth/adapters/memory";
 import { bearer, genericOAuth } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { getCookie } from "@tanstack/react-start/server";
@@ -155,7 +154,7 @@ const grokUserInfoUrl = `${issuerBase}/api/auth/oauth2/userinfo`;
 const database = databaseUrl
   ? new Pool({ connectionString: databaseUrl })
   : process.env.VERCEL
-    ? memoryAdapter({})
+    ? undefined
     : { dialect: pgliteDialect(() => getPglite()), type: "postgres" as const };
 
 /** Session token cookie name — also read by the live-preview popup completion page. */
