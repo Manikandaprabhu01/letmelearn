@@ -28,7 +28,7 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "LetMeLearn — system design studio. HLD, LLD, Alex Xu examples, the awesome list, and interactive labs.",
+          "LetMeLearn — system design studio. HLD, LLD, worked system design examples, the awesome list, and interactive labs.",
       },
     ],
     scripts: [

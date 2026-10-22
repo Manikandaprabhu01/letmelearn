@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Check, Eye, EyeOff } from "lucide-react";
+import { Check, Eye, EyeOff, Sparkles } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { ClientOnly } from "@/components/auth/ClientOnly";
 import { LogoMark } from "@/components/layout/Logo";
 import { Button } from "@/components/ui/button";
 import { APP_NAME } from "@/data/nav";
-import { authClient } from "@/lib/auth/client";
+import { authClient, setBearerToken } from "@/lib/auth/client";
+import { ensureTestUser, TEST_USER_CREDENTIALS } from "@/lib/auth/test-user";
 import { SignInButtons, SignedIn, SignedOut, UserButton } from "@/lib/auth/gates";
 import { getSignInMethods, type SignInMethods } from "@/lib/signin/methods";
 import { cn } from "@/lib/utils";
@@ -153,6 +154,46 @@ function SignInPanel() {
     return null;
   }
 
+  async function handleQuickTestLogin() {
+    setBusy(true);
+    setError(null);
+    try {
+      await ensureTestUser();
+      const result = await authClient.signIn.email({
+        email: TEST_USER_CREDENTIALS.email,
+        password: TEST_USER_CREDENTIALS.password,
+      });
+      if (result.error) {
+        const up = await authClient.signUp.email({
+          name: TEST_USER_CREDENTIALS.name,
+          email: TEST_USER_CREDENTIALS.email,
+          password: TEST_USER_CREDENTIALS.password,
+        });
+        if (up.error) {
+          setError(describeError(result.error));
+          setBusy(false);
+          return;
+        }
+        if (up.data?.token) setBearerToken(up.data.token);
+      } else {
+        if (result.data?.token) setBearerToken(result.data.token);
+      }
+      await navigate({ to: "/" });
+    } catch {
+      setError("Could not sign in as test user. Try manually.");
+      setBusy(false);
+    }
+  }
+
+  function fillTestCredentials() {
+    setEmail(TEST_USER_CREDENTIALS.email);
+    setPassword(TEST_USER_CREDENTIALS.password);
+    if (mode === "sign-up") {
+      setName(TEST_USER_CREDENTIALS.name);
+    }
+    setError(null);
+  }
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     const problem = validate();
@@ -170,6 +211,9 @@ function SignInPanel() {
         setError(describeError(result.error));
         setBusy(false);
         return;
+      }
+      if (result.data?.token) {
+        setBearerToken(result.data.token);
       }
       // Sign-up signs the new account straight in, so both paths land here.
       await navigate({ to: "/" });
@@ -210,10 +254,49 @@ function SignInPanel() {
           : "Welcome back. Pick up where you left off."}
       </p>
 
+      {/* Test & Demo Access Banner */}
+      <div className="mt-6 rounded-lg border border-accent/40 bg-accent/5 p-4 text-sm">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 font-medium text-fg">
+            <Sparkles className="size-4 text-accent" />
+            <span>Test Account Access</span>
+          </div>
+          <span className="rounded bg-accent/15 px-2 py-0.5 text-[11px] font-mono uppercase tracking-wider text-accent font-medium">
+            Lifetime Pro
+          </span>
+        </div>
+        <p className="mt-1.5 text-xs text-muted leading-relaxed">
+          Pre-configured account with full lifetime access to all concepts, chapters, and labs:
+        </p>
+        <div className="mt-2.5 flex flex-wrap items-center gap-2 font-mono text-xs text-fg">
+          <span className="rounded border border-border bg-surface px-2 py-1">test@letmelearn.dev</span>
+          <span className="rounded border border-border bg-surface px-2 py-1">password123</span>
+        </div>
+        <div className="mt-3.5 flex gap-2">
+          <Button
+            type="button"
+            size="sm"
+            className="flex-1"
+            disabled={busy}
+            onClick={handleQuickTestLogin}
+          >
+            {busy ? "Signing in…" : "1-Click Test Sign-In"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={fillTestCredentials}
+          >
+            Fill form
+          </Button>
+        </div>
+      </div>
+
       <div
         role="tablist"
         aria-label="Sign in or create an account"
-        className="mt-8 grid grid-cols-2 gap-1 rounded-lg border border-border bg-inset p-1"
+        className="mt-6 grid grid-cols-2 gap-1 rounded-lg border border-border bg-inset p-1"
       >
         {(["sign-in", "sign-up"] as const).map((m) => (
           <button

@@ -24,14 +24,14 @@ export const resources: ResourceLink[] = [
     kind: "playground",
   },
   {
-    title: "System Design Interview — Volume 1 (Alex Xu)",
+    title: "System Design Interview — Volume 1",
     href: "https://www.amazon.com/dp/B08CMF2CQF",
     blurb:
       "Scale-from-zero, estimation, the four-step framework, then rate limiter through Google Drive. 16 chapters.",
     kind: "book",
   },
   {
-    title: "System Design Interview — Volume 2 (Alex Xu, Sahn Lam)",
+    title: "System Design Interview — Volume 2",
     href: "https://www.amazon.com/System-Design-Interview-Insiders-Guide/dp/1736049119",
     blurb:
       "Proximity, maps, Kafka-like queues, metrics, ads, hotels, S3, wallets, matching engines. 13 chapters.",

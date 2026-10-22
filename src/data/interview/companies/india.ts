@@ -162,6 +162,123 @@ export const indiaCompanies: Company[] = [
         ans: "c-apispeed",
         note: "Flipkart-specific additions to the generic answer: pre-scale ahead of the event rather than autoscaling into it, warm caches from last year's hot keys, degrade personalisation before availability, and have a documented load-shedding order.",
       },
+      {
+        q: "Machine coding: Buy Now Pay Later (BNPL) Credit Limit & Instant EMI Checkout Engine",
+        t: "lld",
+        lv: ["SDE2", "Lead SDE"],
+        d: "H",
+        round: 3,
+        a: "**Problem**: Build a Flipkart Pay Later / BNPL ledger engine in 90 minutes. Candidates must implement: user credit account registration with approved limit, instant checkout with EMI plan selection (3, 6, 9, 12 months), atomic credit limit deduction, monthly repayment ledger generation, and repayment processing with overdue penalty.\n\n**Grading Criteria**: (1) Thread-safe balance adjustments — two concurrent checkouts must never breach the credit limit; (2) Accurate financial amortization calculation (principal + interest); (3) Extensible fee/penalty calculation strategies; (4) Working unit tests with JUnit/pytest.",
+        code: {
+          java: `public class BnplEngine {
+    public enum EmiTenure {
+        THREE_MONTHS(3, 0.12), SIX_MONTHS(6, 0.14), TWELVE_MONTHS(12, 0.16);
+        final int months; final double annualRate;
+        EmiTenure(int m, double r) { this.months = m; this.annualRate = r; }
+    }
+
+    public static class Account {
+        final String userId;
+        final BigDecimal totalLimit;
+        BigDecimal usedLimit = BigDecimal.ZERO;
+        final ReentrantLock lock = new ReentrantLock();
+
+        public Account(String userId, BigDecimal totalLimit) {
+            this.userId = userId; this.totalLimit = totalLimit;
+        }
+
+        public boolean reserveLimit(BigDecimal amount) {
+            lock.lock();
+            try {
+                if (usedLimit.add(amount).compareTo(totalLimit) > 0) return false;
+                usedLimit = usedLimit.add(amount);
+                return true;
+            } finally { lock.unlock(); }
+        }
+
+        public void releaseLimit(BigDecimal amount) {
+            lock.lock();
+            try {
+                usedLimit = usedLimit.subtract(amount).max(BigDecimal.ZERO);
+            } finally { lock.unlock(); }
+        }
+    }
+
+    public record EmiInstallment(int month, BigDecimal emiAmount, BigDecimal principal, BigDecimal interest) {}
+
+    public static List<EmiInstallment> calculateSchedule(BigDecimal amount, EmiTenure tenure) {
+        int n = tenure.months;
+        double monthlyRate = tenure.annualRate / 12.0;
+        // EMI = [P x R x (1+R)^N]/[(1+R)^N-1]
+        double p = amount.doubleValue();
+        double emi = (p * monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1);
+        BigDecimal monthlyEmi = BigDecimal.valueOf(emi).setScale(2, RoundingMode.HALF_UP);
+
+        List<EmiInstallment> schedule = new ArrayList<>();
+        BigDecimal balance = amount;
+        for (int i = 1; i <= n; i++) {
+            BigDecimal interest = balance.multiply(BigDecimal.valueOf(monthlyRate)).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal principal = monthlyEmi.subtract(interest);
+            if (i == n) principal = balance; // settle rounding
+            balance = balance.subtract(principal);
+            schedule.add(new EmiInstallment(i, monthlyEmi, principal, interest));
+        }
+        return schedule;
+    }
+}`,
+          py: `import threading
+from decimal import Decimal, ROUND_HALF_UP
+
+class BnplAccount:
+    def __init__(self, user_id, total_limit):
+        self.user_id = user_id
+        self.total_limit = Decimal(str(total_limit))
+        self.used_limit = Decimal('0')
+        self.lock = threading.Lock()
+
+    def reserve(self, amount):
+        amt = Decimal(str(amount))
+        with self.lock:
+            if self.used_limit + amt > self.total_limit:
+                return False
+            self.used_limit += amt
+            return True
+
+    def release(self, amount):
+        amt = Decimal(str(amount))
+        with self.lock:
+            self.used_limit = max(Decimal('0'), self.used_limit - amt)
+
+def generate_emi_schedule(principal, months, annual_rate):
+    p = float(principal)
+    r = annual_rate / 12.0
+    emi = (p * r * ((1 + r) ** months)) / (((1 + r) ** months) - 1)
+    emi_dec = Decimal(str(round(emi, 2)))
+
+    schedule = []
+    rem = Decimal(str(principal))
+    for m in range(1, months + 1):
+        interest = (rem * Decimal(str(r))).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        princ = emi_dec - interest if m < months else rem
+        rem -= princ
+        schedule.append({"month": m, "emi": emi_dec, "principal": princ, "interest": interest})
+    return schedule`,
+        },
+      },
+      {
+        q: "Design Flipkart Minutes / Hyperlocal 10-Minute Grocery Delivery Pipeline",
+        t: "hld",
+        lv: ["Lead SDE", "Staff SDE"],
+        d: "H",
+        round: 4,
+        a: "**Clarify**: 10-minute grocery delivery (Flipkart Minutes / Blinkit / Zepto style). 5,000 dark stores across Tier-1 cities. Store catalog ~3,000 high-velocity SKUs. Hard constraint: 2 minutes for pick-pack inside warehouse, 8 minutes for rider transit within a 2.5 km radius.\n\n**Key Engineering Architecture**:\n1. **Dark Store Geofencing & Serviceability**: Customer app queries nearby dark stores using H3 hexagonal index (resolution 8). Only products with positive confirmed physical stock at the local store are rendered.\n2. **Micro-Inventory Hold & Out-Of-Stock Protection**: Flash inventory updates via Redis. When customer opens checkout, hold stock for 180 seconds. Avoid 99% of out-of-stock refund friction.\n3. **Optimal Pick-Pack Path (Warehouse Routing)**: Every dark store has standardized numbered aisles. Pick list is sorted using a Travelling Salesperson (TSP) heuristic algorithm so the warehouse picker traverses an S-shaped sweep across the floor in under 90 seconds.\n4. **Dynamic Rider Staging**: Pre-assign riders based on real-time order readiness predictions rather than waiting until the bag is packed.",
+        fu: [
+          {
+            q: "How to handle inventory shrinkage (item missing from shelf when picker arrives)?",
+            a: "Picker presses 'Item Missing' on handheld scanner. System triggers instant automatic substitution rule (e.g. 500g milk substituted with 2x250g at zero cost) or auto-refunds and flags the dark store SKU for immediate manual cycle count.",
+          },
+        ],
+      },
     ],
     prep: [
       "Build 5–10 machine coding apps under a 90-minute timer before the loop — booking systems, parking lots, splitwise, inventory. Speed of modelling is the skill being tested.",
@@ -331,6 +448,75 @@ export const indiaCompanies: Company[] = [
         lv: ["Lead SDE", "Staff SDE"],
         round: 4,
         a: "**2PC**: a coordinator asks every participant to *prepare* (durably promise it can commit), and if all vote yes, tells them to *commit*; otherwise *abort*. It gives atomicity across resources.\n\n**Why you avoid it in microservices**: it is blocking — if the coordinator dies after prepare, participants hold locks indefinitely (the classic in-doubt transaction); it requires all participants to be available simultaneously, so availability multiplies down; and it couples services' release cycles through a shared transaction manager.\n\n**What you do instead**: a **saga** — local transactions with compensating actions, coordinated by events or an orchestrator — plus the **outbox pattern** so state change and event publication are atomic within one service. Accept eventual consistency and design idempotent, retryable steps.\n\nMention where 2PC still lives: inside a single database cluster, XA transactions with a message broker in legacy stacks, and Kafka's transactional producer (which is a scoped 2PC over the log).",
+      },
+      {
+        q: "Machine coding: Hyperlocal Delivery Order-to-Rider Dynamic Batching & Route Optimizer",
+        t: "lld",
+        lv: ["SDE", "SDE2", "Lead SDE"],
+        d: "H",
+        round: 3,
+        a: "**Requirements**: Build a delivery batching engine in 90 minutes. A delivery partner can carry up to 2 orders if: (1) Restaurants are within 1 km of each other; (2) Drop-off locations are along the same trajectory (added detour time < 10 mins); (3) Combined delivery promise is not breached.\n\n**Implementation**: Model `Order`, `Location(lat, lon)`, `DeliveryPartner`, and `BatchRoute`. Use Strategy pattern for batch eligibility and routing order: `Pickup A -> Pickup B -> Drop A -> Drop B` vs `Pickup A -> Drop A -> Pickup B -> Drop B`.",
+        code: {
+          java: `public class RiderBatchMatcher {
+    public record GeoPoint(double lat, double lon) {
+        public double distanceKm(GeoPoint other) {
+            double dLat = Math.toRadians(other.lat - this.lat);
+            double dLon = Math.toRadians(other.lon - this.lon);
+            double a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(Math.toRadians(this.lat))*Math.cos(Math.toRadians(other.lat))*Math.sin(dLon/2)*Math.sin(dLon/2);
+            return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+    }
+
+    public record DeliveryOrder(String id, GeoPoint pickup, GeoPoint drop, long deadlineEpochSec) {}
+
+    public boolean canBatch(DeliveryOrder o1, DeliveryOrder o2) {
+        // Condition 1: Pickups close together (< 1.2 km)
+        if (o1.pickup().distanceKm(o2.pickup()) > 1.2) return false;
+
+        // Condition 2: Drop locations along trajectory
+        double direct1 = o1.pickup().distanceKm(o1.drop());
+        double direct2 = o2.pickup().distanceKm(o2.drop());
+        double batchedDist = o1.pickup().distanceKm(o2.pickup())
+                           + o2.pickup().distanceKm(o1.drop())
+                           + o1.drop().distanceKm(o2.drop());
+
+        // Max detour overhead <= 2.5 km (approx 8 minutes bike speed)
+        return batchedDist <= (direct1 + direct2) * 0.75;
+    }
+}`,
+          py: `import math
+
+def haversine_km(lat1, lon1, lat2, lon2):
+    R = 6371.0
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = math.sin(dlat / 2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2)**2
+    return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+def can_batch_orders(order1, order2, max_detour_km=2.5):
+    # Check pickup proximity (< 1.2 km)
+    p_dist = haversine_km(order1['pickup'][0], order1['pickup'][1], order2['pickup'][0], order2['pickup'][1])
+    if p_dist > 1.2:
+        return False
+
+    # Check total route distance (P1 -> P2 -> D1 -> D2)
+    p2_to_d1 = haversine_km(order2['pickup'][0], order2['pickup'][1], order1['drop'][0], order1['drop'][1])
+    d1_to_d2 = haversine_km(order1['drop'][0], order1['drop'][1], order2['drop'][0], order2['drop'][1])
+    combined_route = p_dist + p2_to_d1 + d1_to_d2
+
+    direct_sum = haversine_km(order1['pickup'][0], order1['pickup'][1], order1['drop'][0], order1['drop'][1]) + \
+                 haversine_km(order2['pickup'][0], order2['pickup'][1], order2['drop'][0], order2['drop'][1])
+
+    return (combined_route - direct_sum) <= max_detour_km`,
+        },
+      },
+      {
+        q: "Design Swiggy Instamart Dark Store Inventory & Pick-Pack Pipeline",
+        t: "hld",
+        lv: ["SDE2", "Lead SDE"],
+        d: "H",
+        round: 3,
+        a: "**Clarify**: 2,000 SKUs per micro-warehouse. High turnover items (milk, bread, snacks). Near real-time stock sync between warehouse rack sensors/barcodes and customer mobile app catalog.\n\n**Architecture**:\n1. **In-Store Topology Service**: Models dark store layouts as a directed graph of bins and aisles.\n2. **Inventory Sync Broker**: Uses Change Data Capture (Debezium) over Postgres to sync live SKU counts into Redis cluster with sub-100ms latency.\n3. **Pick Wave Generator**: Orders arriving within a 30-second window are grouped into picking waves. Pickers pick multiple orders simultaneously into segmented tote bags with color-coded LED bin verification.\n4. **Stock Replenishment & Shrinkage**: Auto-reorder signals sent to central mother-hub DC when inventory drops below safety thresholds.",
       },
     ],
     prep: [

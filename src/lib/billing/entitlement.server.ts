@@ -11,5 +11,13 @@ export async function hasLifetimeAccess(userId: string): Promise<boolean> {
      where user_id = ${userId} and status = 'paid'
      limit 1
   `;
-  return rows.length > 0;
+  if (rows.length > 0) return true;
+
+  // In local development / test environments without Razorpay configured,
+  // grant access to signed-in users so every track and lab can be tested.
+  if (!process.env.RAZORPAY_KEY_ID) {
+    return true;
+  }
+
+  return false;
 }

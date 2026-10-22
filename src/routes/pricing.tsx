@@ -47,11 +47,11 @@ function PricingPage() {
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
           {/* What you get */}
-          <section className="rounded-xl border border-border bg-surface p-6">
-            <h2 className="font-display text-xl tracking-tight">What is included</h2>
-            <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+          <section className="glass-card rounded-2xl p-6 sm:p-8">
+            <h2 className="font-display text-xl font-medium tracking-tight text-fg">What is included</h2>
+            <ul className="mt-6 grid gap-3 sm:grid-cols-2">
               {INCLUDED.map((item) => (
-                <li key={item} className="flex gap-2.5 text-[14px] leading-6 text-muted">
+                <li key={item} className="flex gap-2.5 text-[13.5px] leading-6 text-muted">
                   <Check className="mt-1 size-4 shrink-0 text-ok" />
                   <span>{item}</span>
                 </li>
@@ -60,20 +60,22 @@ function PricingPage() {
           </section>
 
           {/* The card */}
-          <aside className="h-fit rounded-xl border border-border bg-surface p-6">
-            <div className="flex items-baseline gap-3">
-              <span
-                className={cn("font-display text-4xl tracking-tight", price.promo && "text-ok")}
-              >
-                {formatPaise(price.totalPaise)}
-              </span>
-              {price.promo ? (
-                <span className="font-display text-xl text-faint line-through">
-                  {formatPaise(price.listPaise)}
+          <aside className="glass-card h-fit rounded-2xl border border-accent/30 p-6 sm:p-7 relative overflow-hidden">
+            <div className="mesh-glow-subtle pointer-events-none absolute inset-0" />
+            <div className="relative">
+              <div className="flex items-baseline gap-3">
+                <span
+                  className={cn("font-display text-4xl tracking-tight font-semibold", price.promo && "text-ok")}
+                >
+                  {formatPaise(price.totalPaise)}
                 </span>
-              ) : null}
-            </div>
-            <p className="mt-1 text-xs text-faint">One-time payment · lifetime access</p>
+                {price.promo ? (
+                  <span className="font-display text-xl text-faint line-through">
+                    {formatPaise(price.listPaise)}
+                  </span>
+                ) : null}
+              </div>
+              <p className="mt-1 text-xs text-muted">One-time payment · lifetime access</p>
 
             {price.promo ? (
               <div className="mt-4 flex items-center justify-between rounded-md border border-ok/30 bg-ok/10 px-3 py-2">
@@ -177,6 +179,7 @@ function PricingPage() {
             <p className="mt-4 text-center text-[11px] leading-5 text-faint">
               Payments are processed by Razorpay. We never see your card details.
             </p>
+            </div>
           </aside>
         </div>
       </div>

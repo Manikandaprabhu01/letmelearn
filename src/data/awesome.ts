@@ -428,7 +428,7 @@ export const awesomeChannels: AwesomeLink[] = [
   {
     title: "ByteByteGo",
     href: "https://www.youtube.com/@ByteByteGo",
-    blurb: "Alex Xu / Sahn Lam diagrams in motion.",
+    blurb: "System architecture diagrams in motion.",
   },
   {
     title: "System Design Interview",

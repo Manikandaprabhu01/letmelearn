@@ -2,6 +2,7 @@ import { COMPANY_INDEX } from "./company-index";
 import type { CompanyMeta, Difficulty, Level, QuestionType, SectorId } from "./types";
 
 export { COMPANY_INDEX, LIBRARY_ANSWER_COUNT } from "./company-index";
+export { ROLE_TRACKS, getRoleTrack, type RoleTrack, type RoleQuestion, type RoleTrackId } from "./roles";
 
 export const LEVELS: readonly Level[] = ["SDE", "SDE2", "Lead SDE", "Staff SDE", "Principal SDE"];
 

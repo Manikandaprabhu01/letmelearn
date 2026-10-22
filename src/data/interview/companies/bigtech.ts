@@ -227,6 +227,107 @@ export const bigtechCompanies: Company[] = [
         round: 4,
         a: 'Answer with a mechanism, not an attitude. The strong version: separate the *decision* from the *rework* — re-derive what changed in the requirement, state the cost of the change in concrete terms ("this adds two weeks and invalidates the sharding choice"), offer two options with trade-offs, and let the owner pick with that information. Then talk about how the design absorbed the change (interfaces, flags, staged rollout), because that is the engineering half of the answer.\n\nClose with what you changed afterwards so the same surprise costs less next time — a design doc review with the product owner earlier, or a thinner first milestone.',
       },
+      {
+        q: "Trapping Rain Water II (3D Elevation Grid with Min-Heap)",
+        t: "coding",
+        lv: ["SDE2", "Lead SDE"],
+        d: "H",
+        lc: 407,
+        slug: "trapping-rain-water-ii",
+        round: 3,
+        a: "**Problem**: Given an `m x n` integer matrix representing the height of each unit cell in a 2D elevation map, compute the volume of water it can trap after raining.\n\n**Key Insight**: Water spills from the lowest boundary point inward. Unlike the 1D two-pointer problem, a 2D grid requires finding the minimum boundary cell at every step. Use a **Min-Heap (PriorityQueue)** storing boundary coordinates `(height, r, c)` and a `visited` boolean matrix.\n\n1. Enqueue all perimeter cells into the Min-Heap and mark them visited.\n2. Maintain `waterLevel = 0`. Repeatedly pop the lowest boundary cell `(h, r, c)`.\n3. Update `waterLevel = max(waterLevel, h)`.\n4. For all 4 cardinal neighbors `(nr, nc)` not yet visited:\n   - If `heightMap[nr][nc] < waterLevel`, trap `waterLevel - heightMap[nr][nc]` water.\n   - Enqueue `(heightMap[nr][nc], nr, nc)` into the heap and mark visited.\n\n**Complexity**: O(M·N · log(M·N)) time, O(M·N) space.",
+        code: {
+          java: `public int trapRainWater(int[][] heightMap) {
+    if (heightMap == null || heightMap.length <= 2 || heightMap[0].length <= 2) return 0;
+    int m = heightMap.length, n = heightMap[0].length;
+    boolean[][] visited = new boolean[m][n];
+    PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
+
+    // Push outer boundaries
+    for (int r = 0; r < m; r++) {
+        pq.offer(new int[]{heightMap[r][0], r, 0});
+        pq.offer(new int[]{heightMap[r][n - 1], r, n - 1});
+        visited[r][0] = visited[r][n - 1] = true;
+    }
+    for (int c = 1; c < n - 1; c++) {
+        pq.offer(new int[]{heightMap[0][c], 0, c});
+        pq.offer(new int[]{heightMap[m - 1][c], m - 1, c});
+        visited[0][c] = visited[m - 1][c] = true;
+    }
+
+    int[][] dirs = {{1,0}, {-1,0}, {0,1}, {0,-1}};
+    int water = 0, waterLevel = 0;
+
+    while (!pq.isEmpty()) {
+        int[] curr = pq.poll();
+        int h = curr[0], r = curr[1], c = curr[2];
+        waterLevel = Math.max(waterLevel, h);
+
+        for (int[] d : dirs) {
+            int nr = r + d[0], nc = c + d[1];
+            if (nr >= 0 && nr < m && nc >= 0 && nc < n && !visited[nr][nc]) {
+                visited[nr][nc] = true;
+                if (heightMap[nr][nc] < waterLevel) {
+                    water += waterLevel - heightMap[nr][nc];
+                }
+                pq.offer(new int[]{heightMap[nr][nc], nr, nc});
+            }
+        }
+    }
+    return water;
+}`,
+          py: `import heapq
+
+def trap_rain_water(height_map):
+    if not height_map or len(height_map) <= 2 or len(height_map[0]) <= 2:
+        return 0
+    m, n = len(height_map), len(height_map[0])
+    visited = [[False] * n for _ in range(m)]
+    pq = []
+
+    for r in range(m):
+        for c in (0, n - 1):
+            heapq.heappush(pq, (height_map[r][c], r, c))
+            visited[r][c] = True
+    for c in range(1, n - 1):
+        for r in (0, m - 1):
+            heapq.heappush(pq, (height_map[r][c], r, c))
+            visited[r][c] = True
+
+    water, water_level = 0, 0
+    dirs = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+
+    while pq:
+        h, r, c = heapq.heappop(pq)
+        water_level = max(water_level, h)
+        for dr, dc in dirs:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < m and 0 <= nc < n and not visited[nr][nc]:
+                visited[nr][nc] = True
+                if height_map[nr][nc] < water_level:
+                    water += water_level - height_map[nr][nc]
+                heapq.heappush(pq, (height_map[nr][nc], nr, nc))
+    return water`,
+        },
+      },
+      {
+        q: "Design Google Docs Real-Time Collaborative Editor (CRDT vs OT & Conflict Resolution)",
+        t: "hld",
+        lv: ["Lead SDE", "Staff SDE"],
+        d: "H",
+        round: 4,
+        a: "**Clarify**: 100+ concurrent editors on one document, rich text formatting, sub-50 ms keystroke latency, offline edits support, and cursor presence.\n\n**Core Conflict Resolution Model**: Google Docs historically uses server-authoritative **Operational Transformation (OT)**; modern apps evaluate **CRDTs (Yjs / Automerge)**. In an L5/L6 Google loop, compare both:\n- **OT**: Central server defines canonical operation order. When client sends op `O_client` at revision `N`, but server is at `N+k`, server transforms `O_client` against concurrent ops `[O_{N+1}..O_{N+k}]` to produce `O'_client`, appends it to document log, and broadcasts `O'_client` with revision `N+k+1`.\n- **CRDT**: Peer-to-peer / decentralized mathematical convergence with unique fractional IDs (e.g., Logoot/LSeq). Advantages: simpler offline sync; Disadvantages: tombstone memory overhead and higher wire serialization.\n\n**Architecture**:\n1. **Collab Gateway**: Stateful WebSocket proxy sharded by `doc_id` using consistent hashing.\n2. **Session Server**: In-memory document manager holding the active session state, revision counter, and transformation matrix.\n3. **Snapshot & Compaction**: Every 500 operations or 1 minute, serialize document AST into Protobuf snapshots in Google Cloud Storage / Spanner. Truncate operation history.\n4. **Cursor & Ephemeral Presence**: Separate high-frequency (50 Hz) cursor positions over WebSocket without persisting to durable storage.",
+        fu: [
+          {
+            q: "How do you handle an offline client reconnecting after 4 hours of typing?",
+            a: "The client generates a local diff. Using OT, the client requests the missed revisions from the server, performs a local three-way rebase, and transmits transformed operations in a single atomic batch with a client transaction ID.",
+          },
+          {
+            q: "How do you prevent a single runaway document from crashing the session node?",
+            a: "Hard bounds on operation payload size (1 MB max paste), sliding window rate limiting per editor, and automatic rollover of session instances with checkpoint handoffs.",
+          },
+        ],
+      },
     ],
     prep: [
       "Practise writing code in a plain Google Doc — no autocomplete, no compiler. Candidates lose points to syntax slips they never make in an IDE.",
@@ -472,6 +573,128 @@ export const bigtechCompanies: Company[] = [
         lv: ["SDE2", "Lead SDE", "Staff SDE", "Principal SDE"],
         round: 6,
         a: "Pick a disagreement that was resolved by evidence, not by rank or by giving up. The arc: you stated your position and the reason, you made the disagreement cheap to resolve (a prototype, a benchmark, a doc with options), you accepted the outcome, and the relationship survived.\n\nInclude a case where **you** were the one who turned out to be wrong — Have Backbone; Disagree and Commit is the paired principle, and a candidate who has only ever been proved right reads as either unlucky or untruthful.",
+      },
+      {
+        q: "Design High-Contention Flash Sale Deals & Inventory Hold with 15-Minute Expiry",
+        t: "hld",
+        lv: ["SDE2", "Lead SDE", "Staff SDE"],
+        d: "H",
+        round: 5,
+        a: "**Clarify**: 100k+ RPS attempting to purchase 5,000 units of a heavily discounted iPhone; must never oversell; unpurchased cart holds must release back to inventory exactly 15 minutes later.\n\n**System Flow**:\n1. **Pre-warming & Atomic Counter**: Pre-load stock into a dedicated Redis cluster. Use a Lua script for atomic decrement and reservation:\n   ```lua\n   local stock = redis.call('GET', KEYS[1])\n   if tonumber(stock) >= tonumber(ARGV[1]) then\n       redis.call('DECRBY', KEYS[1], ARGV[1])\n       redis.call('ZADD', KEYS[2], ARGV[2], ARGV[3]) -- hold expiry timestamp\n       return 1\n   end\n   return 0\n   ```\n2. **Reservation Token**: Successful decrement returns a unique `reservation_token` stored in Redis with an expiry timestamp (`now + 900s`).\n3. **Async Order Checkout Queue**: Order creation event is published to Kafka partitioned by `product_id`. Consumer creates an order in `PENDING_PAYMENT` in Aurora/DynamoDB.\n4. **Hold Expiry Sweeper**: A distributed scheduler (e.g. Redis Sorted Set polled via `ZRANGEBYSCORE` or Kafka delayed message) checks reservations. If payment isn't completed within 15 minutes, cancel order and issue atomic Lua `INCRBY` back to stock.\n5. **Post-Payment Hard Commit**: Payment confirmation marks the order `PAID` and deletes the temporary reservation record.",
+        fu: [
+          {
+            q: "What if Redis crashes during the flash sale?",
+            a: "Fail closed on reservation. Redis is deployed with multi-AZ replication. If primary fails, slave promotes. Reconcile Redis counts against DB hard ledger via CDC.",
+          },
+          {
+            q: "How to prevent bots draining the inventory in seconds?",
+            a: "Cloudflare Turnstile captcha on checkout button, per-account device fingerprinting, and strict limit of 1 item per verified KYC/phone number.",
+          },
+        ],
+      },
+      {
+        q: "Machine Coding: Multi-Level Cache with TTL & Eviction Policies",
+        t: "lld",
+        lv: ["SDE2", "Lead SDE"],
+        d: "M",
+        round: 4,
+        a: "**Requirements**: Build an in-memory L1/L2 multi-level cache. L1 is fast and bounded in memory; L2 is larger. Support `get(key)`, `put(key, val, ttlMs)`, and automatic eviction (LRU / LFU) with thread safety.\n\n**Key Pattern**: Composite Cache with `CacheLevel` abstractions and `ReadThrough` / `WriteThrough` strategies.",
+        code: {
+          java: `public class MultiLevelCache<K, V> {
+    private final int l1Cap, l2Cap;
+    private final Map<K, V> l1, l2;
+    private final Map<K, Long> expiry = new ConcurrentHashMap<>();
+    private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+
+    public MultiLevelCache(int l1Cap, int l2Cap) {
+        this.l1Cap = l1Cap;
+        this.l2Cap = l2Cap;
+        this.l1 = new LinkedHashMap<>(l1Cap, 0.75f, true) {
+            protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+                if (size() > l1Cap) {
+                    l2.put(eldest.getKey(), eldest.getValue()); // Demote to L2
+                    return true;
+                }
+                return false;
+            }
+        };
+        this.l2 = new LinkedHashMap<>(l2Cap, 0.75f, true) {
+            protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+                return size() > l2Cap;
+            }
+        };
+    }
+
+    public V get(K key) {
+        rwLock.writeLock().lock();
+        try {
+            Long exp = expiry.get(key);
+            if (exp != null && System.currentTimeMillis() > exp) {
+                l1.remove(key); l2.remove(key); expiry.remove(key);
+                return null;
+            }
+            if (l1.containsKey(key)) return l1.get(key);
+            if (l2.containsKey(key)) {
+                V val = l2.remove(key);
+                l1.put(key, val); // Promote to L1
+                return val;
+            }
+            return null;
+        } finally { rwLock.writeLock().unlock(); }
+    }
+
+    public void put(K key, V val, long ttlMs) {
+        rwLock.writeLock().lock();
+        try {
+            if (ttlMs > 0) expiry.put(key, System.currentTimeMillis() + ttlMs);
+            l1.put(key, val);
+        } finally { rwLock.writeLock().unlock(); }
+    }
+}`,
+          py: `import time
+from collections import OrderedDict
+import threading
+
+class MultiLevelCache:
+    def __init__(self, l1_cap, l2_cap):
+        self.l1_cap = l1_cap
+        self.l2_cap = l2_cap
+        self.l1 = OrderedDict()
+        self.l2 = OrderedDict()
+        self.expiry = {}
+        self.lock = threading.Lock()
+
+    def get(self, key):
+        with self.lock:
+            if key in self.expiry and time.time() > self.expiry[key]:
+                self.l1.pop(key, None)
+                self.l2.pop(key, None)
+                del self.expiry[key]
+                return None
+            if key in self.l1:
+                self.l1.move_to_end(key)
+                return self.l1[key]
+            if key in self.l2:
+                val = self.l2.pop(key)
+                self.put_l1(key, val)
+                return val
+            return None
+
+    def put_l1(self, key, val):
+        self.l1[key] = val
+        self.l1.move_to_end(key)
+        if len(self.l1) > self.l1_cap:
+            old_k, old_v = self.l1.popitem(last=False)
+            self.l2[old_k] = old_v
+            if len(self.l2) > self.l2_cap:
+                self.l2.popitem(last=False)
+
+    def put(self, key, val, ttl_sec=None):
+        with self.lock:
+            if ttl_sec:
+                self.expiry[key] = time.time() + ttl_sec
+            self.put_l1(key, val)`,
+        },
       },
     ],
     prep: [
@@ -945,6 +1168,55 @@ export const bigtechCompanies: Company[] = [
         lv: ["Lead SDE", "Staff SDE"],
         round: 5,
         a: 'This is the E5 bar written as a question: ownership of something that required coordinating others. Structure: the ambiguous problem, how you scoped it into shippable pieces, how you divided work and kept it coherent (design doc, interfaces, weekly checkpoint), what went wrong mid-way, and the quantified result.\n\nName your own contribution precisely — Meta interviewers are trained to ask "what did *you* do" twice. Include one decision you made that a less senior engineer would not have (cutting scope, changing the data model, deferring a migration) and its trade-off.',
+      },
+      {
+        q: "Design Live Comments & Reactions Streaming Engine for Instagram/Facebook Live",
+        t: "hld",
+        lv: ["SDE2", "Lead SDE", "Staff SDE"],
+        d: "H",
+        round: 4,
+        a: "**Clarify**: 10 million simultaneous viewers on a celebrity live stream. 50,000 incoming comments/sec and 200,000 emoji reactions/sec. Sub-second delivery.\n\n**Scale & Bottleneck Analysis**: Mobile clients cannot render 50k comments/sec (GPU & thread lock). Human eyes can only read ~10 comments/sec. Therefore, **fan-out must be sampled and aggregated**.\n\n**Architecture**:\n1. **Ingestion**: Ingress Envoy gateway performs rate limiting and content safety filtering (AI moderation). Writes comments to Kafka topic partitioned by `broadcast_id`.\n2. **Dynamic Sampling Engine**: A stream worker samples comments based on broadcaster tier (e.g. top 100 comments/sec dynamically downsampled via reservoir sampling per geographical region).\n3. **Emoji Aggregation**: Reaction clicks are not sent individually. Edge nodes buffer reactions over 1-second tumbling windows into histogram buckets (e.g. `{❤️: 4200, 😂: 1800}`) and broadcast compact vector deltas.\n4. **Egress Gateway**: Stateful WebSocket / HTTP/3 server clusters connected via regional Redis Pub/Sub channels. Local connection pools push sampled comment batches to viewers.",
+        fu: [
+          {
+            q: "How to ensure the broadcaster sees their own comments and VIP comments?",
+            a: "VIP and broadcaster messages bypass the downsampling reservoir via a high-priority Kafka partition and are tagged with `is_priority: true` for deterministic client render.",
+          },
+        ],
+      },
+      {
+        q: "Subarray Sum Equals K (Negative numbers & streaming updates)",
+        t: "coding",
+        lv: ["SDE", "SDE2"],
+        d: "M",
+        lc: 560,
+        slug: "subarray-sum-equals-k",
+        round: 3,
+        a: "**Brute Force**: Check every subarray `(i, j)` in O(n²) time.\n\n**Why Two Pointers Fails**: Negative values break the monotonicity required for sliding window shrink/expand.\n\n**Optimal**: Use a **Prefix Sum with Hash Map**. Maintain running sum `currSum`. The sum of subarray `nums[i..j]` is `prefix[j] - prefix[i-1]`. If `currSum - k` exists in our frequency map, add its frequency to `count`. Seed map with `{0: 1}` for subarrays starting at index 0.\n\n**Complexity**: O(N) time, O(N) space.",
+        code: {
+          java: `public int subarraySum(int[] nums, int k) {
+    int count = 0, sum = 0;
+    Map<Integer, Integer> map = new HashMap<>();
+    map.put(0, 1);
+
+    for (int num : nums) {
+        sum += num;
+        if (map.containsKey(sum - k)) {
+            count += map.get(sum - k);
+        }
+        map.merge(sum, 1, Integer::sum);
+    }
+    return count;
+}`,
+          py: `def subarray_sum(nums, k):
+    count, curr_sum = 0, 0
+    freq = {0: 1}
+    for n in nums:
+        curr_sum += n
+        if curr_sum - k in freq:
+            count += freq[curr_sum - k]
+        freq[curr_sum] = freq.get(curr_sum, 0) + 1
+    return count`,
+        },
       },
     ],
     prep: [

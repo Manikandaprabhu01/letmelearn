@@ -52,13 +52,18 @@ function NavItem({
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "relative flex items-center justify-between gap-2 rounded-sm py-1.5 pl-3 pr-2 text-[13px] transition-colors duration-150",
-        active ? "bg-raised text-fg" : "text-muted hover:bg-raised/60 hover:text-fg",
+        "relative flex items-center justify-between gap-2 rounded-lg py-1.5 pl-3.5 pr-2.5 text-[13px] transition-all duration-150",
+        active
+          ? "bg-accent/15 text-fg font-medium shadow-sm"
+          : "text-muted hover:bg-raised/60 hover:text-fg",
       )}
     >
-      {/* The single electric accent, used as a position marker. */}
+      {/* Electric accent with subtle glow */}
       {active ? (
-        <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-cta" aria-hidden />
+        <span
+          className="absolute inset-y-1 left-0 w-1 rounded-full bg-cta shadow-[0_0_8px_rgba(228,242,34,0.65)]"
+          aria-hidden
+        />
       ) : null}
       <span className="truncate">{label}</span>
       {progress && progress.done > 0 ? (
@@ -165,29 +170,36 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       ) : null}
 
-      <div className="lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
-        <aside className="sticky top-0 hidden h-dvh border-r border-border lg:flex lg:flex-col">
-          <Link to="/" className="flex items-center gap-2.5 px-4 py-5 text-fg">
-            <LogoMark />
+      <div className="lg:grid lg:grid-cols-[256px_minmax(0,1fr)]">
+        <aside className="sticky top-0 hidden h-dvh border-r border-border/80 bg-surface/30 backdrop-blur-xl lg:flex lg:flex-col">
+          <Link to="/" className="flex items-center gap-2.5 px-4 py-5 text-fg group">
+            <div className="relative">
+              <LogoMark className="size-7 transition-transform group-hover:scale-105" />
+              <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-cta animate-soft-pulse" />
+            </div>
             <div>
-              <div className="font-display text-[19px] leading-none tracking-tight">{APP_NAME}</div>
-              <div className="eyebrow mt-1.5">System design</div>
+              <div className="font-display text-[19px] leading-none tracking-tight font-medium text-fg">
+                {APP_NAME}
+              </div>
+              <div className="eyebrow mt-1 text-[10px] tracking-widest text-accent">Studio 2.0</div>
             </div>
           </Link>
           <div className="flex-1 overflow-y-auto px-3 pb-6">
             <NavLinks pathname={pathname} />
           </div>
-          <div className="border-t border-border p-3">
+          <div className="border-t border-border/70 p-3 bg-surface/20">
             <button
               type="button"
               onClick={() => setSearch(true)}
-              className="flex h-9 w-full items-center justify-between rounded-sm bg-raised px-3 text-[13px] text-muted shadow-panel transition-colors duration-150 hover:text-fg"
+              className="flex h-9 w-full items-center justify-between rounded-lg bg-inset/80 px-3 text-[13px] text-muted border border-border/70 shadow-sm transition-all duration-150 hover:border-accent/40 hover:text-fg hover:bg-raised/70"
             >
               <span className="flex items-center gap-2">
-                <Search className="size-3.5" />
-                Search
+                <Search className="size-3.5 text-accent" />
+                Quick Search
               </span>
-              <kbd className="font-mono text-[10.5px] text-faint">⌘K</kbd>
+              <kbd className="font-mono text-[10px] bg-surface px-1.5 py-0.5 rounded border border-border text-faint">
+                ⌘K
+              </kbd>
             </button>
             <div className="mt-3">
               <AccountStrip />
@@ -195,9 +207,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </aside>
         <div className="min-w-0">
-          <div className="sticky top-0 z-20 hidden h-12 items-center justify-between border-b border-border bg-bg/80 px-5 backdrop-blur-md lg:flex">
+          <div className="sticky top-0 z-20 hidden h-12 items-center justify-between border-b border-border/80 bg-bg/75 px-6 backdrop-blur-xl lg:flex">
             <BackButton />
-            <ThemeToggle />
+            <div className="flex items-center gap-3">
+              <Link
+                to="/interview-prep"
+                className="text-xs font-mono text-muted hover:text-accent transition-colors"
+              >
+                Interview Console
+              </Link>
+              <span className="text-border-strong">&bull;</span>
+              <Link
+                to="/playgrounds"
+                className="text-xs font-mono text-muted hover:text-accent transition-colors"
+              >
+                Labs
+              </Link>
+              <div className="ml-2 pl-3 border-l border-border/70">
+                <ThemeToggle />
+              </div>
+            </div>
           </div>
           {children}
         </div>

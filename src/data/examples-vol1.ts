@@ -11,7 +11,7 @@ export const vol1Examples: DesignExample[] = [
     tags: ["framework", "web stack"],
     companies: ["Any web product"],
     summary:
-      "The opening chapter of Alex Xu Volume 1 is a tour of the standard web stack: one server, then split, load balance, cache, replica, CDN, queue, and shard. Use it as the skeleton under every later design.",
+      "The opening chapter of Volume 1 is a tour of the standard web stack: one server, then split, load balance, cache, replica, CDN, queue, and shard. Use it as the skeleton under every later design.",
     requirements: {
       functional: [
         "Users can read and write the product's core objects",
@@ -149,7 +149,7 @@ export const vol1Examples: DesignExample[] = [
     tags: ["redis", "gateway"],
     companies: ["Stripe", "Twitter", "AWS API Gateway", "Lyft"],
     summary:
-      "Alex Xu Volume 1, chapter 4. Throttle clients so no neighbor starves the API. Token bucket is the default algorithm; Redis holds counters; a rules service holds limits; rejected callers get HTTP 429 plus headers.",
+      "Volume 1, chapter 4. Throttle clients so no neighbor starves the API. Token bucket is the default algorithm; Redis holds counters; a rules service holds limits; rejected callers get HTTP 429 plus headers.",
     requirements: {
       functional: [
         "Limit by user, IP, or API key, with different rules per endpoint and tier",

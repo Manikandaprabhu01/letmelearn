@@ -49,7 +49,7 @@ const TRACKS = [
   {
     kicker: "Worked examples",
     title: "System Design Examples",
-    body: "Every Alex Xu example rewritten to chapter depth: clarifying questions, back-of-envelope maths, architecture boards and model answers.",
+    body: "Every classic system design problem rewritten to chapter depth: clarifying questions, back-of-envelope maths, architecture boards and model answers.",
     to: "/examples" as const,
     stat: "41 examples",
   },
@@ -134,7 +134,7 @@ function WelcomeBody({ signedIn }: { signedIn: boolean }) {
           </h1>
           <p className="mt-6 max-w-2xl text-[17px] leading-8 text-muted">
             Java &amp; Spring Boot, Python end to end for AI, LLD, HLD with microservices, every
-            worked example from Alex Xu&rsquo;s System Design Interview volumes, and an AI Forward
+            worked example from standard System Design Interview volumes, and an AI Forward
             Deployed Engineer roadmap — written the way the interview actually goes.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-3">

@@ -155,6 +155,151 @@ export const fintechCompanies: Company[] = [
         round: 4,
         a: "The answer they want is a set of habits, not a philosophy: idempotency keys on every mutating path; double-entry so discrepancies are detectable rather than invisible; append-only state with audit; reconciliation against the external source of truth as a scheduled job with an owned exception queue; and a bias to **fail closed** on money movement (refuse rather than guess) while failing open on non-financial features.\n\nPair it with a real incident: what broke, what the customer impact was in rupees, how you detected it (ideally reconciliation caught it before the customer did), and the control you added afterwards.",
       },
+      {
+        q: "Design a High-Throughput Webhook Delivery Service with Exponential Backoff, HMAC Signatures & DLQ",
+        t: "hld",
+        lv: ["SDE2", "Lead SDE"],
+        d: "H",
+        round: 3,
+        a: "**Clarify**: 50,000 payment events per second must be dispatched to tens of thousands of merchant server endpoints. Merchant endpoints may be slow (30s timeouts), down, or erroring (5xx). System must guarantee at-least-once delivery, verifiable authenticity, and prevent slow merchants from starving fast merchants.\n\n**Architecture**:\n1. **Outbox & Event Streaming**: Payment transactions commit business state and write to a `webhook_events` outbox table in the same DB transaction. Debezium CDC streams events to Kafka topic partitioned by `merchant_id`.\n2. **Tiered Worker Dispatchers**: Workers consume events, compute HMAC-SHA256 signature using the merchant's secret key, and set `X-Razorpay-Signature: t=1740000000,v1=hex`. Dispatched via non-blocking HTTP client (Netty / Go fasthttp) with a 5-second connection/read timeout.\n3. **Exponential Backoff & Jitter**: If endpoint returns non-2xx or times out, schedule retry with jittered intervals (e.g. 15s, 1m, 5m, 30m, 2h, 6h, 24h). Use Kafka delayed topic or Redis sorted set.\n4. **Per-Merchant Circuit Breaker**: If a merchant's endpoint has a 90%+ failure rate over 5 minutes, open circuit for that merchant to avoid thread pool exhaustion. Remaining events skip live dispatch and go straight to backoff queue.\n5. **Dead-Letter Queue (DLQ) & Self-Service Replay**: After 24 hours of failed retries, event lands in DLQ. Merchant dashboard surfaces failed webhooks with a 'Replay Events' API button.",
+        fu: [
+          {
+            q: "How do you prevent a slow merchant from starving other merchants?",
+            a: "Shard dispatch queues by merchant tier and run dedicated worker pools. Enforce strict HTTP timeouts (3–5s max) and use async non-blocking I/O.",
+          },
+        ],
+      },
+      {
+        q: "Machine Coding: In-Memory Key-Value Store with Nested Transactions & Rollback",
+        t: "lld",
+        lv: ["SDE", "SDE2", "Lead SDE"],
+        d: "H",
+        round: 2,
+        a: "**Problem**: Build an in-memory Key-Value store supporting `SET(k, v)`, `GET(k)`, `DELETE(k)`, `BEGIN`, `COMMIT`, and `ROLLBACK`. Support nested transactions.\n\n**Design**: Maintain a global hash map for committed data, and a stack (`Deque<Map<String, String>>`) of active transaction layers. Use a tombstone value (e.g. `null` or `\"__DELETED__\"`) to represent deletes within a transaction.",
+        code: {
+          java: `public class TransactionalKVStore {
+    private static final String TOMBSTONE = "__TOMBSTONE__";
+    private final Map<String, String> globalStore = new ConcurrentHashMap<>();
+    private final Deque<Map<String, String>> txnStack = new ArrayDeque<>();
+    private final ReentrantLock lock = new ReentrantLock();
+
+    public void begin() {
+        lock.lock();
+        try { txnStack.push(new HashMap<>()); }
+        finally { lock.unlock(); }
+    }
+
+    public void set(String key, String value) {
+        lock.lock();
+        try {
+            if (txnStack.isEmpty()) {
+                globalStore.put(key, value);
+            } else {
+                txnStack.peek().put(key, value);
+            }
+        } finally { lock.unlock(); }
+    }
+
+    public String get(String key) {
+        lock.lock();
+        try {
+            for (Map<String, String> layer : txnStack) {
+                if (layer.containsKey(key)) {
+                    String val = layer.get(key);
+                    return TOMBSTONE.equals(val) ? null : val;
+                }
+            }
+            return globalStore.get(key);
+        } finally { lock.unlock(); }
+    }
+
+    public void delete(String key) {
+        lock.lock();
+        try {
+            if (txnStack.isEmpty()) {
+                globalStore.remove(key);
+            } else {
+                txnStack.peek().put(key, TOMBSTONE);
+            }
+        } finally { lock.unlock(); }
+    }
+
+    public boolean commit() {
+        lock.lock();
+        try {
+            if (txnStack.isEmpty()) return false;
+            Map<String, String> top = txnStack.pop();
+            if (txnStack.isEmpty()) {
+                for (var entry : top.entrySet()) {
+                    if (TOMBSTONE.equals(entry.getValue())) globalStore.remove(entry.getKey());
+                    else globalStore.put(entry.getKey(), entry.getValue());
+                }
+            } else {
+                txnStack.peek().putAll(top); // Merge into parent frame
+            }
+            return true;
+        } finally { lock.unlock(); }
+    }
+
+    public boolean rollback() {
+        lock.lock();
+        try {
+            if (txnStack.isEmpty()) return false;
+            txnStack.pop();
+            return true;
+        } finally { lock.unlock(); }
+    }
+}`,
+          py: `class TransactionalKVStore:
+    TOMBSTONE = "__TOMBSTONE__"
+
+    def __init__(self):
+        self.global_store = {}
+        self.txn_stack = []
+
+    def begin(self):
+        self.txn_stack.append({})
+
+    def set(self, key, value):
+        if not self.txn_stack:
+            self.global_store[key] = value
+        else:
+            self.txn_stack[-1][key] = value
+
+    def get(self, key):
+        for layer in reversed(self.txn_stack):
+            if key in layer:
+                val = layer[key]
+                return None if val == self.TOMBSTONE else val
+        return self.global_store.get(key)
+
+    def delete(self, key):
+        if not self.txn_stack:
+            self.global_store.pop(key, None)
+        else:
+            self.txn_stack[-1][key] = self.TOMBSTONE
+
+    def commit(self):
+        if not self.txn_stack:
+            return False
+        top = self.txn_stack.pop()
+        if not self.txn_stack:
+            for k, v in top.items():
+                if v == self.TOMBSTONE:
+                    self.global_store.pop(k, None)
+                else:
+                    self.global_store[k] = v
+        else:
+            self.txn_stack[-1].update(top)
+        return True
+
+    def rollback(self):
+        if not self.txn_stack:
+            return False
+        self.txn_stack.pop()
+        return True`,
+        },
+      },
     ],
     prep: [
       "Learn the payments vocabulary properly: authorise vs capture, settlement, chargeback, mandate, reconciliation, webhook signing.",
@@ -321,6 +466,104 @@ export const fintechCompanies: Company[] = [
         lv: ["SDE2", "Lead SDE", "Staff SDE"],
         round: 3,
         ans: "c-apispeed",
+      },
+      {
+        q: "Machine Coding: Distributed Rate Limiter with Sliding Window Counter & Multi-Tenant Quotas",
+        t: "lld",
+        lv: ["SDE", "SDE2", "Lead SDE"],
+        d: "H",
+        round: 1,
+        a: "**Problem**: Build a multi-tenant rate limiter in 90 minutes. Must support configurable tiers (Silver: 100/min, Gold: 1,000/min). Must use **Sliding Window Counter** to eliminate window-boundary burst attacks. Thread-safe.\n\n**Algorithm**: Sliding Window Counter approximates exact sliding log using weighted average of previous window and current window:\n`weight = (window_size - time_into_current_window) / window_size`\n`estimated_count = prev_window_count * weight + current_window_count`.",
+        code: {
+          java: `public class SlidingWindowRateLimiter {
+    static class WindowBucket {
+        long windowStart;
+        AtomicInteger count = new AtomicInteger(0);
+        WindowBucket(long start) { this.windowStart = start; }
+    }
+
+    private final int limitPerMinute;
+    private final ConcurrentHashMap<String, WindowBucket[]> clientWindows = new ConcurrentHashMap<>();
+
+    public SlidingWindowRateLimiter(int limitPerMinute) {
+        this.limitPerMinute = limitPerMinute;
+    }
+
+    public boolean allowRequest(String clientId) {
+        long now = System.currentTimeMillis();
+        long currentWindowStart = (now / 60000) * 60000;
+        long timeIntoWindow = now - currentWindowStart;
+        double weight = (60000.0 - timeIntoWindow) / 60000.0;
+
+        WindowBucket[] buckets = clientWindows.computeIfAbsent(clientId, k -> new WindowBucket[] {
+            new WindowBucket(currentWindowStart - 60000), // previous
+            new WindowBucket(currentWindowStart)          // current
+        });
+
+        synchronized (buckets) {
+            if (buckets[1].windowStart != currentWindowStart) {
+                // Roll forward
+                if (buckets[1].windowStart == currentWindowStart - 60000) {
+                    buckets[0] = buckets[1];
+                } else {
+                    buckets[0] = new WindowBucket(currentWindowStart - 60000);
+                }
+                buckets[1] = new WindowBucket(currentWindowStart);
+            }
+
+            int prevCount = buckets[0].count.get();
+            int currCount = buckets[1].count.get();
+            double estimatedCount = prevCount * weight + currCount;
+
+            if (estimatedCount < limitPerMinute) {
+                buckets[1].count.incrementAndGet();
+                return true;
+            }
+            return false;
+        }
+    }
+}`,
+          py: `import time
+from collections import defaultdict
+import threading
+
+class SlidingWindowRateLimiter:
+    def __init__(self, limit_per_minute):
+        self.limit = limit_per_minute
+        self.clients = defaultdict(lambda: {"prev": 0, "curr": 0, "curr_start": 0})
+        self.lock = threading.Lock()
+
+    def allow_request(self, client_id):
+        now = time.time()
+        window_size = 60.0
+        current_window_start = int(now / window_size) * window_size
+        time_into_window = now - current_window_start
+        weight = (window_size - time_into_window) / window_size
+
+        with self.lock:
+            state = self.clients[client_id]
+            if state["curr_start"] != current_window_start:
+                if state["curr_start"] == current_window_start - window_size:
+                    state["prev"] = state["curr"]
+                else:
+                    state["prev"] = 0
+                state["curr"] = 0
+                state["curr_start"] = current_window_start
+
+            estimated_count = state["prev"] * weight + state["curr"]
+            if estimated_count < self.limit:
+                state["curr"] += 1
+                return True
+            return False`,
+        },
+      },
+      {
+        q: "Design UPI Autopay / Recurring Mandates Engine with Retry Fallback",
+        t: "hld",
+        lv: ["Lead SDE", "Staff SDE"],
+        d: "H",
+        round: 3,
+        a: "**Clarify**: PhonePe processing 100M+ recurring SIP, insurance, and subscription mandates monthly. NPCI guidelines mandate: 24-hour pre-debit notifications, execution on scheduled due dates, and strict debit retries.\n\n**Architecture**:\n1. **Mandate Creation & e-Mandate Switch**: User authorizes UPI PIN once; system registers mandate UMN (Unique Mandate Number) with NPCI and sponsor bank.\n2. **Pre-Debit Notification Worker**: Cron-wheel job queries mandates due tomorrow. Publishes notification event via SMS/Push with a pre-debit pause link.\n3. **Scheduled Execution Engine**: On due date, partition mandates by bank handle (@ybl, @axl, @ibl) to prevent overwhelming any single issuing bank switch. Issues execution request with unique `execution_id`.\n4. **Intelligent Debit Retry Matrix**: Differentiate technical errors (Bank switch down -> retry in 2 hours) from business declines (insufficient funds -> retry next day morning at 9 AM when salary deposits hit).",
       },
     ],
     prep: [

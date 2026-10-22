@@ -37,7 +37,7 @@ function ResourcesPage() {
       </h1>
       <p className="mt-3 max-w-2xl text-[15px] leading-7 text-muted">
         LetMeLearn is original teaching notes inspired by public system-design practice and the
-        chapter maps of Alex Xu's books — not a reproduction of the books. Buy them. Then use the
+        chapter maps of the core system design books — not a reproduction of the books. Then use the
         labs here to keep the diagrams in your hands. Source 6 is the public awesome list: problems,
         papers, and channels folded into this page.
       </p>

@@ -49,7 +49,7 @@ export const COMPANY_INDEX: CompanyMeta[] = [
     sector: "product",
     tag: "Algorithms-first loop with a hiring committee; system design only from L5.",
     loc: "Bengaluru · Hyderabad · Pune",
-    questions: 13,
+    questions: 15,
   },
   {
     id: "amazon",
@@ -57,7 +57,7 @@ export const COMPANY_INDEX: CompanyMeta[] = [
     sector: "product",
     tag: "Every round is half Leadership Principles; the bar raiser can veto the loop.",
     loc: "Bengaluru · Hyderabad · Chennai · Pune",
-    questions: 11,
+    questions: 13,
   },
   {
     id: "microsoft",
@@ -73,7 +73,7 @@ export const COMPANY_INDEX: CompanyMeta[] = [
     sector: "product",
     tag: "Timed coding (two problems in 35 min), then design that decides your level.",
     loc: "Bengaluru · Hyderabad",
-    questions: 10,
+    questions: 12,
   },
   {
     id: "uber",
@@ -81,7 +81,7 @@ export const COMPANY_INDEX: CompanyMeta[] = [
     sector: "product",
     tag: "Domain-specialised coding plus a technical retrospective for senior candidates.",
     loc: "Bengaluru · Hyderabad",
-    questions: 9,
+    questions: 11,
   },
   {
     id: "atlassian",
@@ -121,7 +121,7 @@ export const COMPANY_INDEX: CompanyMeta[] = [
     sector: "product",
     tag: "The machine coding round is the gate: a working, extensible app in 90–120 minutes.",
     loc: "Bengaluru",
-    questions: 8,
+    questions: 10,
   },
   {
     id: "swiggy",
@@ -129,7 +129,7 @@ export const COMPANY_INDEX: CompanyMeta[] = [
     sector: "product",
     tag: "Machine coding with a working demo, then OS/distributed-systems depth in the HM round.",
     loc: "Bengaluru",
-    questions: 7,
+    questions: 9,
   },
   {
     id: "zomato",
@@ -177,7 +177,7 @@ export const COMPANY_INDEX: CompanyMeta[] = [
     sector: "product",
     tag: "Five rounds with a bar raiser and a culture-fit round that genuinely rejects people.",
     loc: "Chennai · Bengaluru · Hyderabad",
-    questions: 10,
+    questions: 22,
   },
   {
     id: "goldman",
@@ -233,7 +233,7 @@ export const COMPANY_INDEX: CompanyMeta[] = [
     sector: "fintech",
     tag: "Machine coding plus payments-domain design: idempotency, reconciliation, webhooks.",
     loc: "Bengaluru",
-    questions: 7,
+    questions: 10,
   },
   {
     id: "phonepe",
@@ -241,7 +241,7 @@ export const COMPANY_INDEX: CompanyMeta[] = [
     sector: "fintech",
     tag: "Machine coding with real data structures, then UPI-scale system design.",
     loc: "Bengaluru",
-    questions: 6,
+    questions: 8,
   },
   {
     id: "paytm",

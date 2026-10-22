@@ -8,13 +8,15 @@ export type ConsoleLocation = { id: string; view: "bank" | "answers" };
 
 export function tabClass(active: boolean) {
   return cn(
-    "inline-flex h-9 items-center rounded-md border px-3.5 text-[13px] transition-colors duration-150",
-    active ? "border-fg bg-fg text-bg" : "border-border text-muted hover:text-fg",
+    "inline-flex h-9 items-center rounded-lg border px-3.5 text-[13px] font-medium transition-all duration-150",
+    active
+      ? "border-accent/60 bg-accent/20 text-accent shadow-sm"
+      : "border-border/70 text-muted hover:text-fg hover:bg-raised/40",
   );
 }
 
 export const chipClass =
-  "inline-flex items-center whitespace-nowrap rounded px-1.5 py-0.5 font-mono text-[10.5px] leading-4";
+  "inline-flex items-center whitespace-nowrap rounded-md px-2 py-0.5 font-mono text-[11px] leading-4";
 
 /** Deep-dive report ids: L1–L7 are Lead loops, S1–S10 Senior loops. */
 export function isReportId(id: string) {

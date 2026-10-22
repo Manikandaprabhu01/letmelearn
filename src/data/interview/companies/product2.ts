@@ -186,6 +186,165 @@ export const product2Companies: Company[] = [
         ans: "hld-ownsystem",
         note: "Uber makes this a dedicated round. The library card is the full preparation checklist — diagram, four numbers, two decisions, one incident, one improvement.",
       },
+      {
+        q: "Design Uber Geospatial Dispatch & Batching Match Engine (H3 Hexagonal Grid & Hungarian Algorithm)",
+        t: "hld",
+        lv: ["Lead SDE", "Staff SDE"],
+        d: "H",
+        round: 4,
+        a: "**Clarify**: 1M+ active drivers emitting GPS coordinates every 4 seconds via WebSocket/gRPC. Riders requesting pickups in dense urban areas. Greedy matching (nearest driver) causes global sub-optimality and driver starvation; dynamic batching (DISCO engine) optimizes global ETA.\n\n**Key Engineering Pillars**:\n1. **Geospatial Indexing**: Divide cities into **Uber H3 hexagonal hierarchical cells** (resolution 7–8: ~0.5 km²). Hexagons are chosen over squares because all 6 adjacent neighbors have identical centroid distance.\n2. **Dynamic Batching Window**: Accumulate ride requests and nearby idle drivers in 5-second tumbling batch windows per H3 cell cluster.\n3. **Bipartite Matching (Kuhn-Munkres / Hungarian Algorithm)**: Compute ETA cost matrix between candidate drivers and riders. Solve minimum-weight bipartite matching to minimize total pickup latency across all riders.\n4. **Distributed State & Exactly-Once Offer**: Once a driver is paired, publish a state reservation with a 15-second TTL in Redis (`SET driver:{id}:offer ride:{id} NX EX 15`). If accepted, driver transitions to `ASSIGNED` via atomic CAS.",
+        fu: [
+          {
+            q: "What happens if a driver crosses an H3 cell boundary during batch calculation?",
+            a: "Driver location updates are treated as an event stream. Ring-buffer smoothing with Kalman filtering filters GPS noise. Batches include a ring of adjacent H3 buffer cells (k-ring = 1) to eliminate edge artifacts.",
+          },
+        ],
+      },
+      {
+        q: "Machine Coding: In-Memory Spatial Index (QuadTree / Geohash Grid) for Nearby Driver Lookup",
+        t: "lld",
+        lv: ["SDE", "SDE2", "Lead SDE"],
+        d: "H",
+        round: 3,
+        a: "**Requirements**: Build a thread-safe in-memory 2D spatial index that supports `updateLocation(driverId, lat, lon)` and `findNearby(lat, lon, radiusKm, limit)`. Must handle thousands of location updates per second efficiently without full table scans.",
+        code: {
+          java: `public class SpatialIndex {
+    static class Point {
+        String id; double lat, lon;
+        Point(String id, double lat, double lon) { this.id = id; this.lat = lat; this.lon = lon; }
+    }
+    static class QuadNode {
+        static final int CAPACITY = 16;
+        double minLat, maxLat, minLon, maxLon;
+        List<Point> points = new ArrayList<>();
+        QuadNode[] children; // NW, NE, SW, SE
+
+        QuadNode(double minLat, double maxLat, double minLon, double maxLon) {
+            this.minLat = minLat; this.maxLat = maxLat;
+            this.minLon = minLon; this.maxLon = maxLon;
+        }
+
+        boolean contains(double lat, double lon) {
+            return lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon;
+        }
+
+        void subdivide() {
+            double midLat = (minLat + maxLat) / 2, midLon = (minLon + maxLon) / 2;
+            children = new QuadNode[] {
+                new QuadNode(midLat, maxLat, minLon, midLon), // NW
+                new QuadNode(midLat, maxLat, midLon, maxLon), // NE
+                new QuadNode(minLat, midLat, minLon, midLon), // SW
+                new QuadNode(minLat, midLat, midLon, maxLon)  // SE
+            };
+            for (Point p : points) {
+                for (QuadNode child : children) {
+                    if (child.contains(p.lat, p.lon)) { child.insert(p); break; }
+                }
+            }
+            points.clear();
+        }
+
+        boolean insert(Point p) {
+            if (!contains(p.lat, p.lon)) return false;
+            if (children == null && points.size() < CAPACITY) {
+                points.add(p);
+                return true;
+            }
+            if (children == null) subdivide();
+            for (QuadNode child : children) {
+                if (child.insert(p)) return true;
+            }
+            return false;
+        }
+
+        void queryRange(double qMinLat, double qMaxLat, double qMinLon, double qMaxLon, List<Point> res) {
+            if (qMaxLat < minLat || qMinLat > maxLat || qMaxLon < minLon || qMinLon > maxLon) return;
+            if (children != null) {
+                for (QuadNode child : children) child.queryRange(qMinLat, qMaxLat, qMinLon, qMaxLon, res);
+            } else {
+                for (Point p : points) {
+                    if (p.lat >= qMinLat && p.lat <= qMaxLat && p.lon >= qMinLon && p.lon <= qMaxLon)
+                        res.add(p);
+                }
+            }
+        }
+    }
+
+    private final QuadNode root = new QuadNode(-90, 90, -180, 180);
+    private final Map<String, Point> driverLocations = new ConcurrentHashMap<>();
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+    public void updateDriver(String id, double lat, double lon) {
+        lock.writeLock().lock();
+        try {
+            Point p = new Point(id, lat, lon);
+            driverLocations.put(id, p);
+            root.insert(p);
+        } finally { lock.writeLock().unlock(); }
+    }
+
+    public List<String> findNearby(double lat, double lon, double deltaDeg, int limit) {
+        lock.readLock().lock();
+        try {
+            List<Point> candidates = new ArrayList<>();
+            root.queryRange(lat - deltaDeg, lat + deltaDeg, lon - deltaDeg, lon + deltaDeg, candidates);
+            return candidates.stream().limit(limit).map(p -> p.id).collect(Collectors.toList());
+        } finally { lock.readLock().unlock(); }
+    }
+}`,
+          py: `class Point:
+    def __init__(self, id, lat, lon):
+        self.id = id; self.lat = lat; self.lon = lon
+
+class QuadNode:
+    CAPACITY = 16
+    def __init__(self, min_lat, max_lat, min_lon, max_lon):
+        self.bounds = (min_lat, max_lat, min_lon, max_lon)
+        self.points = []
+        self.children = None
+
+    def contains(self, lat, lon):
+        min_lat, max_lat, min_lon, max_lon = self.bounds
+        return min_lat <= lat <= max_lat and min_lon <= lon <= max_lon
+
+    def subdivide(self):
+        min_lat, max_lat, min_lon, max_lon = self.bounds
+        mid_lat = (min_lat + max_lat) / 2
+        mid_lon = (min_lon + max_lon) / 2
+        self.children = [
+            QuadNode(mid_lat, max_lat, min_lon, mid_lon),
+            QuadNode(mid_lat, max_lat, mid_lon, max_lon),
+            QuadNode(min_lat, mid_lat, min_lon, mid_lon),
+            QuadNode(min_lat, mid_lat, mid_lon, max_lon),
+        ]
+        for p in self.points:
+            for child in self.children:
+                if child.contains(p.lat, p.lon):
+                    child.insert(p); break
+        self.points = []
+
+    def insert(self, p):
+        if not self.contains(p.lat, p.lon): return False
+        if not self.children and len(self.points) < self.CAPACITY:
+            self.points.append(p)
+            return True
+        if not self.children:
+            self.subdivide()
+        return any(child.insert(p) for child in self.children)
+
+    def query(self, q_box, result):
+        q_min_lat, q_max_lat, q_min_lon, q_max_lon = q_box
+        min_lat, max_lat, min_lon, max_lon = self.bounds
+        if q_max_lat < min_lat or q_min_lat > max_lat or q_max_lon < min_lon or q_min_lon > max_lon:
+            return
+        if self.children:
+            for c in self.children: c.query(q_box, result)
+        else:
+            for p in self.points:
+                if q_min_lat <= p.lat <= q_max_lat and q_min_lon <= p.lon <= q_max_lon:
+                    result.append(p.id)`,
+        },
+      },
     ],
     prep: [
       "Prepare the technical retrospective like a talk: one architecture you can draw in three minutes with real traffic numbers.",

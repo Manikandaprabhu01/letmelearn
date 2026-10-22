@@ -15,7 +15,7 @@ function ExamplesIndex() {
         System Design Examples
       </h1>
       <p className="mt-3 max-w-2xl text-[15px] leading-7 text-muted">
-        Worked interviews in three collections. Volume 1 and 2 follow Alex Xu. Source 6 is the
+        Worked interviews in three collections. Volume 1 and 2 cover foundational system design patterns. Source 6 is the
         public{" "}
         <a
           href="https://github.com/ashishps1/awesome-system-design-resources"

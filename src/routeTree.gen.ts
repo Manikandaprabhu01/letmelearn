@@ -36,6 +36,7 @@ import { Route as InterviewPrepSlugIndexRouteImport } from './routes/interview-p
 import { Route as InterviewPrepSlugAnswersRouteImport } from './routes/interview-prep/$slug/answers'
 import { Route as InterviewPrepFreshworksLeadIndexRouteImport } from './routes/interview-prep/freshworks-lead/index'
 import { Route as InterviewPrepFreshworksLeadAnswersRouteImport } from './routes/interview-prep/freshworks-lead/answers'
+import { Route as InterviewPrepRoleRoleRouteImport } from './routes/interview-prep/role/$role'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -175,6 +176,11 @@ const InterviewPrepFreshworksLeadAnswersRoute =
     path: '/interview-prep/freshworks-lead/answers',
     getParentRoute: () => rootRouteImport,
   } as any)
+const InterviewPrepRoleRoleRoute = InterviewPrepRoleRoleRouteImport.update({
+  id: '/interview-prep/role/$role',
+  path: '/interview-prep/role/$role',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -202,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/interview-prep/$slug/answers': typeof InterviewPrepSlugAnswersRoute
   '/interview-prep/freshworks-lead/answers': typeof InterviewPrepFreshworksLeadAnswersRoute
+  '/interview-prep/role/$role': typeof InterviewPrepRoleRoleRoute
   '/interview-prep/$slug/': typeof InterviewPrepSlugIndexRoute
   '/interview-prep/freshworks-lead/': typeof InterviewPrepFreshworksLeadIndexRoute
 }
@@ -231,6 +238,7 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/interview-prep/$slug/answers': typeof InterviewPrepSlugAnswersRoute
   '/interview-prep/freshworks-lead/answers': typeof InterviewPrepFreshworksLeadAnswersRoute
+  '/interview-prep/role/$role': typeof InterviewPrepRoleRoleRoute
   '/interview-prep/$slug': typeof InterviewPrepSlugIndexRoute
   '/interview-prep/freshworks-lead': typeof InterviewPrepFreshworksLeadIndexRoute
 }
@@ -261,6 +269,7 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/interview-prep/$slug/answers': typeof InterviewPrepSlugAnswersRoute
   '/interview-prep/freshworks-lead/answers': typeof InterviewPrepFreshworksLeadAnswersRoute
+  '/interview-prep/role/$role': typeof InterviewPrepRoleRoleRoute
   '/interview-prep/$slug/': typeof InterviewPrepSlugIndexRoute
   '/interview-prep/freshworks-lead/': typeof InterviewPrepFreshworksLeadIndexRoute
 }
@@ -292,6 +301,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/interview-prep/$slug/answers'
     | '/interview-prep/freshworks-lead/answers'
+    | '/interview-prep/role/$role'
     | '/interview-prep/$slug/'
     | '/interview-prep/freshworks-lead/'
   fileRoutesByTo: FileRoutesByTo
@@ -321,6 +331,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/interview-prep/$slug/answers'
     | '/interview-prep/freshworks-lead/answers'
+    | '/interview-prep/role/$role'
     | '/interview-prep/$slug'
     | '/interview-prep/freshworks-lead'
   id:
@@ -350,6 +361,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/interview-prep/$slug/answers'
     | '/interview-prep/freshworks-lead/answers'
+    | '/interview-prep/role/$role'
     | '/interview-prep/$slug/'
     | '/interview-prep/freshworks-lead/'
   fileRoutesById: FileRoutesById
@@ -380,6 +392,7 @@ export interface RootRouteChildren {
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   InterviewPrepSlugAnswersRoute: typeof InterviewPrepSlugAnswersRoute
   InterviewPrepFreshworksLeadAnswersRoute: typeof InterviewPrepFreshworksLeadAnswersRoute
+  InterviewPrepRoleRoleRoute: typeof InterviewPrepRoleRoleRoute
   InterviewPrepSlugIndexRoute: typeof InterviewPrepSlugIndexRoute
   InterviewPrepFreshworksLeadIndexRoute: typeof InterviewPrepFreshworksLeadIndexRoute
 }
@@ -575,6 +588,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InterviewPrepFreshworksLeadAnswersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/interview-prep/role/$role': {
+      id: '/interview-prep/role/$role'
+      path: '/interview-prep/role/$role'
+      fullPath: '/interview-prep/role/$role'
+      preLoaderRoute: typeof InterviewPrepRoleRoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -605,6 +625,7 @@ const rootRouteChildren: RootRouteChildren = {
   InterviewPrepSlugAnswersRoute: InterviewPrepSlugAnswersRoute,
   InterviewPrepFreshworksLeadAnswersRoute:
     InterviewPrepFreshworksLeadAnswersRoute,
+  InterviewPrepRoleRoleRoute: InterviewPrepRoleRoleRoute,
   InterviewPrepSlugIndexRoute: InterviewPrepSlugIndexRoute,
   InterviewPrepFreshworksLeadIndexRoute: InterviewPrepFreshworksLeadIndexRoute,
 }

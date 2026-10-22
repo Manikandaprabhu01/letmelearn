@@ -181,6 +181,12 @@ export type DeepQuestion = {
   n?: string;
   /** The LeetCode link is the closest match, not the exact problem. */
   approx?: boolean;
+  /** Id of the shared library answer. */
+  ans?: string;
+  /** Inline answer or strategy for this question. */
+  a?: string;
+  code?: { java?: string; py?: string } | string;
+  codeLang?: string;
 };
 
 export type DeepRound = {

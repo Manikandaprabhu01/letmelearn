@@ -685,6 +685,297 @@ export const product3Companies: Company[] = [
         round: 5,
         ans: "b-values",
       },
+      {
+        q: "Nearest Smaller Element to the Left using Monotonic Stack",
+        t: "coding",
+        lv: ["SDE2", "Lead SDE"],
+        d: "M",
+        round: 1,
+        a: "**Problem**: Given an array of integers, for each element find the closest smaller element that appears to its left. If none exists, output -1.\n\n**Optimal Monotonic Stack Approach**: Maintain a stack of elements strictly in increasing order. When inspecting `arr[i]`, pop all elements from the stack that are `>= arr[i]` (since they can never be the nearest smaller element for `arr[i]` or any element to its right). The current stack top is the nearest smaller element to the left. Then push `arr[i]`. O(N) time (each element pushed and popped at most once), O(N) space.\n\n**Interviewer Signals**: State the amortized $O(N)$ proof out loud; do not stop at the $O(N^2)$ brute force. SDE 2 and Lead candidates are asked this on paper in in-person Chennai/Bengaluru drives.",
+        code: {
+          java: `public int[] nearestSmallerLeft(int[] arr) {
+    int n = arr.length;
+    int[] result = new int[n];
+    Deque<Integer> stack = new ArrayDeque<>();
+
+    for (int i = 0; i < n; i++) {
+        while (!stack.isEmpty() && stack.peek() >= arr[i]) {
+            stack.pop();
+        }
+        result[i] = stack.isEmpty() ? -1 : stack.peek();
+        stack.push(arr[i]);
+    }
+    return result;
+}`,
+          py: `def nearest_smaller_left(arr):
+    result = []
+    stack = []
+    for x in arr:
+        while stack and stack[-1] >= x:
+            stack.pop()
+        result.append(stack[-1] if stack else -1)
+        stack.append(x)
+    return result`,
+        },
+        fu: [
+          {
+            q: "How to handle an unbounded streaming incoming sequence?",
+            a: "Keep the monotonic stack in memory. If elements must also have an expiry or window (e.g. nearest smaller within last K seconds), store pairs (value, timestamp) and evict outdated timestamps from the bottom with a Deque.",
+          },
+        ],
+      },
+      {
+        q: "How do you diagnose and speed up a high-latency API endpoint in a multi-tenant SaaS?",
+        t: "concept",
+        lv: ["Lead SDE", "Staff SDE"],
+        round: 1,
+        a: "**Diagnostic Protocol (Methodical 6-Step Hierarchy)**:\n1. **Telemetry & Distributed Tracing**: Inspect APM spans (OpenTelemetry/Datadog) to isolate p99 latency contribution: Downstream HTTP vs Database Query vs JVM Garbage Collection pause vs Lock contention.\n2. **Query Plan & Database Indexing**: Execute `EXPLAIN ANALYZE` on slowest SQL queries. Inspect for Table Scans (lack of composite index on `(tenant_id, status, created_at)`), Filesorts, and N+1 query loops in ORM models.\n3. **Noisy Neighbor Check**: In a shared multi-tenant database, check if a single high-volume tenant is consuming 80%+ of DB buffer pool or running un-indexed bulk exports. Mitigate using per-tenant rate limiters and dedicated replica pools.\n4. **Caching & Stampede Protection**: Cache read-heavy tenant configurations in Redis with key prefix `tenant:{id}:cache:{key}`. Use distributed mutex / singleflight pattern to prevent cache stampedes during key invalidation.\n5. **Connection Pool Starvation**: Check HikariCP active vs idle connections. Connection leaks or holding DB connections across slow third-party webhook calls rapidly exhausts the pool.\n6. **Asynchronous Offloading**: Move non-critical synchronous processing (email dispatch, auditing, search indexing) into background Kafka workers.",
+      },
+      {
+        q: "Machine Coding: Multi-Tenant Ticket SLA Tracker & Escalation Policy Engine",
+        t: "lld",
+        lv: ["Lead SDE", "Staff SDE"],
+        d: "H",
+        round: 2,
+        a: "**Problem**: Build Freshdesk's core SLA engine in 90 minutes. Must handle: (1) Per-tenant SLA policies (First Response SLA, Resolution SLA); (2) Business hours calculation (skipping weekends, holidays, and night hours); (3) Dynamic status changes (e.g. ticket moving to 'Waiting on Customer' pauses SLA timer; moving to 'Open' resumes it); (4) Escalation ladder when breach threshold is approached.\n\n**Grading Standards**: Thread-safe timer management, accurate calendar/business hours arithmetic, extensible notification hooks, and JUnit/pytest test suites.",
+        code: {
+          java: `public class SlaEngine {
+    public enum TicketStatus { OPEN, PENDING_CUSTOMER, RESOLVED, CLOSED }
+    public enum SlaState { RUNNING, PAUSED, BREACHED, MET }
+
+    public record BusinessHours(LocalTime workStart, LocalTime workEnd, Set<DayOfWeek> workDays) {
+        public boolean isWorking(LocalDateTime dt) {
+            return workDays.contains(dt.getDayOfWeek())
+                && !dt.toLocalTime().isBefore(workStart)
+                && dt.toLocalTime().isBefore(workEnd);
+        }
+    }
+
+    public static class SlaTracker {
+        final String ticketId;
+        final long targetResponseMins;
+        long elapsedWorkingMins = 0;
+        LocalDateTime lastEventTime;
+        SlaState state = SlaState.RUNNING;
+        final ReentrantLock lock = new ReentrantLock();
+
+        public SlaTracker(String ticketId, long targetResponseMins, LocalDateTime now) {
+            this.ticketId = ticketId;
+            this.targetResponseMins = targetResponseMins;
+            this.lastEventTime = now;
+        }
+
+        public void onStatusChange(TicketStatus status, LocalDateTime now, BusinessHours hours) {
+            lock.lock();
+            try {
+                if (state == SlaState.RUNNING && hours.isWorking(lastEventTime)) {
+                    long addedMins = Duration.between(lastEventTime, now).toMinutes();
+                    elapsedWorkingMins += addedMins;
+                    if (elapsedWorkingMins > targetResponseMins) state = SlaState.BREACHED;
+                }
+                lastEventTime = now;
+                if (status == TicketStatus.PENDING_CUSTOMER) state = SlaState.PAUSED;
+                else if (status == TicketStatus.OPEN && state == SlaState.PAUSED) state = SlaState.RUNNING;
+                else if (status == TicketStatus.RESOLVED) state = (elapsedWorkingMins <= targetResponseMins) ? SlaState.MET : SlaState.BREACHED;
+            } finally { lock.unlock(); }
+        }
+    }
+}`,
+          py: `from datetime import datetime, time, timedelta
+import threading
+
+class SlaTracker:
+    def __init__(self, ticket_id, target_minutes, work_start=time(9,0), work_end=time(18,0)):
+        self.ticket_id = ticket_id
+        self.target_minutes = target_minutes
+        self.work_start = work_start
+        self.work_end = work_end
+        self.elapsed_minutes = 0
+        self.last_ts = datetime.now()
+        self.state = "RUNNING"
+        self.lock = threading.Lock()
+
+    def update_status(self, new_status, now):
+        with self.lock:
+            if self.state == "RUNNING":
+                # calculate working minutes elapsed
+                delta = (now - self.last_ts).total_seconds() / 60.0
+                self.elapsed_minutes += delta
+                if self.elapsed_minutes > self.target_minutes:
+                    self.state = "BREACHED"
+            self.last_ts = now
+            if new_status == "PENDING_CUSTOMER":
+                self.state = "PAUSED"
+            elif new_status == "OPEN" and self.state == "PAUSED":
+                self.state = "RUNNING"
+            elif new_status == "RESOLVED":
+                self.state = "MET" if self.elapsed_minutes <= self.target_minutes else "BREACHED"`,
+        },
+      },
+      {
+        q: "Machine Coding: Dynamic Form Builder with Schema Validation & Admin Field Filters",
+        t: "lld",
+        lv: ["SDE2", "Lead SDE"],
+        d: "H",
+        round: 2,
+        a: "**Problem**: Freshworks products (Freshdesk/Freshservice) allow tenant admins to define custom ticket form fields with validation rules (e.g., dropdowns, regex text fields, required checkboxes, nested sub-categories).\n\n**Architecture**: Composite Pattern with `FormField<T>`, `FieldValidator` (RegexValidator, NumberRangeValidator, RequiredValidator), `FormSchema` definition per tenant, and `FormSubmission` validator returning a structured list of validation errors.",
+        code: {
+          java: `public class FormBuilder {
+    public interface Validator {
+        Optional<String> validate(Object value);
+    }
+
+    public record RegexValidator(String pattern, String errorMsg) implements Validator {
+        public Optional<String> validate(Object value) {
+            if (value == null || !value.toString().matches(pattern)) return Optional.of(errorMsg);
+            return Optional.empty();
+        }
+    }
+
+    public static class FormField {
+        final String fieldId;
+        final String label;
+        final boolean required;
+        final List<Validator> validators = new ArrayList<>();
+
+        public FormField(String id, String label, boolean req) {
+            this.fieldId = id; this.label = label; this.required = req;
+        }
+
+        public List<String> validate(Object input) {
+            List<String> errors = new ArrayList<>();
+            if (required && (input == null || input.toString().isBlank())) {
+                errors.add(label + " is required.");
+                return errors;
+            }
+            if (input != null) {
+                for (Validator v : validators) v.validate(input).ifPresent(errors::add);
+            }
+            return errors;
+        }
+    }
+}`,
+          py: `import re
+
+class FormField:
+    def __init__(self, field_id, label, required=False, regex_pattern=None):
+        self.field_id = field_id
+        self.label = label
+        self.required = required
+        self.regex = re.compile(regex_pattern) if regex_pattern else None
+
+    def validate(self, value):
+        errors = []
+        if self.required and (value is None or str(value).strip() == ""):
+            errors.append(f"{self.label} is required.")
+            return errors
+        if value is not None and self.regex:
+            if not self.regex.match(str(value)):
+                errors.append(f"{self.label} format is invalid.")
+        return errors`,
+        },
+      },
+      {
+        q: "Design Multi-Tenant SaaS Architecture for Freshdesk (Tenant Isolation & Noisy Neighbor Mitigation)",
+        t: "hld",
+        lv: ["Lead SDE", "Staff SDE"],
+        d: "H",
+        round: 3,
+        a: "**Scale**: 60,000+ businesses (tenants), 100M+ tickets/month, sub-100 ms API response, zero cross-tenant data leakage.\n\n**Three Database Tenancy Models & Trade-Offs**:\n1. *Database-per-tenant*: Maximum security/isolation, but severe connection pool exhaustion and unmanageable database migration scripts across 60,000 schemas.\n2. *Shared DB, Shared Schema with `tenant_id` column*: Maximum packing density and cost-efficiency; risk of cross-tenant query bugs and noisy neighbor resource monopolization.\n3. *Freshworks Tiered Hybrid Approach*: Shared database clusters with logical tenant sharding for SMB/Mid-market; Dedicated isolated physical clusters for Top 5% Enterprise tenants.\n\n**Ingress & Routing Architecture**:\n- **Gateway & Domain Resolution**: Ingress Envoy gateway inspects custom domain (e.g. `support.acme.com`) or subdomain (`acme.freshdesk.com`). Checks Redis Tenant Directory cache to inject `X-Tenant-ID` and `X-Tenant-Shard` headers.\n- **Noisy Neighbor Protection**: Two-tier Token Bucket rate limiting (Global tier + Per-tenant tier). Kafka ingestion queues separated into High-Priority (real-time user actions) and Bulk/Background queues (batch CSV imports).\n- **Database Security**: PostgreSQL Row-Level Security (RLS) enforcing `USING (tenant_id = current_setting('app.current_tenant_id'))` at the engine level, guaranteeing zero application-level data leakage even if developer forgets a WHERE clause.",
+        fu: [
+          {
+            q: "How to migrate an enterprise tenant from shared DB to a dedicated cluster with zero downtime?",
+            a: "1. Snapshot & backfill past data to dedicated DB. 2. Enable dual-write via Change Data Capture (Debezium/Kafka) to mirror incoming changes. 3. Verify replication lag = 0. 4. Flip tenant routing pointer in Redis atomically (takes < 1 ms). 5. Decommission old tenant rows asynchronously.",
+          },
+        ],
+      },
+      {
+        q: "Design an Omnichannel Real-Time Messaging Platform (WhatsApp, Live Chat, Email)",
+        t: "hld",
+        lv: ["Lead SDE", "Staff SDE"],
+        d: "H",
+        round: 3,
+        a: "**Problem**: Freshchat aggregates WhatsApp Business API, Live Chat WebSockets, Apple Messages for Business, and Email into a single agent console.\n\n**Architecture**:\n1. **Channel Adapters**: Ingress webhooks from Meta WhatsApp, SendGrid, Apple Business Chat parsed into a standardized `OmnichannelEvent(tenantId, channelType, senderId, conversationId, messageBody, attachments)`.\n2. **Conversation Manager**: Stateful actor / state machine holding conversation context (Active, Bot-Handled, Agent-Assigned, Resolved). Keyed by `tenant_id:conversation_id`.\n3. **Agent Routing & Presence Engine**: Matches unassigned conversations to agents based on skills, channel capacity (e.g. max 4 active WhatsApp chats per agent), and real-time WebSocket connection presence.\n4. **WebSocket Fan-out Gateway**: Distributed Netty/Node.js WebSocket cluster backed by Redis Pub/Sub channels per tenant to stream agent typing indicators and live messages sub-50 ms.",
+      },
+      {
+        q: "Bar Raiser: Outage Post-Mortem, Connection Pool Starvation & Distributed Deadlock Resolution",
+        t: "behavioral",
+        lv: ["Lead SDE", "Staff SDE"],
+        round: 4,
+        a: "**Bar Raiser Scenario (Conducted by Staff/Principal Engineer)**: Walk through a real production crisis you resolved.\n\n**Strong STAR Response (HikariCP Connection Pool Exhaustion)**:\n- **Situation**: During a product launch, our core API began failing with HTTP 504 Gateway Timeouts across all tenants, despite DB CPU being only at 25%.\n- **Task**: Lead emergency triage and restore availability within 15 minutes.\n- **Action**: Pulled thread dumps and HikariCP connection pool metrics. Discovered 100% of connections were in `ACTIVE` state and 0 `IDLE`. Root cause: A recent feature called a third-party CRM webhook synchronously inside an open `@Transactional` database method. When the external webhook had a 15-second latency hiccup, DB connections were held idle waiting on network I/O, rapidly exhausting our 50-connection pool.\n- **Resolution**: (1) Severed the webhook call from the transactional boundary using an asynchronous Outbox pattern with Kafka; (2) Added Resilience4j circuit breakers with a 1.5s timeout; (3) Added HikariCP connection acquisition latency alarms in Grafana.\n\n**Database Locking Probe**: Why pessimistic locking (`SELECT ... FOR UPDATE`) causes deadlocks across related tables under high concurrency, and why Optimistic Concurrency Control (`UPDATE ... WHERE version = ?`) with exponential backoff retries is superior for multi-tenant SaaS ticket updates.",
+      },
+      {
+        q: "Bar Raiser Puzzle: The 5-Tyre Car Rotation Puzzle (Each tyre lasts 20 km — how to drive 25 km?)",
+        t: "concept",
+        lv: ["Lead SDE"],
+        round: 4,
+        a: "**Problem**: A car has 4 wheels in active use, plus 1 spare tyre in the boot. Each tyre has a maximum tread lifespan of 20 km. What is the maximum distance the car can drive, and what is the rotation schedule?\n\n**Mathematical Proof**:\n- Total available tyre wear capacity = 5 tyres × 20 km = 100 tyre-km.\n- The car requires 4 active tyres on the road at any given moment.\n- Maximum theoretical distance = 100 tyre-km / 4 tyres = **25 km**.\n\n**Optimal 5-Stage Rotation Schedule (Rotate every 5 km)**:\n- Stage 1 (0 to 5 km): Tyres 1, 2, 3, 4 run on the car. Tyre 5 rests in boot.\n- Stage 2 (5 to 10 km): Tyres 1, 2, 3, 5 run. Tyre 4 rests.\n- Stage 3 (10 to 15 km): Tyres 1, 2, 4, 5 run. Tyre 3 rests.\n- Stage 4 (15 to 20 km): Tyres 1, 3, 4, 5 run. Tyre 2 rests.\n- Stage 5 (20 to 25 km): Tyres 2, 3, 4, 5 run. Tyre 1 rests.\n\nAt 25 km, each of the 5 tyres has run exactly 4 stages × 5 km = 20 km, perfectly exhausting all tyres simultaneously.",
+      },
+      {
+        q: "Technical Leadership: Balancing Tech Debt vs Product Roadmap, Code Reviews & Team Mentorship",
+        t: "behavioral",
+        lv: ["Lead SDE", "Staff SDE"],
+        round: 5,
+        a: "**Director / Engineering Manager Round Framework**:\n1. **Managing Tech Debt vs Velocity**: Negotiate an explicit 20% engineering allocation in each sprint for refactoring, dependency upgrades, and performance tuning. Quantify tech debt in business terms: *'Fixing this query reduces cloud database spend by $4,000/month and drops p99 latency from 1.2s to 80ms.'*\n2. **Driving Zero-Downtime Migrations**: Use the **Strangler Fig pattern** and feature flags rather than high-risk big-bang releases.\n3. **Code Review Standards**: Tier PR reviews into (a) Functional correctness and test coverage, (b) Non-functional safety (multi-tenant RLS checks, query plan impact, N+1 query elimination), and (c) Automated style checks enforced strictly by CI linters so senior engineers focus only on architecture.\n4. **Mentoring Underperforming Engineers**: Establish clear, unambiguous goals; identify if the bottleneck is skill gap vs motivation vs unclear PRDs; establish a 30-day paired-programming checkpoint plan with weekly written feedback.",
+      },
+      {
+        q: "Sort Colors / Dutch National Flag Algorithm (0s, 1s, 2s in one pass)",
+        t: "coding",
+        lv: ["SDE", "SDE2"],
+        d: "M",
+        lc: 75,
+        slug: "sort-colors",
+        round: 1,
+        a: "**Problem**: Given an array with `n` objects colored red, white, or blue (represented by 0, 1, 2), sort them in-place so that objects of the same color are adjacent, with 0s first, then 1s, then 2s.\n\n**Three-Pointer Approach (Dutch National Flag)**: Maintain `low = 0`, `mid = 0`, and `high = n - 1`.\n- If `nums[mid] == 0`: swap `nums[low]` and `nums[mid]`, increment `low++` and `mid++`.\n- If `nums[mid] == 1`: increment `mid++`.\n- If `nums[mid] == 2`: swap `nums[mid]` and `nums[high]`, decrement `high--` (do NOT increment `mid`, as the swapped element must be checked).\nO(N) time in a single pass, O(1) space.",
+        code: {
+          java: `public void sortColors(int[] nums) {
+    int low = 0, mid = 0, high = nums.length - 1;
+    while (mid <= high) {
+        if (nums[mid] == 0) {
+            int tmp = nums[low]; nums[low++] = nums[mid]; nums[mid++] = tmp;
+        } else if (nums[mid] == 1) {
+            mid++;
+        } else {
+            int tmp = nums[mid]; nums[mid] = nums[high]; nums[high--] = tmp;
+        }
+    }
+}`,
+          py: `def sort_colors(nums):
+    low, mid, high = 0, 0, len(nums) - 1
+    while mid <= high:
+        if nums[mid] == 0:
+            nums[low], nums[mid] = nums[mid], nums[low]
+            low += 1; mid += 1
+        elif nums[mid] == 1:
+            mid += 1
+        else:
+            nums[mid], nums[high] = nums[high], nums[mid]
+            high -= 1`,
+        },
+      },
+      {
+        q: "REST Verbs: PUT vs PATCH vs POST, and Idempotency Guarantees",
+        t: "concept",
+        lv: ["SDE", "SDE2"],
+        round: 1,
+        a: "**Core Differences**:\n- **POST**: Creates a subordinate resource; **non-idempotent** (calling POST twice creates two separate resources with different IDs).\n- **PUT**: Complete replacement of the resource; **idempotent** (calling PUT multiple times with the same payload results in the exact same resource state).\n- **PATCH**: Partial modification/delta of the resource; **not inherently idempotent** (e.g. `PATCH /items/1 {\"count\": {\"$inc\": 1}}` increments each time, though `PATCH /items/1 {\"status\": \"ACTIVE\"}` is idempotent).\n\n**Production Idempotency Pattern**: For mutating financial or ticket operations over POST/PATCH, client sends an `Idempotency-Key` header (UUID). Server saves key with response in a 24-hour Redis/DB cache. If duplicate request arrives, returns saved response without re-executing business logic.",
+      },
+      {
+        q: "Cell-Based Architecture for Global SaaS: Limiting Blast Radius across 100,000 Tenants",
+        t: "hld",
+        lv: ["Staff SDE", "Principal SDE"],
+        d: "H",
+        round: 3,
+        a: "**Architectural Principle**: A single global monolithic cluster means a fatal database bug or bad config rollout takes down 100,000 tenants simultaneously. Cell-Based Architecture partitions the entire platform into independent, self-contained, deployable mini-instances ('Cells').\n\n**Cell Composition**:\n- Each Cell hosts ~5,000 tenants and possesses its own dedicated Kubernetes cluster, Aurora PostgreSQL database cluster, Redis cluster, and Kafka brokers.\n- **Routing Layer**: Edge Envoy proxies consult an in-memory Global Tenant Mapping cache to route traffic to Cell-1, Cell-2, etc.\n- **Blast Radius**: A P0 database crash in Cell-2 affects only 5% of customers; 95% of tenants in other cells experience zero degradation.\n- **Upgrades**: Deployments roll out to a canary cell first, soak for 2 hours, and proceed cell-by-cell.",
+      },
+      {
+        q: "Design Freddy AI: Multi-Tenant RAG & LLM Customer Service Copilot",
+        t: "hld",
+        lv: ["Staff SDE", "Principal SDE"],
+        d: "H",
+        round: 3,
+        a: "**Problem**: Freshworks Freddy AI drafts contextual ticket responses for customer service agents using company knowledge base articles and past resolved tickets, with sub-2s latency and zero cross-tenant leakage.\n\n**Pipeline Architecture**:\n1. **Document Ingestion & Chunking**: Articles and ticket conversations cleaned, PII masked, chunked into 512-token segments with 50-token overlap.\n2. **Multi-Tenant Vector Index**: Generate text embeddings via text-embedding-3-small. Store in vector database (OpenSearch / Pinecone) with **mandatory tenant metadata filter** (`metadata.tenant_id = 'acme'`). The vector query strictly partitions vector search spaces so Tenant A's documents can never be retrieved by Tenant B.\n3. **Hybrid Search**: Combine Dense Semantic Vector search with BM25 Lexical Keyword search using Reciprocal Rank Fusion (RRF).\n4. **LLM Generation & Safety**: Retrieve top 4 context chunks, assemble system prompt with strict ground-truth instructions ('Answer only using the provided documentation. If unknown, say I do not have enough information.'). Stream generated tokens to agent frontend via Server-Sent Events (SSE).",
+      },
     ],
     prep: [
       "This company has a full 93-answer sheet already built — use the deep-dive links above for the complete question bank and worked answers.",
