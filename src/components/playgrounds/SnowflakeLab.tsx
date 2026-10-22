@@ -52,8 +52,8 @@ export function SnowflakeLab() {
   return (
     <div className="space-y-6">
       <p className="max-w-prose text-sm leading-6 text-muted">
-        1 sign + 41 timestamp + 5 datacenter + 5 worker + 12 sequence. Custom epoch 2010-11-04. Fits in a signed 64-bit
-        integer and sorts roughly by time.
+        1 sign + 41 timestamp + 5 datacenter + 5 worker + 12 sequence. Custom epoch 2010-11-04. Fits
+        in a signed 64-bit integer and sorts roughly by time.
       </p>
       <div className="flex min-w-0 overflow-x-auto rounded-md border border-border font-mono text-[10px] sm:text-xs">
         <BitField label="0" bits={bits.slice(0, 1)} flex={1} />

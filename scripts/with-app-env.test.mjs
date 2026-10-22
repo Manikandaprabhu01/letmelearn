@@ -59,8 +59,11 @@ test("an explicit process-env override wins over the file", () => {
   assert.equal(merged.PATH, "/usr/bin");
 });
 
-test("the template ships auth off", () => {
-  assert.deepEqual(readAppEnv(projectRoot()), { VITE_AUTH_ENABLED: "false" });
+test("this app has sign-in on", () => {
+  // Sign-in is turned on by DELETING the key (auth skill, "Turning sign-in on"),
+  // not by setting it to "true" — `authEnabled` is `value !== "false"`, so an
+  // absent key and the platform's injected "true" resolve the same way.
+  assert.equal(readAppEnv(projectRoot()).VITE_AUTH_ENABLED, undefined);
 });
 
 test("vite loadEnv resolves the wrapped value", () => {
@@ -74,13 +77,18 @@ test("vite loadEnv resolves the wrapped value", () => {
 });
 
 test("the wrapped command runs with the app env applied", async () => {
+  // `projectRoot()` comes from the wrapper's own location, so a fixture
+  // workspace cannot redirect it. Derive the expectation from the app's config
+  // instead of hardcoding one — what this proves is that the merge reaches the
+  // child, not which way this particular app has sign-in set.
+  const expected = String(readAppEnv(projectRoot()).VITE_AUTH_ENABLED);
   const { stdout } = await execFileAsync(process.execPath, [
     WRAPPER,
     process.execPath,
     "-e",
     PRINT_FLAG,
   ]);
-  assert.equal(stdout, "false");
+  assert.equal(stdout, expected);
 });
 
 test("the wrapped command sees an explicit override, not the file value", async () => {
@@ -122,7 +130,9 @@ test("the CLI still runs when invoked through a symlinked path", async () => {
     join(link, "with-app-env.mjs"),
     process.execPath,
     "-e",
-    PRINT_FLAG,
+    "process.stdout.write('ran');",
   ]);
-  assert.equal(stdout, "false");
+  // The point is that the wrapper RAN — a no-op exits 0 with no output. Don't
+  // assert a flag value here; it depends on whether the app has sign-in on.
+  assert.equal(stdout, "ran");
 });

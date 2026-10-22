@@ -10,24 +10,67 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CompilerRouteImport } from './routes/compiler'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as WelcomeRouteImport } from './routes/welcome'
+import { Route as ApiRunRouteImport } from './routes/api/run'
 import { Route as ExamplesIndexRouteImport } from './routes/examples/index'
 import { Route as ExamplesSlugRouteImport } from './routes/examples/$slug'
+import { Route as FdeIndexRouteImport } from './routes/fde/index'
+import { Route as FdeSlugRouteImport } from './routes/fde/$slug'
 import { Route as HldIndexRouteImport } from './routes/hld/index'
 import { Route as HldSlugRouteImport } from './routes/hld/$slug'
+import { Route as InterviewPrepIndexRouteImport } from './routes/interview-prep/index'
+import { Route as JavaIndexRouteImport } from './routes/java/index'
+import { Route as JavaSlugRouteImport } from './routes/java/$slug'
 import { Route as LldIndexRouteImport } from './routes/lld/index'
 import { Route as LldSlugRouteImport } from './routes/lld/$slug'
 import { Route as PlaygroundsIndexRouteImport } from './routes/playgrounds/index'
 import { Route as PlaygroundsSlugRouteImport } from './routes/playgrounds/$slug'
+import { Route as PythonIndexRouteImport } from './routes/python/index'
+import { Route as PythonSlugRouteImport } from './routes/python/$slug'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as InterviewPrepSlugIndexRouteImport } from './routes/interview-prep/$slug/index'
+import { Route as InterviewPrepSlugAnswersRouteImport } from './routes/interview-prep/$slug/answers'
+import { Route as InterviewPrepFreshworksLeadIndexRouteImport } from './routes/interview-prep/freshworks-lead/index'
+import { Route as InterviewPrepFreshworksLeadAnswersRouteImport } from './routes/interview-prep/freshworks-lead/answers'
+import { Route as InterviewPrepRoleRoleRouteImport } from './routes/interview-prep/role/$role'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompilerRoute = CompilerRouteImport.update({
+  id: '/compiler',
+  path: '/compiler',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WelcomeRoute = WelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRunRoute = ApiRunRouteImport.update({
+  id: '/api/run',
+  path: '/api/run',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExamplesIndexRoute = ExamplesIndexRouteImport.update({
@@ -40,6 +83,16 @@ const ExamplesSlugRoute = ExamplesSlugRouteImport.update({
   path: '/examples/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FdeIndexRoute = FdeIndexRouteImport.update({
+  id: '/fde/',
+  path: '/fde/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FdeSlugRoute = FdeSlugRouteImport.update({
+  id: '/fde/$slug',
+  path: '/fde/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HldIndexRoute = HldIndexRouteImport.update({
   id: '/hld/',
   path: '/hld/',
@@ -48,6 +101,21 @@ const HldIndexRoute = HldIndexRouteImport.update({
 const HldSlugRoute = HldSlugRouteImport.update({
   id: '/hld/$slug',
   path: '/hld/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InterviewPrepIndexRoute = InterviewPrepIndexRouteImport.update({
+  id: '/interview-prep/',
+  path: '/interview-prep/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JavaIndexRoute = JavaIndexRouteImport.update({
+  id: '/java/',
+  path: '/java/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JavaSlugRoute = JavaSlugRouteImport.update({
+  id: '/java/$slug',
+  path: '/java/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LldIndexRoute = LldIndexRouteImport.update({
@@ -70,94 +138,263 @@ const PlaygroundsSlugRoute = PlaygroundsSlugRouteImport.update({
   path: '/playgrounds/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PythonIndexRoute = PythonIndexRouteImport.update({
+  id: '/python/',
+  path: '/python/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PythonSlugRoute = PythonSlugRouteImport.update({
+  id: '/python/$slug',
+  path: '/python/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InterviewPrepSlugIndexRoute = InterviewPrepSlugIndexRouteImport.update({
+  id: '/interview-prep/$slug/',
+  path: '/interview-prep/$slug/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InterviewPrepSlugAnswersRoute =
+  InterviewPrepSlugAnswersRouteImport.update({
+    id: '/interview-prep/$slug/answers',
+    path: '/interview-prep/$slug/answers',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InterviewPrepFreshworksLeadIndexRoute =
+  InterviewPrepFreshworksLeadIndexRouteImport.update({
+    id: '/interview-prep/freshworks-lead/',
+    path: '/interview-prep/freshworks-lead/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InterviewPrepFreshworksLeadAnswersRoute =
+  InterviewPrepFreshworksLeadAnswersRouteImport.update({
+    id: '/interview-prep/freshworks-lead/answers',
+    path: '/interview-prep/freshworks-lead/answers',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InterviewPrepRoleRoleRoute = InterviewPrepRoleRoleRouteImport.update({
+  id: '/interview-prep/role/$role',
+  path: '/interview-prep/role/$role',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/compiler': typeof CompilerRoute
+  '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/resources': typeof ResourcesRoute
+  '/welcome': typeof WelcomeRoute
+  '/api/run': typeof ApiRunRoute
   '/examples/$slug': typeof ExamplesSlugRoute
+  '/fde/$slug': typeof FdeSlugRoute
   '/hld/$slug': typeof HldSlugRoute
+  '/java/$slug': typeof JavaSlugRoute
   '/lld/$slug': typeof LldSlugRoute
   '/playgrounds/$slug': typeof PlaygroundsSlugRoute
+  '/python/$slug': typeof PythonSlugRoute
   '/examples/': typeof ExamplesIndexRoute
+  '/fde/': typeof FdeIndexRoute
   '/hld/': typeof HldIndexRoute
+  '/interview-prep/': typeof InterviewPrepIndexRoute
+  '/java/': typeof JavaIndexRoute
   '/lld/': typeof LldIndexRoute
   '/playgrounds/': typeof PlaygroundsIndexRoute
+  '/python/': typeof PythonIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/interview-prep/$slug/answers': typeof InterviewPrepSlugAnswersRoute
+  '/interview-prep/freshworks-lead/answers': typeof InterviewPrepFreshworksLeadAnswersRoute
+  '/interview-prep/role/$role': typeof InterviewPrepRoleRoleRoute
+  '/interview-prep/$slug/': typeof InterviewPrepSlugIndexRoute
+  '/interview-prep/freshworks-lead/': typeof InterviewPrepFreshworksLeadIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/compiler': typeof CompilerRoute
+  '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/resources': typeof ResourcesRoute
+  '/welcome': typeof WelcomeRoute
+  '/api/run': typeof ApiRunRoute
   '/examples/$slug': typeof ExamplesSlugRoute
+  '/fde/$slug': typeof FdeSlugRoute
   '/hld/$slug': typeof HldSlugRoute
+  '/java/$slug': typeof JavaSlugRoute
   '/lld/$slug': typeof LldSlugRoute
   '/playgrounds/$slug': typeof PlaygroundsSlugRoute
+  '/python/$slug': typeof PythonSlugRoute
   '/examples': typeof ExamplesIndexRoute
+  '/fde': typeof FdeIndexRoute
   '/hld': typeof HldIndexRoute
+  '/interview-prep': typeof InterviewPrepIndexRoute
+  '/java': typeof JavaIndexRoute
   '/lld': typeof LldIndexRoute
   '/playgrounds': typeof PlaygroundsIndexRoute
+  '/python': typeof PythonIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/interview-prep/$slug/answers': typeof InterviewPrepSlugAnswersRoute
+  '/interview-prep/freshworks-lead/answers': typeof InterviewPrepFreshworksLeadAnswersRoute
+  '/interview-prep/role/$role': typeof InterviewPrepRoleRoleRoute
+  '/interview-prep/$slug': typeof InterviewPrepSlugIndexRoute
+  '/interview-prep/freshworks-lead': typeof InterviewPrepFreshworksLeadIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/compiler': typeof CompilerRoute
+  '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/resources': typeof ResourcesRoute
+  '/welcome': typeof WelcomeRoute
+  '/api/run': typeof ApiRunRoute
   '/examples/$slug': typeof ExamplesSlugRoute
+  '/fde/$slug': typeof FdeSlugRoute
   '/hld/$slug': typeof HldSlugRoute
+  '/java/$slug': typeof JavaSlugRoute
   '/lld/$slug': typeof LldSlugRoute
   '/playgrounds/$slug': typeof PlaygroundsSlugRoute
+  '/python/$slug': typeof PythonSlugRoute
   '/examples/': typeof ExamplesIndexRoute
+  '/fde/': typeof FdeIndexRoute
   '/hld/': typeof HldIndexRoute
+  '/interview-prep/': typeof InterviewPrepIndexRoute
+  '/java/': typeof JavaIndexRoute
   '/lld/': typeof LldIndexRoute
   '/playgrounds/': typeof PlaygroundsIndexRoute
+  '/python/': typeof PythonIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/interview-prep/$slug/answers': typeof InterviewPrepSlugAnswersRoute
+  '/interview-prep/freshworks-lead/answers': typeof InterviewPrepFreshworksLeadAnswersRoute
+  '/interview-prep/role/$role': typeof InterviewPrepRoleRoleRoute
+  '/interview-prep/$slug/': typeof InterviewPrepSlugIndexRoute
+  '/interview-prep/freshworks-lead/': typeof InterviewPrepFreshworksLeadIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/compiler'
+    | '/login'
+    | '/pricing'
     | '/resources'
+    | '/welcome'
+    | '/api/run'
     | '/examples/$slug'
+    | '/fde/$slug'
     | '/hld/$slug'
+    | '/java/$slug'
     | '/lld/$slug'
     | '/playgrounds/$slug'
+    | '/python/$slug'
     | '/examples/'
+    | '/fde/'
     | '/hld/'
+    | '/interview-prep/'
+    | '/java/'
     | '/lld/'
     | '/playgrounds/'
+    | '/python/'
+    | '/api/auth/$'
+    | '/interview-prep/$slug/answers'
+    | '/interview-prep/freshworks-lead/answers'
+    | '/interview-prep/role/$role'
+    | '/interview-prep/$slug/'
+    | '/interview-prep/freshworks-lead/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/compiler'
+    | '/login'
+    | '/pricing'
     | '/resources'
+    | '/welcome'
+    | '/api/run'
     | '/examples/$slug'
+    | '/fde/$slug'
     | '/hld/$slug'
+    | '/java/$slug'
     | '/lld/$slug'
     | '/playgrounds/$slug'
+    | '/python/$slug'
     | '/examples'
+    | '/fde'
     | '/hld'
+    | '/interview-prep'
+    | '/java'
     | '/lld'
     | '/playgrounds'
+    | '/python'
+    | '/api/auth/$'
+    | '/interview-prep/$slug/answers'
+    | '/interview-prep/freshworks-lead/answers'
+    | '/interview-prep/role/$role'
+    | '/interview-prep/$slug'
+    | '/interview-prep/freshworks-lead'
   id:
     | '__root__'
     | '/'
+    | '/compiler'
+    | '/login'
+    | '/pricing'
     | '/resources'
+    | '/welcome'
+    | '/api/run'
     | '/examples/$slug'
+    | '/fde/$slug'
     | '/hld/$slug'
+    | '/java/$slug'
     | '/lld/$slug'
     | '/playgrounds/$slug'
+    | '/python/$slug'
     | '/examples/'
+    | '/fde/'
     | '/hld/'
+    | '/interview-prep/'
+    | '/java/'
     | '/lld/'
     | '/playgrounds/'
+    | '/python/'
+    | '/api/auth/$'
+    | '/interview-prep/$slug/answers'
+    | '/interview-prep/freshworks-lead/answers'
+    | '/interview-prep/role/$role'
+    | '/interview-prep/$slug/'
+    | '/interview-prep/freshworks-lead/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CompilerRoute: typeof CompilerRoute
+  LoginRoute: typeof LoginRoute
+  PricingRoute: typeof PricingRoute
   ResourcesRoute: typeof ResourcesRoute
+  WelcomeRoute: typeof WelcomeRoute
+  ApiRunRoute: typeof ApiRunRoute
   ExamplesSlugRoute: typeof ExamplesSlugRoute
+  FdeSlugRoute: typeof FdeSlugRoute
   HldSlugRoute: typeof HldSlugRoute
+  JavaSlugRoute: typeof JavaSlugRoute
   LldSlugRoute: typeof LldSlugRoute
   PlaygroundsSlugRoute: typeof PlaygroundsSlugRoute
+  PythonSlugRoute: typeof PythonSlugRoute
   ExamplesIndexRoute: typeof ExamplesIndexRoute
+  FdeIndexRoute: typeof FdeIndexRoute
   HldIndexRoute: typeof HldIndexRoute
+  InterviewPrepIndexRoute: typeof InterviewPrepIndexRoute
+  JavaIndexRoute: typeof JavaIndexRoute
   LldIndexRoute: typeof LldIndexRoute
   PlaygroundsIndexRoute: typeof PlaygroundsIndexRoute
+  PythonIndexRoute: typeof PythonIndexRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  InterviewPrepSlugAnswersRoute: typeof InterviewPrepSlugAnswersRoute
+  InterviewPrepFreshworksLeadAnswersRoute: typeof InterviewPrepFreshworksLeadAnswersRoute
+  InterviewPrepRoleRoleRoute: typeof InterviewPrepRoleRoleRoute
+  InterviewPrepSlugIndexRoute: typeof InterviewPrepSlugIndexRoute
+  InterviewPrepFreshworksLeadIndexRoute: typeof InterviewPrepFreshworksLeadIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -169,11 +406,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/compiler': {
+      id: '/compiler'
+      path: '/compiler'
+      fullPath: '/compiler'
+      preLoaderRoute: typeof CompilerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resources': {
       id: '/resources'
       path: '/resources'
       fullPath: '/resources'
       preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/welcome': {
+      id: '/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/run': {
+      id: '/api/run'
+      path: '/api/run'
+      fullPath: '/api/run'
+      preLoaderRoute: typeof ApiRunRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/examples/': {
@@ -190,6 +462,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExamplesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fde/': {
+      id: '/fde/'
+      path: '/fde'
+      fullPath: '/fde/'
+      preLoaderRoute: typeof FdeIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fde/$slug': {
+      id: '/fde/$slug'
+      path: '/fde/$slug'
+      fullPath: '/fde/$slug'
+      preLoaderRoute: typeof FdeSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hld/': {
       id: '/hld/'
       path: '/hld'
@@ -202,6 +488,27 @@ declare module '@tanstack/react-router' {
       path: '/hld/$slug'
       fullPath: '/hld/$slug'
       preLoaderRoute: typeof HldSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/interview-prep/': {
+      id: '/interview-prep/'
+      path: '/interview-prep'
+      fullPath: '/interview-prep/'
+      preLoaderRoute: typeof InterviewPrepIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/java/': {
+      id: '/java/'
+      path: '/java'
+      fullPath: '/java/'
+      preLoaderRoute: typeof JavaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/java/$slug': {
+      id: '/java/$slug'
+      path: '/java/$slug'
+      fullPath: '/java/$slug'
+      preLoaderRoute: typeof JavaSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lld/': {
@@ -232,20 +539,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlaygroundsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/python/': {
+      id: '/python/'
+      path: '/python'
+      fullPath: '/python/'
+      preLoaderRoute: typeof PythonIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/python/$slug': {
+      id: '/python/$slug'
+      path: '/python/$slug'
+      fullPath: '/python/$slug'
+      preLoaderRoute: typeof PythonSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/interview-prep/$slug/': {
+      id: '/interview-prep/$slug/'
+      path: '/interview-prep/$slug'
+      fullPath: '/interview-prep/$slug/'
+      preLoaderRoute: typeof InterviewPrepSlugIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/interview-prep/$slug/answers': {
+      id: '/interview-prep/$slug/answers'
+      path: '/interview-prep/$slug/answers'
+      fullPath: '/interview-prep/$slug/answers'
+      preLoaderRoute: typeof InterviewPrepSlugAnswersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/interview-prep/freshworks-lead/': {
+      id: '/interview-prep/freshworks-lead/'
+      path: '/interview-prep/freshworks-lead'
+      fullPath: '/interview-prep/freshworks-lead/'
+      preLoaderRoute: typeof InterviewPrepFreshworksLeadIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/interview-prep/freshworks-lead/answers': {
+      id: '/interview-prep/freshworks-lead/answers'
+      path: '/interview-prep/freshworks-lead/answers'
+      fullPath: '/interview-prep/freshworks-lead/answers'
+      preLoaderRoute: typeof InterviewPrepFreshworksLeadAnswersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/interview-prep/role/$role': {
+      id: '/interview-prep/role/$role'
+      path: '/interview-prep/role/$role'
+      fullPath: '/interview-prep/role/$role'
+      preLoaderRoute: typeof InterviewPrepRoleRoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CompilerRoute: CompilerRoute,
+  LoginRoute: LoginRoute,
+  PricingRoute: PricingRoute,
   ResourcesRoute: ResourcesRoute,
+  WelcomeRoute: WelcomeRoute,
+  ApiRunRoute: ApiRunRoute,
   ExamplesSlugRoute: ExamplesSlugRoute,
+  FdeSlugRoute: FdeSlugRoute,
   HldSlugRoute: HldSlugRoute,
+  JavaSlugRoute: JavaSlugRoute,
   LldSlugRoute: LldSlugRoute,
   PlaygroundsSlugRoute: PlaygroundsSlugRoute,
+  PythonSlugRoute: PythonSlugRoute,
   ExamplesIndexRoute: ExamplesIndexRoute,
+  FdeIndexRoute: FdeIndexRoute,
   HldIndexRoute: HldIndexRoute,
+  InterviewPrepIndexRoute: InterviewPrepIndexRoute,
+  JavaIndexRoute: JavaIndexRoute,
   LldIndexRoute: LldIndexRoute,
   PlaygroundsIndexRoute: PlaygroundsIndexRoute,
+  PythonIndexRoute: PythonIndexRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
+  InterviewPrepSlugAnswersRoute: InterviewPrepSlugAnswersRoute,
+  InterviewPrepFreshworksLeadAnswersRoute:
+    InterviewPrepFreshworksLeadAnswersRoute,
+  InterviewPrepRoleRoleRoute: InterviewPrepRoleRoleRoute,
+  InterviewPrepSlugIndexRoute: InterviewPrepSlugIndexRoute,
+  InterviewPrepFreshworksLeadIndexRoute: InterviewPrepFreshworksLeadIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

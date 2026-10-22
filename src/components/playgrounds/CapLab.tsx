@@ -36,8 +36,8 @@ export function CapLab() {
   return (
     <div className="space-y-6">
       <p className="max-w-prose text-sm leading-6 text-muted">
-        Two replicas, one network. During a partition CP refuses to lie; AP keeps serving and repairs later. Toggle the
-        mode, split the network, then write.
+        Two replicas, one network. During a partition CP refuses to lie; AP keeps serving and
+        repairs later. Toggle the mode, split the network, then write.
       </p>
       <div className="flex flex-wrap gap-2">
         <Button variant={mode === "CP" ? "primary" : "secondary"} onClick={() => setMode("CP")}>
@@ -46,7 +46,10 @@ export function CapLab() {
         <Button variant={mode === "AP" ? "primary" : "secondary"} onClick={() => setMode("AP")}>
           AP
         </Button>
-        <Button variant={partition ? "danger" : "outline"} onClick={() => (partition ? heal() : setPartition(true))}>
+        <Button
+          variant={partition ? "danger" : "outline"}
+          onClick={() => (partition ? heal() : setPartition(true))}
+        >
           {partition ? "Heal partition" : "Split network"}
         </Button>
         <Button onClick={writeA}>Write on A</Button>
@@ -55,17 +58,23 @@ export function CapLab() {
         <NodeCard name="Node A" value={valueA} isolated={partition} />
         <NodeCard name="Node B" value={valueB} isolated={partition} />
       </div>
-      <p className="rounded-md border border-border bg-raised px-3 py-2 text-sm text-muted">{last}</p>
+      <p className="rounded-md border border-border bg-raised px-3 py-2 text-sm text-muted">
+        {last}
+      </p>
     </div>
   );
 }
 
 function NodeCard({ name, value, isolated }: { name: string; value: string; isolated: boolean }) {
   return (
-    <div className={`rounded-lg border p-4 ${isolated ? "border-bad/50 bg-bad/5" : "border-border bg-surface"}`}>
-      <div className="text-[11px] uppercase tracking-[0.14em] text-faint">{name}</div>
+    <div
+      className={`rounded-lg border p-4 ${isolated ? "border-bad/50 bg-bad/5" : "border-border bg-surface"}`}
+    >
+      <div className="eyebrow">{name}</div>
       <div className="mt-2 font-mono text-4xl tabular-nums">{value}</div>
-      <div className="mt-1 text-xs text-muted">{isolated ? "Unreachable from peer" : "Replicating"}</div>
+      <div className="mt-1 text-xs text-muted">
+        {isolated ? "Unreachable from peer" : "Replicating"}
+      </div>
     </div>
   );
 }

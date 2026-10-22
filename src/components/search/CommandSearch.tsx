@@ -31,7 +31,12 @@ export function CommandSearch({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-bg/80 px-4 pt-[12vh] backdrop-blur-sm">
-      <button type="button" className="absolute inset-0 cursor-default" aria-label="Close search" onClick={onClose} />
+      <button
+        type="button"
+        className="absolute inset-0 cursor-default"
+        aria-label="Close search"
+        onClick={onClose}
+      />
       <div className="relative w-full max-w-lg overflow-hidden rounded-xl border border-border bg-surface shadow-panel">
         <div className="flex items-center gap-2 border-b border-border px-3">
           <Search className="size-4 text-faint" />
@@ -45,7 +50,12 @@ export function CommandSearch({ onClose }: { onClose: () => void }) {
             placeholder="Search concepts, examples, labs"
             className="h-12 flex-1 bg-transparent text-sm text-fg outline-none placeholder:text-faint"
           />
-          <button type="button" onClick={onClose} className="text-faint hover:text-fg" aria-label="Close">
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-faint hover:text-fg"
+            aria-label="Close"
+          >
             <X className="size-4" />
           </button>
         </div>
@@ -62,7 +72,7 @@ export function CommandSearch({ onClose }: { onClose: () => void }) {
                 >
                   <div className="flex items-baseline justify-between gap-3">
                     <span className="text-sm font-medium">{hit.title}</span>
-                    <span className="text-[11px] uppercase tracking-wider text-accent">{hit.kind}</span>
+                    <span className="eyebrow">{hit.kind}</span>
                   </div>
                   <p className="mt-0.5 line-clamp-1 text-xs text-muted">{hit.subtitle}</p>
                 </AppLink>

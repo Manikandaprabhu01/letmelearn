@@ -1,0 +1,289 @@
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Search } from "lucide-react";
+import type { ReactNode } from "react";
+import { FRESHWORKS_LEAD, type ConsoleLocation } from "@/components/interview/console-shared";
+import { COMPANY_INDEX, LEVELS, SECTORS, ROLE_TRACKS } from "@/data/interview/meta";
+import { useInterviewPrefs, useRestoreInterviewPrefs } from "@/lib/interview-prefs";
+import { cn } from "@/lib/utils";
+
+/** Page frame for every console page: filter bar, company menu (wide screens), content. */
+export function ConsoleLayout({
+  current,
+  showLevels = true,
+  showLang = true,
+  searchLabel = "Search questions",
+  children,
+}: {
+  current?: ConsoleLocation;
+  showLevels?: boolean;
+  showLang?: boolean;
+  searchLabel?: string;
+  children: ReactNode;
+}) {
+  useRestoreInterviewPrefs();
+  return (
+    <div className="px-5 sm:px-8 lg:px-12">
+      <Toolbar
+        current={current}
+        showLevels={showLevels}
+        showLang={showLang}
+        searchLabel={searchLabel}
+      />
+      <div className="xl:grid xl:grid-cols-[220px_minmax(0,1fr)] xl:gap-10">
+        <CompanyNav current={current} />
+        <main className="min-w-0 pb-16 pt-8">{children}</main>
+      </div>
+    </div>
+  );
+}
+
+function Toolbar({
+  current,
+  showLevels,
+  showLang,
+  searchLabel,
+}: {
+  current?: ConsoleLocation;
+  showLevels: boolean;
+  showLang: boolean;
+  searchLabel: string;
+}) {
+  const level = useInterviewPrefs((s) => s.level);
+  const setLevel = useInterviewPrefs((s) => s.setLevel);
+  const lang = useInterviewPrefs((s) => s.lang);
+  const setLang = useInterviewPrefs((s) => s.setLang);
+  const query = useInterviewPrefs((s) => s.query);
+  const setQuery = useInterviewPrefs((s) => s.setQuery);
+
+  return (
+    // Sticks under the app's own top bar: h-14 below lg, h-12 from lg. On phones
+    // it wraps to several rows, so it scrolls away there instead.
+    <div className="z-10 -mx-5 border-b border-border/80 bg-bg/85 px-5 py-2.5 backdrop-blur-md sm:sticky sm:top-14 sm:-mx-8 sm:px-8 lg:top-12 lg:-mx-12 lg:px-12">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <Link
+          to="/interview-prep"
+          className="font-display text-[15px] tracking-tight text-fg hover:text-accent font-medium flex items-center gap-2"
+        >
+          <span className="size-2 rounded-full bg-cta animate-soft-pulse" />
+          Interview Prep Console
+        </Link>
+        <CompanySelect current={current} />
+        <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
+          {showLevels ? (
+            <div role="group" aria-label="Role level" className="flex flex-wrap gap-1">
+              {LEVELS.map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  aria-pressed={level === l}
+                  onClick={() => setLevel(l)}
+                  className={cn(
+                    "h-8 whitespace-nowrap rounded-lg border px-2.5 text-[12px] transition-all duration-150",
+                    level === l
+                      ? "border-accent/60 bg-accent/20 text-accent font-semibold shadow-sm"
+                      : "border-border/70 text-muted hover:text-fg hover:bg-raised/40",
+                  )}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+          ) : null}
+          <label className="relative flex items-center">
+            <span className="sr-only">{searchLabel}</span>
+            <Search className="pointer-events-none absolute left-2.5 size-3.5 text-faint" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={`${searchLabel}…`}
+              className="h-8 w-48 rounded-lg border border-border/80 bg-inset/80 pl-8 pr-2 text-[13px] text-fg placeholder:text-faint focus:border-accent/60 focus:ring-1 focus:ring-accent/30 focus:outline-none transition-all"
+            />
+          </label>
+          {showLang ? (
+            <div
+              role="group"
+              aria-label="Code language"
+              className="flex h-8 overflow-hidden rounded-lg border border-border/80 bg-inset/60"
+            >
+              {(["java", "py"] as const).map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  aria-pressed={lang === l}
+                  onClick={() => setLang(l)}
+                  className={cn(
+                    "px-2.5 font-mono text-[12px] transition-colors",
+                    lang === l
+                      ? "bg-accent/25 text-accent font-semibold"
+                      : "text-muted hover:text-fg hover:bg-raised/40",
+                  )}
+                >
+                  {l === "java" ? "Java" : "Python"}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Company picker for screens too narrow for the side menu. */
+function CompanySelect({ current }: { current?: ConsoleLocation }) {
+  const navigate = useNavigate();
+  return (
+    <select
+      aria-label="Company or Role"
+      value={current?.id ?? ""}
+      onChange={(e) => {
+        const val = e.target.value;
+        if (!val) void navigate({ to: "/interview-prep" });
+        else if (val.startsWith("role:")) {
+          const role = val.replace("role:", "");
+          void navigate({ to: "/interview-prep/role/$role", params: { role } });
+        } else if (val === FRESHWORKS_LEAD) {
+          void navigate({ to: "/interview-prep/freshworks-lead" });
+        } else if (current?.view === "answers") {
+          void navigate({ to: "/interview-prep/$slug/answers", params: { slug: val } });
+        } else {
+          void navigate({ to: "/interview-prep/$slug", params: { slug: val } });
+        }
+      }}
+      className="h-8 max-w-[13rem] rounded-md border border-border bg-inset px-2 text-[13px] text-fg focus:border-accent focus:outline-none xl:hidden"
+    >
+      <option value="">All companies & roles</option>
+      <optgroup label="Roles & Experience Levels">
+        {ROLE_TRACKS.map((r) => (
+          <option key={r.id} value={`role:${r.id}`}>
+            Role: {r.shortTitle} ({r.badge})
+          </option>
+        ))}
+      </optgroup>
+      {SECTORS.map((s) => (
+        <optgroup key={s.id} label={s.name}>
+          {COMPANY_INDEX.filter((c) => c.sector === s.id).map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </optgroup>
+      ))}
+      <optgroup label="Deep dives">
+        <option value={FRESHWORKS_LEAD}>Freshworks Lead SE</option>
+      </optgroup>
+    </select>
+  );
+}
+
+const navItem = (active: boolean) =>
+  cn(
+    "flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-[13px] transition-all duration-150",
+    active
+      ? "bg-accent/15 text-fg font-medium shadow-sm border border-accent/30"
+      : "text-muted hover:bg-raised/60 hover:text-fg",
+  );
+
+const subItem = (active: boolean) =>
+  cn(
+    "block rounded-md px-2.5 py-1 text-[12.5px] transition-colors",
+    active ? "font-medium text-accent bg-accent/10" : "text-muted hover:text-fg hover:bg-raised/40",
+  );
+
+function GroupLabel({ children, dot }: { children: ReactNode; dot?: string }) {
+  return (
+    <div className="mb-1.5 flex items-center gap-2 px-2.5 eyebrow">
+      {dot ? <span className={cn("size-1.5 rounded-full", dot)} aria-hidden /> : null}
+      {children}
+    </div>
+  );
+}
+
+function CompanyNav({ current }: { current?: ConsoleLocation }) {
+  return (
+    <nav
+      aria-label="Companies and Roles"
+      className="hidden xl:sticky xl:top-28 xl:block xl:max-h-[calc(100dvh-7rem)] xl:overflow-y-auto xl:pb-8 xl:pr-2 xl:pt-8"
+    >
+      {/* Role Tracks section */}
+      <div className="mb-6 rounded-lg border border-border/80 bg-surface/50 p-2">
+        <GroupLabel dot="bg-accent">Role Tracks</GroupLabel>
+        <div className="space-y-0.5">
+          {ROLE_TRACKS.map((r) => (
+            <Link
+              key={r.id}
+              to="/interview-prep/role/$role"
+              params={{ role: r.id }}
+              className={navItem(current?.id === r.id)}
+            >
+              <span className="truncate">{r.shortTitle}</span>
+              <span className="rounded bg-accent/15 px-1.5 py-0.5 font-mono text-[10px] text-accent">
+                {r.badge}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {SECTORS.map((s) => (
+        <div key={s.id} className="mb-5">
+          <GroupLabel dot={s.dot}>{s.name}</GroupLabel>
+          {COMPANY_INDEX.filter((c) => c.sector === s.id).map((c) => (
+            <div key={c.id}>
+              <Link
+                to="/interview-prep/$slug"
+                params={{ slug: c.id }}
+                className={navItem(current?.id === c.id)}
+              >
+                <span className="truncate">{c.name}</span>
+                <span className="font-mono text-[10.5px] text-faint">{c.questions}</span>
+              </Link>
+              {current && current.id === c.id ? (
+                <div className="my-1 ml-3 border-l border-border pl-1">
+                  <Link
+                    to="/interview-prep/$slug"
+                    params={{ slug: c.id }}
+                    className={subItem(current.view === "bank")}
+                  >
+                    Question bank
+                  </Link>
+                  <Link
+                    to="/interview-prep/$slug/answers"
+                    params={{ slug: c.id }}
+                    className={subItem(current.view === "answers")}
+                  >
+                    Answer sheet
+                  </Link>
+                </div>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ))}
+      <div>
+        <GroupLabel>Deep dives</GroupLabel>
+        <Link
+          to="/interview-prep/freshworks-lead"
+          className={navItem(current?.id === FRESHWORKS_LEAD)}
+        >
+          Freshworks Lead SE
+        </Link>
+        {current && current.id === FRESHWORKS_LEAD ? (
+          <div className="my-1 ml-3 border-l border-border pl-1">
+            <Link to="/interview-prep/freshworks-lead" className={subItem(current.view === "bank")}>
+              Question bank
+            </Link>
+            <Link
+              to="/interview-prep/freshworks-lead/answers"
+              className={subItem(current.view === "answers")}
+            >
+              Answer sheet
+            </Link>
+          </div>
+        ) : null}
+      </div>
+    </nav>
+  );
+}
+

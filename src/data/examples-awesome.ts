@@ -20,16 +20,38 @@ export const awesomeExamples: DesignExample[] = [
         "Stay signed in across devices, with sign-out-everywhere",
         "Optional MFA, password reset, API keys for machines",
       ],
-      nonFunctional: ["Login p95 < 200 ms", "No plaintext secrets at rest", "Revoke a stolen session in seconds"],
+      nonFunctional: [
+        "Login p95 < 200 ms",
+        "No plaintext secrets at rest",
+        "Revoke a stolen session in seconds",
+      ],
     },
     apis: [
-      { method: "POST", path: "/v1/auth/login", desc: "Verify credentials, start a session, set cookies." },
-      { method: "POST", path: "/v1/auth/refresh", desc: "Rotate refresh token, mint a new access token." },
-      { method: "POST", path: "/v1/auth/logout", desc: "Kill this session or all sessions for the user." },
+      {
+        method: "POST",
+        path: "/v1/auth/login",
+        desc: "Verify credentials, start a session, set cookies.",
+      },
+      {
+        method: "POST",
+        path: "/v1/auth/refresh",
+        desc: "Rotate refresh token, mint a new access token.",
+      },
+      {
+        method: "POST",
+        path: "/v1/auth/logout",
+        desc: "Kill this session or all sessions for the user.",
+      },
     ],
     dataModel: [
-      { entity: "User", fields: ["id", "email_hash", "password_hash (argon2id)", "mfa_secret_enc"] },
-      { entity: "Session", fields: ["id", "user_id", "refresh_hash", "device", "expires_at", "revoked_at"] },
+      {
+        entity: "User",
+        fields: ["id", "email_hash", "password_hash (argon2id)", "mfa_secret_enc"],
+      },
+      {
+        entity: "Session",
+        fields: ["id", "user_id", "refresh_hash", "device", "expires_at", "revoked_at"],
+      },
     ],
     architecture: [
       {
@@ -60,9 +82,21 @@ export const awesomeExamples: DesignExample[] = [
         table: {
           headers: ["", "JWT access + opaque refresh", "Server session cookie"],
           rows: [
-            ["Revoke", "Kill refresh; access lives until expiry unless you keep a denylist", "Delete the row — instant"],
-            ["Scale", "Resource servers verify a signature, no hop", "Every request hits the session store (or a cache of it)"],
-            ["Use when", "Many services, mobile, third-party APIs", "A single web origin, you want instant logout"],
+            [
+              "Revoke",
+              "Kill refresh; access lives until expiry unless you keep a denylist",
+              "Delete the row — instant",
+            ],
+            [
+              "Scale",
+              "Resource servers verify a signature, no hop",
+              "Every request hits the session store (or a cache of it)",
+            ],
+            [
+              "Use when",
+              "Many services, mobile, third-party APIs",
+              "A single web origin, you want instant logout",
+            ],
           ],
         },
         callout: {
@@ -73,8 +107,16 @@ export const awesomeExamples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "Opaque sessions only", pickWhen: "One origin, instant revoke is non-negotiable", cost: "Session store on every request" },
-      { choice: "JWT access + rotating refresh", pickWhen: "Many services and mobile clients", cost: "Access tokens linger until expiry" },
+      {
+        choice: "Opaque sessions only",
+        pickWhen: "One origin, instant revoke is non-negotiable",
+        cost: "Session store on every request",
+      },
+      {
+        choice: "JWT access + rotating refresh",
+        pickWhen: "Many services and mobile clients",
+        cost: "Access tokens linger until expiry",
+      },
     ],
     related: ["/hld/api-gateway", "/examples/distributed-lock", "/lld/singleton-di"],
     furtherReading: [
@@ -94,7 +136,11 @@ export const awesomeExamples: DesignExample[] = [
       "Source 6, Easy. A fleet of memory boxes in front of a slow store. The interview is not 'Redis exists' — it is placement, hashing, eviction, and what happens when the cache is empty all at once.",
     requirements: {
       functional: ["GET / SET / DEL by key", "TTL", "Optional pub/sub invalidation"],
-      nonFunctional: ["Sub-ms p50 inside a zone", "Survive a node death without a thundering herd", "Memory bounded"],
+      nonFunctional: [
+        "Sub-ms p50 inside a zone",
+        "Survive a node death without a thundering herd",
+        "Memory bounded",
+      ],
     },
     architecture: [
       {
@@ -134,12 +180,28 @@ export const awesomeExamples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "Cache-aside", pickWhen: "Most product APIs", cost: "App owns fill + invalidation" },
-      { choice: "Write-through", pickWhen: "Read-your-writes on the same key", cost: "Write latency includes the cache" },
+      {
+        choice: "Cache-aside",
+        pickWhen: "Most product APIs",
+        cost: "App owns fill + invalidation",
+      },
+      {
+        choice: "Write-through",
+        pickWhen: "Read-your-writes on the same key",
+        cost: "Write latency includes the cache",
+      },
     ],
-    related: ["/hld/caching", "/lld/lru-cache", "/playgrounds/lru-cache", "/hld/consistent-hashing"],
+    related: [
+      "/hld/caching",
+      "/lld/lru-cache",
+      "/playgrounds/lru-cache",
+      "/hld/consistent-hashing",
+    ],
     furtherReading: [
-      { label: "Awesome list — distributed cache", href: "https://www.youtube.com/watch?v=iuqZvajTOyA" },
+      {
+        label: "Awesome list — distributed cache",
+        href: "https://www.youtube.com/watch?v=iuqZvajTOyA",
+      },
       { label: "Source 6 on GitHub", href: list },
     ],
     playground: "lru-cache",
@@ -155,8 +217,16 @@ export const awesomeExamples: DesignExample[] = [
     summary:
       "Source 6, Medium. Photos are the payload; the follow graph is the fan-out problem. Upload asynchronously, serve from a CDN, and do not rebuild the news-feed chapter from scratch — call out where the media pipeline is the new hard part.",
     requirements: {
-      functional: ["Upload a photo/video, caption, tags", "Follow graph, home feed, permalink", "Stories (24h) and likes"],
-      nonFunctional: ["Upload ack in seconds, processing in the background", "Feed p95 < 200 ms", "Read-heavy, celebrity-safe"],
+      functional: [
+        "Upload a photo/video, caption, tags",
+        "Follow graph, home feed, permalink",
+        "Stories (24h) and likes",
+      ],
+      nonFunctional: [
+        "Upload ack in seconds, processing in the background",
+        "Feed p95 < 200 ms",
+        "Read-heavy, celebrity-safe",
+      ],
     },
     estimation: [
       { item: "DAU", calc: "Say 50M. 2 uploads/user/day → ~1.2k writes/s average, ~4k peak" },
@@ -173,7 +243,10 @@ export const awesomeExamples: DesignExample[] = [
             { title: "Client", items: ["Camera roll", "Feed", "CDN images"] },
             { title: "API", items: ["Upload init", "Graph", "Feed mixer"] },
             { title: "Async", items: ["Transcode", "Thumbnails", "Fan-out workers"] },
-            { title: "Stores", items: ["Object store", "Post metadata", "Follow graph", "Feed cache"] },
+            {
+              title: "Stores",
+              items: ["Object store", "Post metadata", "Follow graph", "Feed cache"],
+            },
           ],
         },
         numbered: [
@@ -192,12 +265,23 @@ export const awesomeExamples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "Hybrid fan-out", pickWhen: "Anyone with > ~10k followers", cost: "Two code paths in the mixer" },
-      { choice: "All pull-on-read", pickWhen: "A small product", cost: "Home-feed latency becomes a graph query" },
+      {
+        choice: "Hybrid fan-out",
+        pickWhen: "Anyone with > ~10k followers",
+        cost: "Two code paths in the mixer",
+      },
+      {
+        choice: "All pull-on-read",
+        pickWhen: "A small product",
+        cost: "Home-feed latency becomes a graph query",
+      },
     ],
     related: ["/examples/news-feed", "/examples/youtube", "/hld/cdn", "/hld/message-queues"],
     furtherReading: [
-      { label: "Awesome list — Instagram", href: "https://algomaster.io/learn/system-design-interviews/design-instagram" },
+      {
+        label: "Awesome list — Instagram",
+        href: "https://algomaster.io/learn/system-design-interviews/design-instagram",
+      },
       { label: "Source 6 on GitHub", href: list },
     ],
   },
@@ -212,8 +296,16 @@ export const awesomeExamples: DesignExample[] = [
     summary:
       "Source 6, Medium. A licensed catalog, encrypted audio chunks, playlists, and a recommendation side-car. The player must keep playing when the network hiccups — that is the deep dive, not the social graph.",
     requirements: {
-      functional: ["Search catalog, play a track, playlists, follow artists", "Offline downloads on premium", "Skip, seek, radio"],
-      nonFunctional: ["Start playback < 1s on broadband", "No unencrypted files on disk", "License-accurate royalty events"],
+      functional: [
+        "Search catalog, play a track, playlists, follow artists",
+        "Offline downloads on premium",
+        "Skip, seek, radio",
+      ],
+      nonFunctional: [
+        "Start playback < 1s on broadband",
+        "No unencrypted files on disk",
+        "License-accurate royalty events",
+      ],
     },
     architecture: [
       {
@@ -232,7 +324,11 @@ export const awesomeExamples: DesignExample[] = [
               { id: "ent", label: "Entitlement", tone: "accent" },
               { id: "cdn", label: "Audio CDN" },
             ],
-            [{ id: "cat", label: "Catalog" }, { id: "rec", label: "Reco" }, { id: "ev", label: "Play events" }],
+            [
+              { id: "cat", label: "Catalog" },
+              { id: "rec", label: "Reco" },
+              { id: "ev", label: "Play events" },
+            ],
           ],
         },
       },
@@ -246,12 +342,23 @@ export const awesomeExamples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "CDN-only audio", pickWhen: "You are not in the ISP-box business", cost: "Egress bill; cache miss = origin" },
-      { choice: "P2P assist (old Spotify)", pickWhen: "Egress was the company-killer", cost: "NAT, cheating, complexity — they left it" },
+      {
+        choice: "CDN-only audio",
+        pickWhen: "You are not in the ISP-box business",
+        cost: "Egress bill; cache miss = origin",
+      },
+      {
+        choice: "P2P assist (old Spotify)",
+        pickWhen: "Egress was the company-killer",
+        cost: "NAT, cheating, complexity — they left it",
+      },
     ],
     related: ["/examples/youtube", "/examples/netflix", "/hld/cdn"],
     furtherReading: [
-      { label: "Awesome list — Spotify", href: "https://algomaster.io/learn/system-design-interviews/design-spotify" },
+      {
+        label: "Awesome list — Spotify",
+        href: "https://algomaster.io/learn/system-design-interviews/design-spotify",
+      },
       { label: "Source 6 on GitHub", href: list },
     ],
   },
@@ -267,7 +374,11 @@ export const awesomeExamples: DesignExample[] = [
       "Source 6, Medium. YouTube is UGC and a firehose of uploads. Netflix is a small catalog, enormous concurrency on opening night, and a CDN they own (Open Connect). Encode once, sit close to ISPs, remember the playhead.",
     requirements: {
       functional: ["Browse, resume, play, profiles, downloads", "Personalized home row"],
-      nonFunctional: ["Opening-night millions of concurrent viewers", "Start in < 2s, no buffering on a decent link", "DRM"],
+      nonFunctional: [
+        "Opening-night millions of concurrent viewers",
+        "Start in < 2s, no buffering on a decent link",
+        "DRM",
+      ],
     },
     architecture: [
       {
@@ -275,9 +386,18 @@ export const awesomeExamples: DesignExample[] = [
         table: {
           headers: ["Plane", "Job"],
           rows: [
-            ["Control", "Auth, catalog, bookmarks, ratings, A/B — ordinary stateless APIs + a viewing-history store"],
-            ["Data", "Encoded ladders in Open Connect appliances inside ISPs, plus a public CDN fallback"],
-            ["Offline encode", "Every title → many bitrates × codecs × languages. A job queue, not a user-facing API"],
+            [
+              "Control",
+              "Auth, catalog, bookmarks, ratings, A/B — ordinary stateless APIs + a viewing-history store",
+            ],
+            [
+              "Data",
+              "Encoded ladders in Open Connect appliances inside ISPs, plus a public CDN fallback",
+            ],
+            [
+              "Offline encode",
+              "Every title → many bitrates × codecs × languages. A job queue, not a user-facing API",
+            ],
           ],
         },
         diagram: {
@@ -299,8 +419,16 @@ export const awesomeExamples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "Own the ISP boxes", pickWhen: "You are the peak traffic of the internet", cost: "Hardware, ISP deals, ops" },
-      { choice: "Rent a CDN", pickWhen: "A smaller catalog or a new region", cost: "Noisy neighbors, less control of placement" },
+      {
+        choice: "Own the ISP boxes",
+        pickWhen: "You are the peak traffic of the internet",
+        cost: "Hardware, ISP deals, ops",
+      },
+      {
+        choice: "Rent a CDN",
+        pickWhen: "A smaller catalog or a new region",
+        cost: "Noisy neighbors, less control of placement",
+      },
     ],
     related: ["/examples/youtube", "/hld/cdn", "/examples/job-scheduler"],
     furtherReading: [
@@ -319,12 +447,28 @@ export const awesomeExamples: DesignExample[] = [
     summary:
       "Source 6, Medium. Cron that survives more than one box. Partition the schedule, lease the next due job, run it exactly-once-enough, retry with backoff, and never let two workers bill the same customer.",
     requirements: {
-      functional: ["One-shot and recurring jobs", "At / cron / every-N", "Cancel, pause, inspect last run"],
-      nonFunctional: ["No missed runs across a node death", "At-least-once delivery with idempotent handlers", "Thousands of due jobs per second"],
+      functional: [
+        "One-shot and recurring jobs",
+        "At / cron / every-N",
+        "Cancel, pause, inspect last run",
+      ],
+      nonFunctional: [
+        "No missed runs across a node death",
+        "At-least-once delivery with idempotent handlers",
+        "Thousands of due jobs per second",
+      ],
     },
     apis: [
-      { method: "POST", path: "/v1/jobs", desc: "Register a job with schedule + handler + payload." },
-      { method: "POST", path: "/v1/jobs/:id/cancel", desc: "Stop future runs; in-flight is best-effort." },
+      {
+        method: "POST",
+        path: "/v1/jobs",
+        desc: "Register a job with schedule + handler + payload.",
+      },
+      {
+        method: "POST",
+        path: "/v1/jobs/:id/cancel",
+        desc: "Stop future runs; in-flight is best-effort.",
+      },
     ],
     architecture: [
       {
@@ -363,12 +507,23 @@ export const awesomeExamples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "Polling + SKIP LOCKED", pickWhen: "You already have Postgres", cost: "Poll delay, DB load" },
-      { choice: "Per-job timer in memory (k8s)", pickWhen: "Job count fits in the control plane", cost: "Does not span 10M jobs" },
+      {
+        choice: "Polling + SKIP LOCKED",
+        pickWhen: "You already have Postgres",
+        cost: "Poll delay, DB load",
+      },
+      {
+        choice: "Per-job timer in memory (k8s)",
+        pickWhen: "Job count fits in the control plane",
+        cost: "Does not span 10M jobs",
+      },
     ],
     related: ["/hld/message-queues", "/examples/distributed-lock", "/hld/idempotency"],
     furtherReading: [
-      { label: "Awesome list — job scheduler", href: "https://blog.algomaster.io/p/design-a-distributed-job-scheduler" },
+      {
+        label: "Awesome list — job scheduler",
+        href: "https://blog.algomaster.io/p/design-a-distributed-job-scheduler",
+      },
       { label: "Source 6 on GitHub", href: list },
     ],
   },
@@ -383,8 +538,17 @@ export const awesomeExamples: DesignExample[] = [
     summary:
       "Source 6, Medium. Not Yelp. People move, preferences are a vector, and a match is a mutual like — a tiny, precious edge. Geo for the deck, a graph for likes, a chat once it is mutual.",
     requirements: {
-      functional: ["A deck of nearby candidates", "Like / pass", "Match on mutual like, then chat", "Filters: age, distance, prefs"],
-      nonFunctional: ["Deck in < 200 ms", "No 'already passed' repeats for a while", "Location stale by minutes is fine"],
+      functional: [
+        "A deck of nearby candidates",
+        "Like / pass",
+        "Match on mutual like, then chat",
+        "Filters: age, distance, prefs",
+      ],
+      nonFunctional: [
+        "Deck in < 200 ms",
+        "No 'already passed' repeats for a while",
+        "Location stale by minutes is fine",
+      ],
     },
     architecture: [
       {
@@ -403,7 +567,10 @@ export const awesomeExamples: DesignExample[] = [
               { id: "rank", label: "Ranker" },
               { id: "deck", label: "Deck" },
             ],
-            [{ id: "like", label: "Like graph" }, { id: "chat", label: "Chat" }],
+            [
+              { id: "like", label: "Like graph" },
+              { id: "chat", label: "Chat" },
+            ],
           ],
         },
       },
@@ -417,7 +584,11 @@ export const awesomeExamples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "Precompute decks", pickWhen: "Read-heavy evenings", cost: "Stale when someone moves city" },
+      {
+        choice: "Precompute decks",
+        pickWhen: "Read-heavy evenings",
+        cost: "Stale when someone moves city",
+      },
       { choice: "Compute on swipe", pickWhen: "Prefs change a lot", cost: "Heavier reads" },
     ],
     related: ["/examples/proximity", "/examples/chat", "/examples/nearby-friends"],
@@ -437,8 +608,16 @@ export const awesomeExamples: DesignExample[] = [
     summary:
       "Source 6, Medium. Four machines: crawl, invert, rank, serve. Do not design PageRank on the whiteboard for thirty minutes — name it, then deep-dive serving a query from a sharded inverted index under a tight latency SLO.",
     requirements: {
-      functional: ["Keyword query → ranked URLs + snippets", "Fresh enough for news", "Spell / autocomplete (reuse that example)"],
-      nonFunctional: ["p95 < 200 ms worldwide", "Index of tens of billions of pages", "Crawl politely"],
+      functional: [
+        "Keyword query → ranked URLs + snippets",
+        "Fresh enough for news",
+        "Spell / autocomplete (reuse that example)",
+      ],
+      nonFunctional: [
+        "p95 < 200 ms worldwide",
+        "Index of tens of billions of pages",
+        "Crawl politely",
+      ],
     },
     architecture: [
       {
@@ -472,12 +651,23 @@ export const awesomeExamples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "Doc-sharded index", pickWhen: "Even load, simple mixer", cost: "Every query touches every shard (or a random subset)" },
-      { choice: "Term-sharded index", pickWhen: "Enormous vocabulary, rare terms", cost: "Hot terms, harder intersection" },
+      {
+        choice: "Doc-sharded index",
+        pickWhen: "Even load, simple mixer",
+        cost: "Every query touches every shard (or a random subset)",
+      },
+      {
+        choice: "Term-sharded index",
+        pickWhen: "Enormous vocabulary, rare terms",
+        cost: "Hot terms, harder intersection",
+      },
     ],
     related: ["/examples/web-crawler", "/examples/autocomplete", "/hld/sharding"],
     furtherReading: [
-      { label: "Awesome list — Google Search", href: "https://www.youtube.com/watch?v=CeGtqouT8eA" },
+      {
+        label: "Awesome list — Google Search",
+        href: "https://www.youtube.com/watch?v=CeGtqouT8eA",
+      },
       { label: "Source 6 on GitHub", href: list },
     ],
   },
@@ -492,11 +682,22 @@ export const awesomeExamples: DesignExample[] = [
     summary:
       "Source 6, Hard. Live location of drivers, a matching engine that does not ping-pong the same car, ETAs, and surge as a pricing valve — not a moral essay. Deep-dive dispatch.",
     requirements: {
-      functional: ["Rider requests a trip", "Match a driver, show ETA and live location", "Turn-by-turn, fare, ratings"],
-      nonFunctional: ["Match in a few seconds", "Location every ~1–4s while on trip", "City-scale partitions"],
+      functional: [
+        "Rider requests a trip",
+        "Match a driver, show ETA and live location",
+        "Turn-by-turn, fare, ratings",
+      ],
+      nonFunctional: [
+        "Match in a few seconds",
+        "Location every ~1–4s while on trip",
+        "City-scale partitions",
+      ],
     },
     estimation: [
-      { item: "City", calc: "50k drivers, 200k concurrent riders peak. Location pings 50k/2s ≈ 25k writes/s for that city" },
+      {
+        item: "City",
+        calc: "50k drivers, 200k concurrent riders peak. Location pings 50k/2s ≈ 25k writes/s for that city",
+      },
     ],
     architecture: [
       {
@@ -515,7 +716,11 @@ export const awesomeExamples: DesignExample[] = [
               { id: "m", label: "Matcher", tone: "accent" },
               { id: "d", label: "Driver" },
             ],
-            [{ id: "geo", label: "Live geo index" }, { id: "map", label: "ETA / maps" }, { id: "pay", label: "Fare" }],
+            [
+              { id: "geo", label: "Live geo index" },
+              { id: "map", label: "ETA / maps" },
+              { id: "pay", label: "Fare" },
+            ],
           ],
         },
       },
@@ -529,10 +734,23 @@ export const awesomeExamples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "Offer one driver at a time", pickWhen: "You want acceptance quality", cost: "Slower match" },
-      { choice: "Broadcast to N", pickWhen: "Supply is thin", cost: "First-accept races, unhappy drivers" },
+      {
+        choice: "Offer one driver at a time",
+        pickWhen: "You want acceptance quality",
+        cost: "Slower match",
+      },
+      {
+        choice: "Broadcast to N",
+        pickWhen: "Supply is thin",
+        cost: "First-accept races, unhappy drivers",
+      },
     ],
-    related: ["/examples/proximity", "/examples/food-delivery", "/examples/google-maps", "/hld/websockets"],
+    related: [
+      "/examples/proximity",
+      "/examples/food-delivery",
+      "/examples/google-maps",
+      "/hld/websockets",
+    ],
     furtherReading: [
       { label: "Awesome list — Uber", href: "https://www.youtube.com/watch?v=umWABit-wbk" },
       { label: "Source 6 on GitHub", href: list },
@@ -549,8 +767,15 @@ export const awesomeExamples: DesignExample[] = [
     summary:
       "Source 6, Hard. Three sides: diner, merchant, courier. The new hard part versus Uber is the merchant's prep time — you cannot dispatch a courier at request time if the burger is 18 minutes out.",
     requirements: {
-      functional: ["Browse nearby menus, cart, pay, track", "Merchant accepts and marks ready", "Courier pickup → dropoff"],
-      nonFunctional: ["Hot food, not just a short route", "Menu reads are cacheable; orders are not"],
+      functional: [
+        "Browse nearby menus, cart, pay, track",
+        "Merchant accepts and marks ready",
+        "Courier pickup → dropoff",
+      ],
+      nonFunctional: [
+        "Hot food, not just a short route",
+        "Menu reads are cacheable; orders are not",
+      ],
     },
     architecture: [
       {
@@ -580,8 +805,16 @@ export const awesomeExamples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "Dispatch late", pickWhen: "Prep time is trustworthy", cost: "A late courier if the kitchen lies" },
-      { choice: "Dispatch early + wait", pickWhen: "You cannot trust prep quotes", cost: "Courier utilization" },
+      {
+        choice: "Dispatch late",
+        pickWhen: "Prep time is trustworthy",
+        cost: "A late courier if the kitchen lies",
+      },
+      {
+        choice: "Dispatch early + wait",
+        pickWhen: "You cannot trust prep quotes",
+        cost: "Courier utilization",
+      },
     ],
     related: ["/examples/uber", "/examples/payment", "/examples/hotel-reservation"],
     furtherReading: [
@@ -600,8 +833,17 @@ export const awesomeExamples: DesignExample[] = [
     summary:
       "Source 6, Hard. Concurrent edits on one document without a single 'save' button. Operational Transform (Docs historically) or CRDTs (Figma, many new tools). Presence, snapshots, offline — pick OT-vs-CRDT as the deep dive.",
     requirements: {
-      functional: ["Many cursors, live characters, comments", "Share / ACL", "Offline then merge", "Version history"],
-      nonFunctional: ["Keystroke feels local (< 50 ms)", "Eventual identical docs", "A 100-page doc does not download every time"],
+      functional: [
+        "Many cursors, live characters, comments",
+        "Share / ACL",
+        "Offline then merge",
+        "Version history",
+      ],
+      nonFunctional: [
+        "Keystroke feels local (< 50 ms)",
+        "Eventual identical docs",
+        "A 100-page doc does not download every time",
+      ],
     },
     architecture: [
       {
@@ -619,7 +861,11 @@ export const awesomeExamples: DesignExample[] = [
               { id: "s", label: "Doc server", sub: "sticky", tone: "accent" },
               { id: "b", label: "Client B" },
             ],
-            [{ id: "log", label: "Op log" }, { id: "snap", label: "Snapshots" }, { id: "acl", label: "ACL" }],
+            [
+              { id: "log", label: "Op log" },
+              { id: "snap", label: "Snapshots" },
+              { id: "acl", label: "ACL" },
+            ],
           ],
         },
       },
@@ -630,9 +876,21 @@ export const awesomeExamples: DesignExample[] = [
         table: {
           headers: ["", "Operational Transform", "CRDT"],
           rows: [
-            ["Idea", "A central sequencer rewrites concurrent ops against each other", "Math that converges without a center"],
-            ["Docs", "Google Docs, older Office Online", "Figma, Automerge, Yjs, many local-first apps"],
-            ["Cost", "Server is a bottleneck per doc; transform code is famously subtle", "Metadata bloat; need compaction"],
+            [
+              "Idea",
+              "A central sequencer rewrites concurrent ops against each other",
+              "Math that converges without a center",
+            ],
+            [
+              "Docs",
+              "Google Docs, older Office Online",
+              "Figma, Automerge, Yjs, many local-first apps",
+            ],
+            [
+              "Cost",
+              "Server is a bottleneck per doc; transform code is famously subtle",
+              "Metadata bloat; need compaction",
+            ],
           ],
         },
         callout: {
@@ -643,8 +901,16 @@ export const awesomeExamples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "OT + sequencer", pickWhen: "Always-online, Google-Docs-like", cost: "Server availability is the doc's availability" },
-      { choice: "CRDT", pickWhen: "Offline / P2P / local-first", cost: "Tombstones, compaction, larger payloads" },
+      {
+        choice: "OT + sequencer",
+        pickWhen: "Always-online, Google-Docs-like",
+        cost: "Server availability is the doc's availability",
+      },
+      {
+        choice: "CRDT",
+        pickWhen: "Offline / P2P / local-first",
+        cost: "Tombstones, compaction, larger payloads",
+      },
     ],
     related: ["/examples/zoom", "/hld/websockets", "/hld/consistency"],
     furtherReading: [
@@ -663,8 +929,16 @@ export const awesomeExamples: DesignExample[] = [
     summary:
       "Source 6, Hard. Real-time audio/video for 2 to a few thousand. The key word is SFU: Selective Forwarding Unit — the server forwards packets, it does not mix every tile into one video (MCU) except as a fallback.",
     requirements: {
-      functional: ["Join a meeting, A/V, screen share, chat", "Mute, gallery, recording", "Waiting room, host controls"],
-      nonFunctional: ["Mouth-to-ear < 150–200 ms", "Survive home NATs", "A 1k webinar is not 1k full meshes"],
+      functional: [
+        "Join a meeting, A/V, screen share, chat",
+        "Mute, gallery, recording",
+        "Waiting room, host controls",
+      ],
+      nonFunctional: [
+        "Mouth-to-ear < 150–200 ms",
+        "Survive home NATs",
+        "A 1k webinar is not 1k full meshes",
+      ],
     },
     architecture: [
       {
@@ -682,7 +956,11 @@ export const awesomeExamples: DesignExample[] = [
               { id: "sfu", label: "SFU", tone: "accent" },
               { id: "b", label: "Client B" },
             ],
-            [{ id: "sig", label: "Signaling" }, { id: "turn", label: "TURN" }, { id: "rec", label: "Recorder" }],
+            [
+              { id: "sig", label: "Signaling" },
+              { id: "turn", label: "TURN" },
+              { id: "rec", label: "Recorder" },
+            ],
           ],
         },
       },
@@ -704,8 +982,16 @@ export const awesomeExamples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "SFU + simulcast", pickWhen: "Almost every meeting product", cost: "Uplink carries extra rungs" },
-      { choice: "SVC (one stream, layers)", pickWhen: "You control the encoder", cost: "Harder, fewer client codecs" },
+      {
+        choice: "SFU + simulcast",
+        pickWhen: "Almost every meeting product",
+        cost: "Uplink carries extra rungs",
+      },
+      {
+        choice: "SVC (one stream, layers)",
+        pickWhen: "You control the encoder",
+        cost: "Harder, fewer client codecs",
+      },
     ],
     related: ["/examples/chat", "/examples/google-docs", "/hld/websockets"],
     furtherReading: [
@@ -724,8 +1010,15 @@ export const awesomeExamples: DesignExample[] = [
     summary:
       "Source 6, Hard. A finite seat map, a flash crowd, and the rule that two people cannot own seat 14F. Holds with TTL, a wait-queue in front of checkout, and a ledger so a crash does not un-sell a sold seat.",
     requirements: {
-      functional: ["Browse events, pick seats, pay, issue ticket", "Hold seats for a few minutes at checkout"],
-      nonFunctional: ["No double-sell", "On-sale minute must not melt the origin", "Idempotent payment"],
+      functional: [
+        "Browse events, pick seats, pay, issue ticket",
+        "Hold seats for a few minutes at checkout",
+      ],
+      nonFunctional: [
+        "No double-sell",
+        "On-sale minute must not melt the origin",
+        "Idempotent payment",
+      ],
     },
     architecture: [
       {
@@ -759,8 +1052,16 @@ export const awesomeExamples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "Hard unique holds", pickWhen: "Assigned seating", cost: "Hot rows on popular seats" },
-      { choice: "GA inventory counter", pickWhen: "General admission", cost: "No seat map; still needs atomic decrement" },
+      {
+        choice: "Hard unique holds",
+        pickWhen: "Assigned seating",
+        cost: "Hot rows on popular seats",
+      },
+      {
+        choice: "GA inventory counter",
+        pickWhen: "General admission",
+        cost: "No seat map; still needs atomic decrement",
+      },
     ],
     related: ["/examples/hotel-reservation", "/examples/payment", "/hld/idempotency"],
     furtherReading: [
@@ -779,8 +1080,16 @@ export const awesomeExamples: DesignExample[] = [
     summary:
       "Source 6, Hard. Coarse-grained locks for leaders, not for every row. Leases so a dead holder does not hold forever, and fencing tokens so a pause-then-resume holder cannot write after losing the lock. This is Chubby, not Redis SETNX.",
     requirements: {
-      functional: ["Acquire / renew / release a named lock", "Ephemeral nodes / watches for membership", "Read small config files"],
-      nonFunctional: ["A handful of locks, held for minutes to hours", "Survive a minority of replica deaths", "Fencing against split brains"],
+      functional: [
+        "Acquire / renew / release a named lock",
+        "Ephemeral nodes / watches for membership",
+        "Read small config files",
+      ],
+      nonFunctional: [
+        "A handful of locks, held for minutes to hours",
+        "Survive a minority of replica deaths",
+        "Fencing against split brains",
+      ],
     },
     architecture: [
       {
@@ -822,13 +1131,32 @@ export const awesomeExamples: DesignExample[] = [
       },
     ],
     tradeoffs: [
-      { choice: "etcd / ZooKeeper", pickWhen: "You need watches and membership too", cost: "Ops, session semantics" },
-      { choice: "DB advisory locks", pickWhen: "One primary database, short critical sections", cost: "Tied to that DB's availability" },
+      {
+        choice: "etcd / ZooKeeper",
+        pickWhen: "You need watches and membership too",
+        cost: "Ops, session semantics",
+      },
+      {
+        choice: "DB advisory locks",
+        pickWhen: "One primary database, short critical sections",
+        cost: "Tied to that DB's availability",
+      },
     ],
-    related: ["/hld/consensus", "/hld/availability", "/examples/kv-store", "/examples/job-scheduler"],
+    related: [
+      "/hld/consensus",
+      "/hld/availability",
+      "/examples/kv-store",
+      "/examples/job-scheduler",
+    ],
     furtherReading: [
-      { label: "How to do distributed locking — Kleppmann", href: "https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html" },
-      { label: "Chubby paper", href: "https://static.googleusercontent.com/media/research.google.com/en//archive/chubby-osdi06.pdf" },
+      {
+        label: "How to do distributed locking — Kleppmann",
+        href: "https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html",
+      },
+      {
+        label: "Chubby paper",
+        href: "https://static.googleusercontent.com/media/research.google.com/en//archive/chubby-osdi06.pdf",
+      },
       { label: "Source 6 on GitHub", href: list },
     ],
   },
