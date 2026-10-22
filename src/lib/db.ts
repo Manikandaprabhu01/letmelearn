@@ -157,6 +157,33 @@ async function createPgliteSql(): Promise<Sql> {
   });
 }
 
+const memoryTables = new Map<string, Array<Record<string, unknown>>>();
+
+function createMemorySql(): Promise<Sql> {
+  return Promise.resolve(
+    toSql(async <T>(text: string, params: unknown[]) => {
+      const lower = text.toLowerCase().trim();
+      if (lower.startsWith("insert into purchases")) {
+        const id = (params[0] as string) || `purch_${Date.now()}`;
+        const userId = params[1] as string;
+        const orderId = params[2] as string;
+        const list = memoryTables.get("purchases") ?? [];
+        list.push({ id, user_id: userId, order_id: orderId, status: "paid" });
+        memoryTables.set("purchases", list);
+        return [] as T[];
+      }
+      if (lower.includes("from purchases")) {
+        const list = (memoryTables.get("purchases") ?? []) as unknown as T[];
+        return list;
+      }
+      if (lower.includes('from "user"') || lower.includes("from user")) {
+        return [] as T[];
+      }
+      return [] as T[];
+    }),
+  );
+}
+
 let sqlPromise: Promise<Sql> | null = null;
 
 async function createSql(): Promise<Sql> {
@@ -166,7 +193,9 @@ async function createSql(): Promise<Sql> {
         "or a server route loader, never from client code.",
     );
   }
-  return dbSource === "neon" ? createNeonSql() : createPgliteSql();
+  if (dbSource === "neon") return createNeonSql();
+  if (process.env.VERCEL) return createMemorySql();
+  return createPgliteSql();
 }
 
 /**
@@ -210,7 +239,7 @@ export async function getPglite(): Promise<import("@electric-sql/pglite").PGlite
  * module kick it off immediately (see bottom of file).
  */
 export function ensureDbReady(): Promise<void> {
-  if (dbSource !== "pglite") return Promise.resolve();
+  if (dbSource !== "pglite" || process.env.VERCEL) return Promise.resolve();
   return getSql().then(() => undefined);
 }
 
@@ -219,7 +248,7 @@ export function ensureDbReady(): Promise<void> {
 const globalBoot = globalThis as typeof globalThis & {
   __pgBootstrapPromise__?: Promise<void>;
 };
-if (typeof window === "undefined" && dbSource === "pglite") {
+if (typeof window === "undefined" && dbSource === "pglite" && !process.env.VERCEL) {
   globalBoot.__pgBootstrapPromise__ ??= ensureDbReady().catch((err) => {
     globalBoot.__pgBootstrapPromise__ = undefined;
     console.error("[db] PGLite bootstrap failed:", err);
