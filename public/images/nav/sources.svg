@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#110d2b"/>
+      <stop offset="100%" stop-color="#05030f"/>
+    </linearGradient>
+    <linearGradient id="indigo" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#a5b4fc"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+  <rect x="1" y="1" width="126" height="126" rx="27" stroke="#6366f1" stroke-width="1.5" stroke-opacity="0.35"/>
+  <g filter="url(#glow)">
+    <!-- Open Book / Papers Stack -->
+    <!-- Base Book Spine -->
+    <path d="M64 48c-12-8-26-8-36-4v44c10-4 24-4 36 4 12-8 26-8 36-4V44c-10-4-24-4-36 4z" fill="#312e81" fill-opacity="0.75" stroke="url(#indigo)" stroke-width="2.5"/>
+    <line x1="64" y1="48" x2="64" y2="92" stroke="#c7d2fe" stroke-width="2"/>
+    <!-- Page text lines left -->
+    <line x1="36" y1="58" x2="56" y2="58" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="36" y1="68" x2="52" y2="68" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="36" y1="78" x2="56" y2="78" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Page text lines right -->
+    <line x1="72" y1="58" x2="92" y2="58" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="76" y1="68" x2="92" y2="68" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="72" y1="78" x2="92" y2="78" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Floating Bookmark Ribbon -->
+    <path d="M62 34h8v18l-4-3-4 3V34z" fill="#f43f5e"/>
+  </g>
+</svg>

@@ -10,9 +10,32 @@ import { useBilling } from "@/lib/billing/use-billing";
  * The upgrade prompt is hidden while billing is loading and once the user is
  * entitled, so a paying customer never sees an "upgrade" nudge.
  */
-export function AccountStrip() {
+export function AccountStrip({ compact = false }: { compact?: boolean }) {
   const { state, loading } = useBilling();
   const showUpgrade = !loading && state.paywallActive && !state.entitled;
+
+  if (compact) {
+    return (
+      <ClientOnly fallback={<div className="size-8 rounded-full bg-surface" aria-hidden />}>
+        <div className="flex items-center justify-center">
+          <SignedOut>
+            <Link
+              to="/login"
+              title="Sign in"
+              className="flex size-8 items-center justify-center rounded-lg bg-surface text-muted hover:text-fg hover:bg-raised transition-colors"
+            >
+              <span className="text-[11px] font-semibold">In</span>
+            </Link>
+          </SignedOut>
+          <SignedIn>
+            <div className="flex items-center justify-center [&_span.text-sm]:hidden [&_button]:hidden">
+              <UserButton />
+            </div>
+          </SignedIn>
+        </div>
+      </ClientOnly>
+    );
+  }
 
   return (
     <ClientOnly fallback={<div className="h-[4.5rem]" aria-hidden />}>
