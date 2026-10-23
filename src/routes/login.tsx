@@ -243,46 +243,6 @@ function SignInPanel({ initialMode = "sign-in" }: { initialMode?: Mode }) {
     return null;
   }
 
-  async function handleQuickTestLogin() {
-    setBusy(true);
-    setError(null);
-    try {
-      await ensureTestUser();
-      const result = await authClient.signIn.email({
-        email: TEST_USER_CREDENTIALS.email,
-        password: TEST_USER_CREDENTIALS.password,
-      });
-      if (result.error) {
-        const up = await authClient.signUp.email({
-          name: TEST_USER_CREDENTIALS.name,
-          email: TEST_USER_CREDENTIALS.email,
-          password: TEST_USER_CREDENTIALS.password,
-        });
-        if (up.error) {
-          setError(describeError(result.error));
-          setBusy(false);
-          return;
-        }
-        if (up.data?.token) setBearerToken(up.data.token);
-      } else {
-        if (result.data?.token) setBearerToken(result.data.token);
-      }
-      await navigate({ to: "/" });
-    } catch {
-      setError("Could not sign in as test user. Try manually.");
-      setBusy(false);
-    }
-  }
-
-  function fillTestCredentials() {
-    setEmail(TEST_USER_CREDENTIALS.email);
-    setPassword(TEST_USER_CREDENTIALS.password);
-    if (mode === "sign-up") {
-      setName(TEST_USER_CREDENTIALS.name);
-    }
-    setError(null);
-  }
-
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     const problem = validate();
@@ -293,10 +253,26 @@ function SignInPanel({ initialMode = "sign-in" }: { initialMode?: Mode }) {
     setBusy(true);
     setError(null);
     try {
+      const normalizedEmail = email.trim().toLowerCase();
+      if (normalizedEmail === TEST_USER_CREDENTIALS.email.toLowerCase()) {
+        await ensureTestUser();
+      }
+
       const result = signingUp
-        ? await authClient.signUp.email({ name: name.trim(), email: email.trim(), password })
-        : await authClient.signIn.email({ email: email.trim(), password });
+        ? await authClient.signUp.email({ name: name.trim(), email: normalizedEmail, password })
+        : await authClient.signIn.email({ email: normalizedEmail, password });
+
       if (result.error) {
+        // Fallback retry for test user if not yet initialized in memory adapter
+        if (!signingUp && normalizedEmail === TEST_USER_CREDENTIALS.email.toLowerCase()) {
+          await ensureTestUser();
+          const retry = await authClient.signIn.email({ email: normalizedEmail, password });
+          if (!retry.error) {
+            if (retry.data?.token) setBearerToken(retry.data.token);
+            await navigate({ to: "/" });
+            return;
+          }
+        }
         setError(describeError(result.error));
         setBusy(false);
         return;
@@ -341,50 +317,6 @@ function SignInPanel({ initialMode = "sign-in" }: { initialMode?: Mode }) {
             ? "Sign up to unlock the complete studio, worked examples, and interactive labs."
             : "Sign in to pick up where you left off in your curriculum."}
         </p>
-      </div>
-
-      {/* 1-Click Test Access Banner */}
-      <div className="rounded-2xl border border-accent/40 bg-accent/5 p-4 sm:p-5 space-y-3 relative overflow-hidden backdrop-blur-md">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 font-semibold text-xs sm:text-sm text-fg">
-            <Sparkles className="size-4 text-accent" />
-            <span>1-Click Test Account Access</span>
-          </div>
-          <span className="rounded-full bg-accent/20 px-2.5 py-0.5 text-[10px] font-mono uppercase font-bold text-accent">
-            Lifetime Pro
-          </span>
-        </div>
-        <p className="text-xs text-muted leading-relaxed">
-          Need quick access? Use our pre-configured test credentials to instantly browse all 8 tracks:
-        </p>
-        <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
-          <span className="rounded-lg border border-border/80 bg-inset/80 px-2.5 py-1 text-fg">
-            test@letmelearn.dev
-          </span>
-          <span className="rounded-lg border border-border/80 bg-inset/80 px-2.5 py-1 text-fg">
-            password123
-          </span>
-        </div>
-        <div className="flex gap-2 pt-1">
-          <Button
-            type="button"
-            size="sm"
-            className="flex-1 font-semibold shadow-md shadow-accent/20"
-            disabled={busy}
-            onClick={handleQuickTestLogin}
-          >
-            {busy ? "Authenticating…" : "⚡ 1-Click Sign-In"}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={fillTestCredentials}
-            className="text-xs"
-          >
-            Pre-fill Form
-          </Button>
-        </div>
       </div>
 
       {/* Mode Switcher Tabs */}

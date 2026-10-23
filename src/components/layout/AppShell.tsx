@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { RequireSignIn } from "@/components/auth/RequireSignIn";
 import { AccountStrip } from "@/components/layout/AccountStrip";
 import { BackButton } from "@/components/layout/BackButton";
+import { BrightnessControl } from "@/components/layout/BrightnessControl";
 import { LogoMark } from "@/components/layout/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { CommandSearch } from "@/components/search/CommandSearch";
@@ -329,13 +330,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           >
             <Menu className="size-5" />
           </Button>
-          <BackButton compact />
+          {pathname !== "/" && <BackButton compact />}
           <Link to="/" className="flex min-w-0 items-center gap-2 text-fg ml-1">
             <LogoMark className="size-6 shrink-0" />
             <span className="font-display text-[17px] font-medium tracking-tight">{APP_NAME}</span>
           </Link>
         </div>
         <div className="flex shrink-0 items-center gap-1">
+          <BrightnessControl />
           <ThemeToggle />
           <Button
             variant="ghost"
@@ -542,7 +544,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <PanelLeftOpen className="size-4" />
                 </Button>
               ) : null}
-              <BackButton />
+              {pathname !== "/" && <BackButton />}
             </div>
             <div className="flex items-center gap-3">
               <Link
@@ -560,7 +562,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <FlaskConical className="size-3.5 text-pink-400" />
                 Labs
               </Link>
-              <div className="ml-2 pl-3 border-l border-border/70">
+              <div className="ml-2 pl-3 border-l border-border/70 flex items-center gap-1">
+                <BrightnessControl />
                 <ThemeToggle />
               </div>
             </div>

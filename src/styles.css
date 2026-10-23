@@ -34,6 +34,7 @@
   /* Text emphasis and links stay monochrome — see rule 2. */
   --color-accent: #d0d6e0;
   --color-accent-fg: #08090a;
+  --color-accent-contrast: #08090a;
   --color-link: #d0d6e0;
 
   /* The one electric accent: primary actions, focus, progress. */
@@ -80,6 +81,7 @@
     --color-faint: #71717a;
     --color-accent: #27272a;
     --color-accent-fg: #ffffff;
+    --color-accent-contrast: #ffffff;
     --color-link: #171717;
     --color-cta: #171717;
     --color-cta-fg: #ffffff;
@@ -105,6 +107,7 @@
   --color-faint: #71717a;
   --color-accent: #27272a;
   --color-accent-fg: #ffffff;
+  --color-accent-contrast: #ffffff;
   --color-link: #171717;
   --color-cta: #171717;
   --color-cta-fg: #ffffff;
@@ -117,6 +120,10 @@
 
   --shadow-panel: inset 0 0 0 1px var(--color-border);
   --shadow-lift: 0 4px 24px rgb(23 23 23 / 0.08);
+}
+
+html {
+  filter: brightness(var(--app-brightness, 1));
 }
 
 @layer base {

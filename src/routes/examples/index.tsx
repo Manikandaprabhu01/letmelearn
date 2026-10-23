@@ -101,7 +101,7 @@ function ExamplesIndex() {
             onClick={() => setActiveTab("cases")}
             className={`px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all ${
               activeTab === "cases"
-                ? "bg-accent text-accent-fg shadow-lg font-semibold"
+                ? "bg-accent text-accent-fg shadow-md font-semibold ring-1 ring-accent/50"
                 : "text-muted hover:text-fg hover:bg-surface/50"
             }`}
           >
@@ -111,7 +111,7 @@ function ExamplesIndex() {
             onClick={() => setActiveTab("blueprints")}
             className={`px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all ${
               activeTab === "blueprints"
-                ? "bg-accent text-accent-fg shadow-lg font-semibold"
+                ? "bg-accent text-accent-fg shadow-md font-semibold ring-1 ring-accent/50"
                 : "text-muted hover:text-fg hover:bg-surface/50"
             }`}
           >
@@ -121,7 +121,7 @@ function ExamplesIndex() {
             onClick={() => setActiveTab("framework")}
             className={`px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all ${
               activeTab === "framework"
-                ? "bg-accent text-accent-fg shadow-lg font-semibold"
+                ? "bg-accent text-accent-fg shadow-md font-semibold ring-1 ring-accent/50"
                 : "text-muted hover:text-fg hover:bg-surface/50"
             }`}
           >
@@ -131,7 +131,7 @@ function ExamplesIndex() {
             onClick={() => setActiveTab("companies")}
             className={`px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all ${
               activeTab === "companies"
-                ? "bg-accent text-accent-fg shadow-lg font-semibold"
+                ? "bg-accent text-accent-fg shadow-md font-semibold ring-1 ring-accent/50"
                 : "text-muted hover:text-fg hover:bg-surface/50"
             }`}
           >

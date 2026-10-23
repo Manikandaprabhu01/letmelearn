@@ -163,7 +163,7 @@ function HldIndex() {
             className={cn(
               "flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all",
               activeTab === "curriculum"
-                ? "bg-accent text-accent-contrast shadow-sm"
+                ? "bg-accent text-accent-fg font-semibold shadow-md ring-1 ring-accent/50"
                 : "border border-border/70 bg-surface/70 text-muted hover:bg-surface hover:text-fg"
             )}
           >
@@ -176,7 +176,7 @@ function HldIndex() {
             className={cn(
               "flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all",
               activeTab === "blueprints"
-                ? "bg-accent text-accent-contrast shadow-sm"
+                ? "bg-accent text-accent-fg font-semibold shadow-md ring-1 ring-accent/50"
                 : "border border-border/70 bg-surface/70 text-muted hover:bg-surface hover:text-fg"
             )}
           >
@@ -189,7 +189,7 @@ function HldIndex() {
             className={cn(
               "flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all",
               activeTab === "qa"
-                ? "bg-accent text-accent-contrast shadow-sm"
+                ? "bg-accent text-accent-fg font-semibold shadow-md ring-1 ring-accent/50"
                 : "border border-border/70 bg-surface/70 text-muted hover:bg-surface hover:text-fg"
             )}
           >
@@ -202,7 +202,7 @@ function HldIndex() {
             className={cn(
               "flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all",
               activeTab === "companies"
-                ? "bg-accent text-accent-contrast shadow-sm"
+                ? "bg-accent text-accent-fg font-semibold shadow-md ring-1 ring-accent/50"
                 : "border border-border/70 bg-surface/70 text-muted hover:bg-surface hover:text-fg"
             )}
           >
@@ -263,7 +263,7 @@ function HldIndex() {
                   className={cn(
                     "rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors",
                     selectedCompany === c.slug
-                      ? "bg-accent text-accent-contrast"
+                      ? "bg-accent text-accent-fg font-semibold shadow-sm ring-1 ring-accent/40"
                       : "border border-border/70 bg-surface text-muted hover:text-fg"
                   )}
                 >
