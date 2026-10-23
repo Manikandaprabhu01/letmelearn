@@ -24,10 +24,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ClientOnly } from "@/components/auth/ClientOnly";
+import { DisplayControl } from "@/components/layout/DisplayControl";
+import { LogoMark } from "@/components/layout/Logo";
 import { SignedIn, SignedOut } from "@/lib/auth/gates";
+import { useCurrentUser } from "@/lib/auth/use-current-user";
 import { formatPaise, priceFor } from "@/lib/billing/pricing";
 import { useCheckout } from "@/lib/billing/use-checkout";
 import { cn } from "@/lib/utils";
+import { APP_NAME } from "@/data/nav";
 import { COMPANY_COUNT, LIBRARY_ANSWER_COUNT, QUESTION_COUNT } from "@/data/interview/meta";
 
 export const Route = createFileRoute("/pricing")({ component: PricingPage });
@@ -198,8 +202,39 @@ function PricingPage() {
     setApplied(promoCode);
   };
 
+  const user = useCurrentUser();
+
   return (
-    <main className="px-4 py-12 sm:px-8 lg:px-12 max-w-7xl mx-auto space-y-12">
+    <div className="min-h-dvh bg-bg text-fg selection:bg-accent/20 selection:text-accent font-sans">
+      {/* Standalone Distraction-Free Header */}
+      <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-border/70 bg-bg/85 px-4 sm:px-8 backdrop-blur-xl">
+        <div className="flex items-center gap-3">
+          <Link to={user ? "/" : "/welcome"} className="flex items-center gap-2.5 text-fg">
+            <LogoMark className="size-6" />
+            <span className="font-display text-lg font-bold tracking-tight">{APP_NAME}</span>
+            <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-mono font-semibold text-accent border border-accent/30">
+              STUDIO 2.0
+            </span>
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Link
+            to={user ? "/" : "/welcome"}
+            className="text-xs sm:text-sm font-medium text-muted hover:text-fg transition-colors"
+          >
+            ← {user ? "Back to Studio" : "Back to Home"}
+          </Link>
+          <DisplayControl />
+          <Link to={user ? "/" : "/login"}>
+            <Button size="sm" className="font-medium text-xs">
+              {user ? "Open Studio" : "Sign In"}
+            </Button>
+          </Link>
+        </div>
+      </header>
+
+      <main className="px-4 py-12 sm:px-8 lg:px-12 max-w-7xl mx-auto space-y-12">
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto space-y-4">
         <div className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3.5 py-1 text-xs font-medium text-accent">
@@ -649,5 +684,6 @@ function PricingPage() {
         </p>
       </div>
     </main>
-  );
+  </div>
+);
 }

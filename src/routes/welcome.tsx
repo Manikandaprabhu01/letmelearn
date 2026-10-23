@@ -118,14 +118,42 @@ const TRACKS = [
 ];
 
 const HERO_SNIPPETS = {
-  architecture: `+-------------------------------------------------------------------------+
-|                  UBER REAL-TIME GEOSPATIAL DISPATCH                     |
-+-------------------------------------------------------------------------+
- [Driver GPS] ──> [Envoy Edge] ──> [H3 Spatial Index] ──> [Redis Geo Cluster]
-                                           │
- [Rider Ping] ──> [Matching Svc] ──> [kRing(Cell, r=2)] ──> [15s Redlock]
-                                           │
-                                  [Trip State Machine]`,
+  architecture: `+--------------------------------------------------------------------------------------------------------+
+| REAL-TIME EVENT FLOW: HIGH-CONCURRENCY RIDE MATCHING & DISPATCH (UBER / LYFT)                          |
++--------------------------------------------------------------------------------------------------------+
+ [1. Driver Location Ping (every 4s)]                 [2. Rider Ride Request (POST /v1/trips)]
+   Payload: {driverId: "d_8821", lat: 37.77,             Payload: {riderId: "r_1092", pickup: (37.78, -122.41),
+             lon: -122.42, bearing: 180, speed: 28}                tier: "UberX", paymentNonce: "tok_visa_491"}
+        │                                                         │
+        ▼                                                         ▼
+ [Envoy L7 Edge Gateway (TLS 1.3 Term)]               [Envoy L7 Edge Gateway (Token Bucket 100 req/s)]
+        │                                                         │
+        ▼ (<1.5ms)                                                ▼ (<2.1ms)
+ [Location Ingestion Service (gRPC/HTTP2)]            [Trip Orchestrator Service (Saga State Machine)]
+        │                                                         │
+        ├──► Step 1a: Quantize to Uber H3 Hex Cell                ├──► Step 2a: Map pickup to H3 Cell: 8828308281fffff
+        │             Lat/Lon ──► Cell: 8828308281fffff           │             Call kRing(cell, radius=2) ──► 19 Hex Cells
+        │                                                         │
+        ├──► Step 1b: Atomic Spatial Cache Update (Redis)         ├──► Step 2b: Query Spatial Index in Redis Cluster
+        │             GEOADD h3:8828308281fffff -122.42 37.77 d_8821│             SMEMBERS on 19 cells ──► 14 candidate drivers
+        │             EXPIRE 10s (Auto-evict stale telemetry)     │
+        │                                                         ▼
+        ├──► Step 1c: Stream to Kafka [topic: driver.telemetry]  [3. Matching & Routing Engine (Valhalla / OSRM)]
+        │             Key: driver_id, acks=all (Surge Compute)     ├── Filter: driver_state == 'AVAILABLE' && rating >= 4.7
+        │                                                          ├── Matrix ETA calc: 14 candidates ──► Best ETA: 2.8 mins
+        ▼                                                          └── Winner: Driver "d_8821" (ETA 2.8m, Dist: 0.8mi)
+ [Surge Pricing Engine (Apache Flink)]                             │
+   Calculates H3 hex supply/demand ratio in 10s windows           ▼
+   Surge multiplier: 1.4x injected into rider quote       [4. Distributed Lock Acquisition (Redis Redlock)]
+                                                                   ├── SET lock:driver:d_8821 rider_1092 NX PX 15000 (15s lease)
+                                                                   ├── If Locked By Another Rider: Fallback to rank #2 candidate
+                                                                   └── Success: Transition trip status ──► 'DISPATCH_OFFERED'
+                                                                   │
+                                                                   ├──► [5a. Push Dispatch Notification via WebSocket / APNs]
+                                                                   │          To Driver "d_8821" with 15-second countdown timer
+                                                                   │
+                                                                   └──► [5b. Emit Audit Event to Kafka [topic: trips.dispatched]]
+                                                                              Trip Ledger in PostgreSQL (ACID) + ScyllaDB History`,
   code: `// High-Performance Concurrent LRU Cache (Lock-Striped)
 public V get(K key) {
     int segment = hash(key) & (NUM_SEGMENTS - 1);

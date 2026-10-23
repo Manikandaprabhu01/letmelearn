@@ -569,6 +569,93 @@ export function FdeCourseHub() {
               </div>
             </div>
           </div>
+
+          {/* Real-Time Production Flow: Enterprise Agentic RAG & Swarm Architecture */}
+          <div className="rounded-2xl border border-border/80 bg-surface/70 p-6 sm:p-8">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3">
+              <div>
+                <h3 className="font-display text-xl font-medium tracking-tight text-emerald-400">
+                  Real-Time Production Flow: Enterprise Agentic RAG, Tool Calling &amp; Inference Pipeline
+                </h3>
+                <p className="mt-1 text-xs text-muted">
+                  End-to-end packet flow through Guardrails, Semantic Query Router, Hybrid Search (BM25 + HNSW), vLLM PagedAttention, and Air-Gapped MCP Sandboxes.
+                </p>
+              </div>
+              <span className="font-mono text-[11px] text-muted rounded-md bg-inset px-2.5 py-1 border border-border/60">
+                P99 Response TTFT: &lt;450ms
+              </span>
+            </div>
+
+            <pre className="mt-4 overflow-x-auto rounded-xl bg-inset p-4 font-mono text-xs text-fg leading-relaxed">
+{`+---------------------------------------------------------------------------------------------------+
+| REAL-TIME EXECUTION FLOW: ENTERPRISE AGENTIC RAG, SWARM ORCHESTRATION & INFERENCE ENGINE          |
++---------------------------------------------------------------------------------------------------+
+
+ [1. Inbound Enterprise User Prompt]
+   "Investigate 2026 Q3 supply chain breach in SAP and calculate total financial exposure."
+        │
+        ▼ (mTLS 1.3 / Enterprise VPN into Customer Air-Gapped VPC)
+ [2. Ingress Security Gateway & NeMo Guardrails Filter]
+   ├── Step 2a: Input Sanitization: Prompt injection check & jailbreak pattern scan (0.8ms)
+   ├── Step 2b: PII / PCI Masking: Replace SSNs, employee names, and account numbers with tokens
+   └── Step 2c: Tenant RBAC Token Validation: Verify user holds 'finance_read' role in Okta JWT
+        │
+        ▼ (Permitted ──► Forwarded to Agent Orchestrator)
+ [3. Semantic Query Decomposition & Sub-Task Planning (Router Model)]
+   Fast Orchestrator (Claude 3.5 Sonnet / GPT-4o-mini, 140ms TTFT) decomposes query into 2 parallel tasks:
+   ├── Sub-Task A: Document Search ──► Retrieve incident root cause from PDF knowledge base
+   └── Sub-Task B: Financial Tool Call ──► Query SAP OData Ledger API for dollar impact
+        │
+        ├──► [4. HYBRID RETRIEVAL PIPELINE (BM25 + Dense Vector Embeddings)]
+        │      ├── Step 4a: Dense Embedding: Generate 3072-dim vector via text-embedding-3-large
+        │      ├── Step 4b: Dual Search Execution:
+        │      │     ├── Dense Vector Search: Qdrant HNSW cosine similarity search (top 40 chunks)
+        │      │     └── Sparse Lexical Search: BM25 keyword inverted index match (top 40 chunks)
+        │      ├── Step 4c: Reciprocal Rank Fusion (RRF with k=60):
+        │      │     Score(d) = Σ [ 1 / (60 + Rank_dense(d)) + 1 / (60 + Rank_bm25(d)) ]
+        │      └── Step 4d: Cross-Encoder Rerank (FlashRank / Cohere Rerank-v3):
+        │            Filter top 80 candidates down to top 4 highest-relevance context chunks (35ms)
+        │
+        └──► [5. SECURE MODEL CONTEXT PROTOCOL (MCP) TOOL EXECUTION]
+               ├── Step 5a: Agent emits tool intent: call_tool("sap_finance_ledger", {quarter: "Q3"})
+               ├── Step 5b: Sandbox Gateway validates read-only permission & scopes SQL WHERE clause
+               ├── Step 5c: Query SAP HANA / Snowflake warehouse (<120ms)
+               └── Step 5d: Return structured JSON payload to Agent working memory
+        │
+        ▼
+ [6. High-Throughput Inference Engine (vLLM / TensorRT-LLM on 8x H100 GPUs)]
+   ├── Continuous Batching: Dynamic iteration-level scheduling (Zero idle GPU time)
+   ├── PagedAttention KV Cache: Allocate non-contiguous virtual memory blocks (Zero memory fragmentation)
+   └── Speculative Decoding: 7B Draft model generates 4 tokens ──► 70B Target model verifies in 1 step (2.8x speedup)
+        │
+        ▼
+ [7. Groundedness Evaluation & Streaming Output]
+   ├── Step 7a: RAG Triad Validation: Context Relevance (0.96), Groundedness (0.98), Answer Faithfulness (0.97)
+   ├── Step 7b: Synthesize Answer: "The Q3 supplier breach at Munich facility caused $4.2M inventory disruption..."
+   └── Step 7c: Stream Server-Sent Events (SSE) to Web UI with interactive source PDF citation badges!`}
+            </pre>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-3 text-xs">
+              <div className="rounded-xl border border-border/60 bg-inset/60 p-3">
+                <span className="font-semibold text-emerald-400 block mb-1">NeMo Guardrails Gate</span>
+                <span className="text-muted leading-relaxed">
+                  Strips malicious prompt injections and masks client PII before queries ever touch foundation model memory buffers.
+                </span>
+              </div>
+              <div className="rounded-xl border border-border/60 bg-inset/60 p-3">
+                <span className="font-semibold text-amber-400 block mb-1">Hybrid RRF Reranking</span>
+                <span className="text-muted leading-relaxed">
+                  Combines semantic vectors (Qdrant HNSW) with exact keyword matching (BM25), eliminating hallucinated document omissions.
+                </span>
+              </div>
+              <div className="rounded-xl border border-border/60 bg-inset/60 p-3">
+                <span className="font-semibold text-blue-400 block mb-1">PagedAttention vLLM</span>
+                <span className="text-muted leading-relaxed">
+                  Partitions LLM Key-Value caches like OS virtual memory pages, slashing memory overhead by 80% under concurrent load.
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

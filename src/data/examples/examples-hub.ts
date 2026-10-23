@@ -50,46 +50,45 @@ export const SYSTEM_BLUEPRINTS: SystemBlueprint[] = [
     summary:
       "A distributed geospatial architecture capable of ingesting high-throughput GPS location pings from millions of mobile drivers, indexing coordinates dynamically via Uber H3 hexagonal spatial cells, and executing concurrent multi-criteria matching (ETA, driver rating, vehicle tier) with zero double-booking.",
     diagram: `+---------------------------------------------------------------------------------------------------+
-|                        UBER REAL-TIME GEOSPATIAL DISPATCH ARCHITECTURE                            |
+| REAL-TIME EVENT FLOW: UBER / LYFT GEOSPATIAL DISPATCH & SURGE ENGINE                              |
 +---------------------------------------------------------------------------------------------------+
 
- [Driver App] (GPS ping every 4s)                 [Rider App] (Request Ride)
-       │                                                 │
-       ▼                                                 ▼
- [Envoy Edge Gateway / SSL]                       [Envoy Edge Gateway / SSL]
-       │                                                 │
-       ├──(gRPC Location Stream)                         ├──(REST / HTTP/2)
-       │                                                 │
-       ▼                                                 ▼
-+──────────────────────+                           +────────────────────────+
-| Location Ingest Svc  |                           | Ride Request Service   |
-+──────────────────────+                           +────────────────────────+
-       │                                                 │
-       ├───> [Kafka Cluster: 'driver-locations']         │  (Find nearby drivers)
-       │             │                                   │
-       │             ▼                                   ▼
-       │      +──────────────────────+             +────────────────────────+
-       │      | H3 Spatial Index Svc | <────────── | Matching Engine Svc    |
-       │      +──────────────────────+             +────────────────────────+
-       │             │                                   │
-       │             ▼                                   │  1. Compute H3 k-ring (radius)
-       │      +──────────────────────+                   │  2. Filter drivers by state & tier
-       │      | Redis Geo / Memcached|                   │  3. Calculate ETAs via Routing Engine
-       │      | (H3 Hex Cell -> IDs) |                   │
-       │      +──────────────────────+                   ▼
-       │                                           +────────────────────────+
-       │                                           | Distributed Lock (DLM) |
-       │                                           | (Lock driver for 15s)  |
-       │                                           +────────────────────────+
-       │                                                 │
-       ▼                                                 ▼
-+──────────────────────+                           +────────────────────────+
-| Surge Pricing Engine |                           | Trip State Machine     |
-| (Supply/Demand Heat) |                           | (Postgres + ScyllaDB)  |
-+──────────────────────+                           +────────────────────────+
-       │                                                 │
-       └──────────────────> [Push Notification] <────────┘
-                            (APNs / FCM Socket to Driver)
+ [1. Driver Ping Stream (every 4s)]                    [2. Rider Ride Request (POST /v1/trips)]
+   Payload: {driverId: "d_9912", lat: 37.7749,            Payload: {riderId: "r_3342", pickup: (37.781, -122.41),
+             lon: -122.4194, bearing: 90, speed: 32}                 tier: "UberX", nonce: "req_tok_991"}
+        │ (gRPC Stream over mTLS)                              │ (HTTPS / TLS 1.3 - 14ms RTT)
+        ▼                                                      ▼
+ [Envoy L7 Edge Gateway (DDOS / Rate Limit)]           [Envoy L7 Edge Gateway (Rate Limiter)]
+        │                                                      │
+        ▼ (<1.2ms)                                             ▼ (<1.8ms)
+ [Location Ingestion Service (Go)]                     [Trip Orchestrator Service (K8s)]
+        │                                                      │
+        ├──► 1a. Spatial Quantization                          ├──► 2a. Map pickup to H3 Hex: 8828308281fffff
+        │        H3.geoToH3(37.7749, -122.4194, res=8)         │        Call H3.kRing(8828308281fffff, radius=2)
+        │        ──► Cell Index: 8828308281fffff               │        ──► Returns 19 neighboring Hex Cells
+        │                                                      │
+        ├──► 1b. Write Ephemeral Cell Location                 ├──► 2b. Query Available Drivers Across 19 Cells:
+        │        Redis: SADD h3:8828308281fffff d_9912         │        Redis: SUNION h3:cell_1 h3:cell_2 ...
+        │        Redis: SET driver:loc:d_9912 (lat, lon)       │        Result: 16 candidate driver IDs (<1.5ms)
+        │        Redis: EXPIRE 10s (Auto-evict stale pings)    │
+        │                                                      ▼
+        └──► 1c. Stream to Kafka ['driver-locations']         [3. Candidate Filter & Routing ETA Calculation]
+                 Partition key: driver_id                      ├── Filter: status == 'AVAILABLE' && rating >= 4.7
+                 Consumed by: Surge Engine & Telemetry         ├── Query OSRM/Valhalla Engine: Matrix ETA calc
+                                                               └── Winner: Driver d_9912 (ETA: 3.2 mins, Dist: 0.9mi)
+                                                               │
+                                                               ▼
+                                                      [4. Atomic Lock Acquisition (Redis Distributed Lock)]
+                                                               ├── SET lock:driver:d_9912 rider_3342 NX PX 15000
+                                                               ├── If Acquired: Transition Trip ──► 'DISPATCH_OFFERED'
+                                                               └── If Contested: Fallback to rank #2 candidate driver
+                                                               │
+                                                               ├──► [5a. Push Offer via WebSocket / Apple APNs]
+                                                               │          Dispatches offer to Driver d_9912 (15s timer)
+                                                               │
+                                                               └──► [5b. Write Durable Ledger Record]
+                                                                          PostgreSQL: INSERT into trips (ACID transaction)
+                                                                          ScyllaDB: Log GPS tracking trail for audit
 `,
     dataFlow: [
       "1. Driver ping: Mobile driver sends {driverId, lat, lon, bearing, speed} over gRPC every 4 seconds to Location Ingestion.",
@@ -131,45 +130,40 @@ export const SYSTEM_BLUEPRINTS: SystemBlueprint[] = [
     summary:
       "A planetary media ingestion and distribution pipeline. Raw ProRes video masters (terabytes in size) are split into parallel chunks, transcoded into hundreds of bitrate/resolution/codec permutations (H.264, HEVC, AV1), packaged into Dynamic Adaptive Streaming (DASH/HLS) manifests, and pre-positioned on ISP edge caching appliances (Open Connect).",
     diagram: `+---------------------------------------------------------------------------------------------------+
-|                   NETFLIX VIDEO ENCODING & OPEN CONNECT CDN ARCHITECTURE                          |
+| REAL-TIME VIDEO ENCODING & ABR PLAYBACK FLOW: NETFLIX TITAN & OPEN CONNECT CDN                    |
 +---------------------------------------------------------------------------------------------------+
 
- [Studio Production]
-       │ (Upload Master ProRes 4K/HDR, ~1 TB)
-       ▼
- [Amazon S3 Ingest Bucket]
-       │
-       ▼ (Event Trigger)
-+───────────────────────────────────────────────────────────────────+
-|               TITAN ORCHESTRATION PIPELINE (AWS)                  |
-|                                                                   |
-| 1. Video Inspection & Audio Slicing                               |
-| 2. Video Chunk Splitting: Scene-based cut into 2-5 sec chunks     |
-| 3. Parallel Transcoding Farm: Thousands of EC2 Spot Instances     |
-|                                                                   |
-|     +───────────────+   +───────────────+   +───────────────+     |
-|     | Worker 1: AV1 |   | Worker 2: HEVC|   | Worker 3: H264|     |
-|     | 1080p @ 2Mbps |   | 4K HDR @ 8Mbps|   | 480p @ 500kbps|     |
-|     +───────────────+   +───────────────+   +───────────────+     |
-|            │                   │                   │              |
-|            └───────────────────┼───────────────────┘              |
-|                                ▼                                  |
-|            4. Assembler & Manifest Generator (DASH / HLS)         |
-+───────────────────────────────────────────────────────────────────+
-       │
-       ├───> Master Assets Store (Amazon S3 Multi-Region)
-       │
-       ▼
-+───────────────────────────────────────────────────────────────────+
-|               PROACTIVE CDN CACHING (OFF-PEAK SYNC)               |
-+───────────────────────────────────────────────────────────────────+
-       │
-       ├───> [Netflix Open Connect Appliance (OCA)] (Inside Comcast ISP)
-       ├───> [Netflix Open Connect Appliance (OCA)] (Inside Vodafone ISP)
-       └───> [Netflix Open Connect Appliance (OCA)] (Inside Jio / Airtel)
-       │
-       ▼
- [Subscriber TV / Phone] ──(HTTP GET chunk_042_av1_1080p.m4s)──> [Local ISP OCA Edge]
+ [PHASE A: ASYNCHRONOUS INGESTION & MATRIX TRANSCODING PIPELINE]
+ [1. Film Studio Master Upload (Aspera UDP Transfer)]
+   Raw Apple ProRes 4K HDR master (1.2 TB) ──► Uploaded to Amazon S3 Multi-Region Ingest Bucket
+        │
+        ▼ (S3 Event Notification: ObjectCreated:Put)
+ [2. Titan Workflow Orchestration Engine (K8s / Mesos)]
+   ├── Step 2a: Scene-Cut Analysis: Scan frames to detect scene boundaries; cut into 2-4s chunks
+   ├── Step 2b: Dispatch to Transcoding Farm (10,000+ EC2 Spot Instances with Spot-Termination Handlers)
+   │     ├── Worker Pool 1: 4K UHD AV1 @ 12 Mbps (High-action scenes)
+   │     ├── Worker Pool 2: 1080p HEVC @ 3.5 Mbps (Mainstream TV profile)
+   │     └── Worker Pool 3: 480p H.264 @ 450 kbps (Mobile cellular profile)
+   └── Step 2c: Dynamic Manifest Generation: Assemble MPEG-DASH (.mpd) & HLS (.m3u8) byte-range index
+        │
+        ▼ (Proactive Off-Peak Cache Pre-positioning, 2 AM - 6 AM BGP Sync)
+ [3. Edge Distribution to Netflix Open Connect Appliances (OCAs)]
+   Custom FreeBSD Flash Storage Boxes deployed inside Comcast, Vodafone, Airtel, and Jio ISP racks
+
+ [PHASE B: REAL-TIME SUBSCRIBER STREAMING SESSION]
+ [4. Subscriber Clicks "Play" on Smart TV (Client PlayAPI Request)]
+   GET /playapi/v1/license?titleId=stranger_things_s4e1
+        │ (TLS 1.3 - 18ms latency to AWS Control Plane)
+        ▼
+   PlayAPI validates subscription & returns DRM Widevine Token + Manifest URL pointing to local OCA
+        │
+        ▼
+ [5. Adaptive Bitrate (ABR) Chunk Streaming Loop]
+   Smart TV Player initiates BOLA (Buffer Occupancy based Lyapunov Algorithm):
+   ├── Chunk 001: Fetch 480p segment (Fast startup, playback begins in <180ms)
+   ├── Buffer Fill Check: Network bandwidth measured at 48 Mbps, buffer level > 12s
+   ├── Chunk 002: Upgrade request to 1080p HEVC (HTTP GET /chunks/chunk_002_hevc_1080p.m4s)
+   └── Chunk 003+: Stable 4K AV1 stream served 100% locally from ISP OCA (0 hops, 0 buffering)
 `,
     dataFlow: [
       "1. Master Upload: Film studios upload mezzanine video files (~1-2 TB per movie) to AWS S3 via Aspera high-speed UDP transfer.",
@@ -211,41 +205,37 @@ export const SYSTEM_BLUEPRINTS: SystemBlueprint[] = [
     summary:
       "A battle-tested distributed messaging fabric engineered in Erlang/Elixir on FreeBSD. Maintains over 2 million persistent TCP/TLS connections per single server node, guarantees end-to-end encryption (Signal Protocol), and enforces a zero-storage privacy model where server memory acts as an ephemeral routing switch.",
     diagram: `+---------------------------------------------------------------------------------------------------+
-|                       WHATSAPP REAL-TIME MESSAGING ARCHITECTURE                                   |
+| REAL-TIME PACKET FLOW: WHATSAPP 2 BILLION CONNECTION INSTANT MESSAGING FABRIC                     |
 +---------------------------------------------------------------------------------------------------+
 
- [User A: Sender]                                              [User B: Receiver]
-       │                                                              │
-       │ (E2EE Signal Payload: Encrypted with User B's public key)    │
-       ▼                                                              ▼
-+─────────────────────────────────────+            +─────────────────────────────────────+
-| Edge Chat Gateway 1 (Erlang BEAM)   |            | Edge Chat Gateway 2 (Erlang BEAM)   |
-| (Maintains 2M concurrent TCP conns) |            | (Holds active TCP conn for User B)  |
-+─────────────────────────────────────+            +─────────────────────────────────────+
-       │                                                              ▲
-       │ 1. Validate auth token                                       │ 3. Forward message over
-       │ 2. Lookup User B location                                    │    established TCP conn
-       ▼                                                              │
-+─────────────────────────────────────────────────────────────────────┼─────────────────────+
-|                          ROUTING & PRESENCE FABRIC                  │                     |
-|                                                                     │                     |
-|   +──────────────────────────────+             +────────────────────┴──────────────+      |
-|   | Session Registry (Redis /    |             | Message Router (Mnesia / BEAM)    |      |
-|   | Distributed Hash Table)      |             +───────────────────────────────────+      |
-|   | {User_B -> Gateway_2_IP}     |                             ▲                          |
-|   +──────────────────────────────+                             │                          |
-+────────────────────────────────────────────────────────────────┼──────────────────────────+
-       │                                                         │
-       │ (If User B is OFFLINE)                                  │ (When User B connects)
-       ▼                                                         │
-+─────────────────────────────────────+                          │
-| Offline Message Store               | ─────────────────────────┘
-| (Cassandra / ScyllaDB FIFO Queue)   |
-| Retained for max 30 days            |
-+─────────────────────────────────────+
-       │
-       ▼ (Trigger APNs / FCM Wake-up Push)
- [Apple APNs / Google FCM Push Service] ──> [User B Phone Wakes Up & Connects to Gateway 2]
+ [1. User A (Sender Device)]
+   ├── Step 1a: Encrypt Payload locally via Signal Protocol Double Ratchet with User B's Public Key
+   │             Ciphertext: "d83f9a...c02" (Zero plaintext leaves device; server cannot read payload)
+   └── Step 1b: Stream binary frame over persistent TLS/TCP Socket (Port 443, minimal XMPP-like protocol)
+        │
+        ▼ (<14ms network RTT)
+ [2. Edge Chat Gateway Node 1 (Erlang BEAM on FreeBSD)]
+   ├── Host maintains 2,000,000+ persistent TCP connections via custom FreeBSD kqueue tuning
+   ├── Step 2a: Validate sender auth session & rate-limit check in local RAM (<0.08ms)
+   └── Step 2b: Query Global Session Registry (Distributed Hash Table in RAM / Mnesia):
+                 Lookup: Where is User B connected? ──► Returns Gateway_Node_42:Port 5222
+        │
+        ├──► [CASE 1: USER B IS ONLINE AT GATEWAY NODE 42]
+        │      ├── Step 3a: Erlang Process Messaging: Gateway 1 passes binary tuple to Gateway 42
+        │      ├── Step 3b: Gateway 42 writes frame to User B's open TCP socket (<1.5ms)
+        │      ├── Step 3c: User B device decrypts message & emits Single-Tick Delivery Receipt ACK
+        │      ├── Step 3d: Server immediately deallocates packet from RAM (Zero durable storage)
+        │      └── Step 3e: Gateway routes Delivery Tick back to User A (User A UI shows "Double Grey Tick ✓✓")
+        │
+        └──► [CASE 2: USER B IS CURRENTLY OFFLINE (Airplane Mode / Dead Battery)]
+               ├── Step 4a: Buffer Ciphertext in Offline Store (ScyllaDB / Cassandra FIFO Spool)
+               │             INSERT INTO offline_messages (user_id, msg_id, payload, created_at)
+               │             WITH TTL = 2592000 (Auto-expire after 30 days)
+               ├── Step 4b: Fire Wake-Up Push Notification:
+               │             Post payload notification to Apple APNs / Google FCM (Wake-up signal only)
+               └── Step 4c: Reconnect Trigger: When User B regains network, client opens TCP connection
+                             Gateway 42 flushes buffered FIFO queue to User B, awaits ACK, deletes rows,
+                             and emits double delivery ticks back to User A.
 `,
     dataFlow: [
       "1. End-to-End Encryption: Sender encrypts message body locally using Double Ratchet Algorithm (Signal Protocol). The server cannot read content.",
@@ -287,46 +277,75 @@ export const SYSTEM_BLUEPRINTS: SystemBlueprint[] = [
     summary:
       "A high-performance tier-1 infrastructure service enforcing rate limits (per API key, user ID, IP address, or organization) across globally distributed Envoy gateways using atomic Redis Lua sliding windows and multi-level local token bucket caching.",
     diagram: `+---------------------------------------------------------------------------------------------------+
-|                        DISTRIBUTED RATE LIMITER ARCHITECTURE                                      |
+| REAL-TIME EXECUTION FLOW: DISTRIBUTED RATE LIMITER & MULTI-TIER TOKEN BUCKET                      |
 +---------------------------------------------------------------------------------------------------+
 
- [Inbound API Requests: 10M RPS]
-       │
-       ▼
-+───────────────────────────────────────────────────────────────────+
-|               ENVOY API GATEWAY CLUSTER (EDGE / REGIONAL)         |
-|                                                                   |
-|  +─────────────────────────────────────────────────────────────+  |
-|  | Local Memory Token Bucket Filter (L1 Cache)                 |  |
-|  | - Allows fast-path requests locally if quota remains        |  |
-|  | - Refills in bulk batches (e.g. 100 tokens at a time)       |  |
-|  +─────────────────────────────────────────────────────────────+  |
-|                                │                                  |
-|                                │ (Quota exhausted or periodic sync)
-|                                ▼                                  |
-|  +─────────────────────────────────────────────────────────────+  |
-|  | Rate Limit gRPC Filter (Async, 1ms timeout)                 |  |
-|  +─────────────────────────────────────────────────────────────+  |
-+────────────────────────────────┼──────────────────────────────────+
-                                 │
-                 (gRPC: CheckRateLimit(key, tokens))
-                                 │
-                                 ▼
-+───────────────────────────────────────────────────────────────────+
-|               RATE LIMITING SERVICE CLUSTER (GO / RUST)           |
-+───────────────────────────────────────────────────────────────────+
-       │                                                 │
-       │ (Execute Atomic Sliding Window Lua)             │ (If Redis times out > 2ms)
-       ▼                                                 ▼
-+───────────────────────────────────+             +───────────────────────────────────+
-| Redis Cluster (Shard by Client ID)|             | Circuit Breaker: FAIL OPEN        |
-| - Key: ratelimit:{client_id}      |             | Log alert and allow request       |
-| - Sliding Window Sorted Set (ZSET)|             | (Prevent gateway outage)          |
-+───────────────────────────────────+             +───────────────────────────────────+
-       │
-       ├───> Under Limit  ──> Return HTTP 200 OK (Forward to upstream service)
-       └───> Over Limit   ──> Return HTTP 429 Too Many Requests
-                              (Headers: X-RateLimit-Limit, X-RateLimit-Remaining, Retry-After)
+ [1. Inbound HTTP Request: 10,000,000 QPS Peak]
+   GET /v1/payments/charges
+   Headers: { Host: "api.stripe.com", Authorization: "Bearer sk_live_9921a", X-Client-IP: "198.51.100.4" }
+        │
+        ▼ (Edge BGP Anycast Routing)
+ [2. Envoy L7 Edge Proxy Cluster]
+   ├── Step 2a: Extract Rate-Limit Domain & Descriptor Tuple:
+   │            Domain: "api_gateway" | Key: "api_key" | Value: "sk_live_9921a"
+   │
+   ├── Step 2b: L1 Thread-Local Token Bucket Check (C++ Memory)
+   │            ├── Read local atomic counter in worker thread cache (<0.02ms latency)
+   │            ├── If local tokens > 0: Decrement token and IMMEDIATELY forward to upstream
+   │            │   (95% of traffic served locally with ZERO network round-trip overhead!)
+   │            └── If local batch depleted: Proceed to Step 3 for centralized verification
+   │
+   └── Step 2c: Non-Blocking Async gRPC Call (envoy.service.ratelimit.v3.RateLimitService)
+        │
+        ▼ (<0.8ms gRPC over Unix Domain Socket / VPC Mesh)
+ [3. Rate Limiting Service Cluster (Go / Rust Tokio Workers)]
+   ├── Step 3a: Aggregate Token Quota Request (Batch refill request: 50 tokens)
+   │
+   └── Step 3b: Atomic Redis Sliding-Window Execution via EVALSHA Lua Script:
+        │
+        │ [Atomic Lua Execution inside Redis Memory: <0.5ms]
+        │ ┌──────────────────────────────────────────────────────────────────────────────┐
+        │ │ local key     = "ratelimit:" .. KEYS[1]                                      │
+        │ │ local now     = tonumber(ARGV[1])   -- Current epoch ms (1719201948120)      │
+        │ │ local window  = tonumber(ARGV[2])   -- 60000ms (1 minute window)             │
+        │ │ local limit   = tonumber(ARGV[3])   -- 1000 requests / minute max            │
+        │ │ -- 1. Purge expired request timestamps outside sliding window                │
+        │ │ redis.call('ZREMRANGEBYSCORE', key, 0, now - window)                         │
+        │ │ -- 2. Count active requests within current 60s sliding window                │
+        │ │ local current = redis.call('ZCARD', key)                                     │
+        │ │ if current < limit then                                                      │
+        │ │     redis.call('ZADD', key, now, now)                                        │
+        │ │     redis.call('EXPIRE', key, math.ceil(window / 1000))                      │
+        │ │     return { 1, limit - current - 1, 0 } -- { ALLOWED, REMAINING, RETRY_SEC }│
+        │ │ else                                                                         │
+        │ │     local oldest = redis.call('ZRANGE', key, 0, 0, 'WITHSCORES')             │
+        │ │     local retry_after = math.ceil((tonumber(oldest[2]) + window - now)/1000) │
+        │ │     return { 0, 0, retry_after }        -- { REJECTED, 0, RETRY_SEC }        │
+        │ │ end                                                                          │
+        │ └──────────────────────────────────────────────────────────────────────────────┘
+        │
+        ├──► [Branch 4a: ALLOWED (Quota Under Limit)]
+        │      ├── Redis returns: { status: 1, remaining: 482, retry_sec: 0 }
+        │      ├── Envoy forwards packet to Upstream Payment Microservice
+        │      └── Injects Response Headers:
+        │            X-RateLimit-Limit: 1000
+        │            X-RateLimit-Remaining: 482
+        │            X-RateLimit-Reset: 1719202008
+        │
+        ├──► [Branch 4b: REJECTED (HTTP 429 Too Many Requests)]
+        │      ├── Redis returns: { status: 0, remaining: 0, retry_sec: 14 }
+        │      ├── Envoy short-circuits request (Upstream service NEVER touched, 0% CPU wasted)
+        │      └── Returns HTTP 429 Payload:
+        │            HTTP/2 429 Too Many Requests
+        │            Retry-After: 14
+        │            Content-Type: application/json
+        │            {"error": "rate_limit_exceeded", "message": "Quota 1000 req/min reached"}
+        │
+        └──► [Branch 4c: RESILIENCE & FAIL-OPEN CIRCUIT BREAKER]
+               ├── Scenario: Redis Cluster network partition or P99 latency > 2.0ms
+               ├── Envoy Circuit Breaker trips: State ──► OPEN (Fail Open Policy)
+               ├── Bypass Rate Limiter: Forward request to preserve 99.999% gateway availability
+               └── Fire Prometheus Alert: [CRIT] RateLimiterDegraded_FailOpenEngaged
 `,
     dataFlow: [
       "1. Request Interception: Envoy Edge Gateway receives HTTP/gRPC request and extracts rate-limit identity key (e.g., `api_key:sk_live_9281`).",
@@ -368,55 +387,73 @@ export const SYSTEM_BLUEPRINTS: SystemBlueprint[] = [
     summary:
       "A planetary-scale web crawler modeled after Mercator and Googlebot. Features a two-stage politeness & priority URL Frontier, distributed robots.txt caching, bloom filter deduplication, asynchronous DNS resolver pools, and content SimHash near-duplicate detection.",
     diagram: `+---------------------------------------------------------------------------------------------------+
-|                        DISTRIBUTED WEB CRAWLER & URL FRONTIER                                     |
+| REAL-TIME CRAWL & DEDUP PIPELINE: PLANETARY WEB CRAWLER & MERCATOR FRONTIER                       |
 +---------------------------------------------------------------------------------------------------+
 
- [Seed URLs: 100M URLs]
-       │
-       ▼
-+───────────────────────────────────────────────────────────────────+
-|                       MERCATOR URL FRONTIER                       |
-|                                                                   |
-|  1. PRIORITY QUEUES (F1, F2, F3... Fn based on PageRank & Quality)|
-|     Selects highest value URLs first                              |
-|                                │                                  |
-|                                ▼                                  |
-|  2. POLITENESS ROUTER (Hash Hostname -> Politeness Queue)         |
-|     - Ensures max 1 request every 1.5s per unique domain          |
-|     - Enforces robots.txt crawl-delay constraints                 |
-|                                                                   |
-|     [Host: cnn.com]      [Host: nytimes.com]    [Host: wiki.org]  |
-|     (Queue 1: FIFO)      (Queue 2: FIFO)        (Queue 3: FIFO)   |
-+────────────────────────────────┼──────────────────────────────────+
-                                 │
-                                 ▼
-+───────────────────────────────────────────────────────────────────+
-|               DISTRIBUTED CRAWLER WORKERS (ASYNC I/O)             |
-+───────────────────────────────────────────────────────────────────+
-       │
-       ├───> 1. DNS Cache Resolver (Custom unbound DNS pool, 24h TTL)
-       ├───> 2. Robots.txt Evaluator (Redis cached AST parsed rules)
-       ├───> 3. HTTP Client (Fetch page with stream timeout & size limit)
-       │
-       ▼
- [Raw HTML Document Payload]
-       │
-       ├───> Document Dedup: SimHash (64-bit Hamming distance <= 3) ──> Discard if duplicate
-       ├───> Document Storage: Compress to WARC format ──> [Amazon S3 / Ceph Object Store]
-       │
-       ▼
- [HTML Parser & Link Extractor]
-       │
-       ▼ (Extracted New Outbound URLs)
-+───────────────────────────────────────────────────────────────────+
-|                      URL FILTER & DEDUP PIPELINE                  |
-|                                                                   |
-|  1. URL Normalization (canonicalize casing, strip anchor tags)    |
-|  2. URL Seen Filter (Scalable Bloom Filter + RocksDB Index)       |
-+────────────────────────────────┼──────────────────────────────────+
-                                 │ (Only unseen URLs)
-                                 ▼
-                     (Feed back into URL Frontier)
+ [1. Frontier Priority Dequeue: 10,000 URLs / second]
+   Mercator Priority Front Queues (F1...Fn: categorized by PageRank, Domain Authority, Freshness)
+        │
+        ▼ (Biased Lottery Selection: Top 10% highest quality seeds picked first)
+ [2. Politeness Hostname Router & Per-Domain Back Queues (B1...Bm)]
+   ├── Step 2a: Extract Root Domain Hash: hash("nytimes.com") % M ──► Bucket B_4091
+   │
+   ├── Step 2b: Politeness Min-Heap Priority Queue:
+   │            ├── Key: Domain | Value: next_allowed_fetch_time (Epoch ms)
+   │            ├── Enforce Host Delay: Current time >= (Last Fetch + 1500ms crawl delay)
+   │            └── Check robots.txt directive: Respect "Crawl-delay: 2" if declared
+   │
+   └── Step 2c: Pop Ready URL: "https://nytimes.com/2026/10/deep-space-probe.html"
+        │
+        ▼ (Dispatched over ZeroMQ / gRPC to Worker Cluster)
+ [3. Async Crawler Worker Node (Rust Tokio Runtime, 25,000 Concurrent Sockets)]
+   ├── Step 3a: DNS Prefetch & Local Cache Check:
+   │            ├── Query local Unbound DNS cache daemon (<0.4ms)
+   │            └── Avoid external authoritative DNS timeout spikes (Prevents worker stalling)
+   │
+   ├── Step 3b: Robots.txt Ruleset Evaluation:
+   │            ├── Redis Cache Lookup: GET robots:nytimes.com (<0.5ms)
+   │            └── Fast AST Match: Disallow: /admin, Allow: /2026/* ──► Status: PERMITTED
+   │
+   ├── Step 3c: Non-Blocking HTTP/2 GET over TLS 1.3:
+   │            ├── Request Header: User-Agent: "GrokBot/2.0 (+https://example.com/bot)"
+   │            ├── Stream Read Payload (Enforce 10MB streaming size limit to prevent memory bomb)
+   │            └── Response Received: HTTP 200 OK (218 KB compressed HTML, 64ms wire latency)
+   │
+   └── Step 3d: 64-Bit SimHash Near-Duplicate Detection:
+        │
+        │ [SimHash Vector Calculation: Extract 5-gram shingles & term weights]
+        │ ├── Generated 64-bit fingerprint: 0x9e3779b97f4a7c15
+        │ ├── Query RocksDB SimHash Index: Split 64 bits into 4 x 16-bit table lookups
+        │ └── Hamming Distance Check:
+        │       ├── If HammingDistance(hash, existing_hashes) <= 3:
+        │       │   ──► NEAR DUPLICATE (Mirror site / syndicated article)
+        │       │   ──► ACTION: Discard payload immediately (Saves petabytes of raw storage!)
+        │       └── If HammingDistance > 3:
+        │           ──► UNIQUE DOCUMENT: Proceed to Storage and Link Extraction
+        │
+        ├──► [4. Archival Compression & Durable Storage]
+        │      ├── Package raw HTML + response headers into standard WARC record format
+        │      ├── Gzip compress into 1GB multi-record chunks (Snappy / Zstandard)
+        │      └── Append to Ceph / Amazon S3 Object Storage Bucket: s3://crawl-archive/2026-10/
+        │
+        └──► [5. HTML Lexer & URL Extraction Pipeline]
+               ├── Fast C++ Lexbor Parser extracts all outbound <a href="..."> hyperlinks
+               ├── Extracted 142 raw target URLs from document
+               │
+               ▼
+ [6. URL Canonicalization & Seen-Filter Engine]
+   ├── Step 6a: Canonicalize: Lowercase scheme/host, strip fragments (#section), remove utm_* tags
+   │
+   └── Step 6b: Scalable Bloom Filter Membership Test (O(1) Memory Lookup):
+        │
+        │ [MurmurHash3 x 8 Hash Functions across 10-Billion-Bit Bitmap]
+        │ ├── If all 8 bits == 1:
+        │ │   ──► ALREADY SEEN OR QUEUED (Drop URL, prevent infinite crawling loops)
+        │ └── If any bit == 0:
+        │     ──► UNSEEN NEW URL DISCOVERED!
+        │     ──► Set all 8 bits = 1 in Bloom Filter
+        │     ──► Append URL to RocksDB persistent seen-set on NVMe SSD
+        │     └── Enqueue URL into Step 1 Frontier Priority Queues (Continuous Loop)
 `,
     dataFlow: [
       "1. Seed Ingestion: Frontier initializes with curated high-PageRank seed URLs.",

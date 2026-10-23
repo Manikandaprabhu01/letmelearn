@@ -436,59 +436,191 @@ export function DatabasesHub() {
             </div>
           </div>
 
-          {/* Visual ASCII Flow */}
-          <div className="grid gap-6 lg:grid-cols-2">
+          {/* Real-Time Visual Architecture Execution Flows */}
+          <div className="space-y-6">
+            {/* Real-Time Flow 1: B+ Tree & WAL Lifecycle */}
             <div className="rounded-2xl border border-border/80 bg-surface/70 p-6">
-              <h3 className="font-display text-lg font-medium text-amber-400">
-                B+ Tree Slotted Page Anatomy (8KB Page)
-              </h3>
-              <pre className="mt-3 overflow-x-auto rounded-xl bg-inset p-4 font-mono text-xs text-fg leading-relaxed">
-{`┌───────────────────────────────────────────────┐
-│ Page Header (LSN, Checksum, Flags, Free Space) │
-├───────────────┬───────────────┬───────────────┤
-│ Line Pointer 1│ Line Pointer 2│ Line Pointer 3│ ... (grows down)
-├───────────────┴───────────────┴───────────────┤
-│                 FREE SPACE                    │
-│                 (Unallocated)                 │
-├───────────────────────────────────────────────┤
-│ Tuple 3 (xmin, xmax, data: "Alice")           │ ... (grows up)
-├───────────────────────────────────────────────┤
-│ Tuple 2 (xmin, xmax, data: "Bob")             │
-├───────────────────────────────────────────────┤
-│ Tuple 1 (xmin, xmax, data: "Charlie")         │
-└───────────────────────────────────────────────┘`}
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3">
+                <h3 className="font-display text-lg font-medium text-amber-400">
+                  Real-Time B+ Tree Write/Commit Flow: Slotted Pages, Buffer Pool &amp; WAL (PostgreSQL / InnoDB)
+                </h3>
+                <span className="font-mono text-[11px] text-muted rounded-md bg-inset px-2 py-0.5 border border-border/60">
+                  Write Path Latency: ~0.8ms (fsync on WAL)
+                </span>
+              </div>
+              <pre className="mt-4 overflow-x-auto rounded-xl bg-inset p-4 font-mono text-xs text-fg leading-relaxed">
+{`+---------------------------------------------------------------------------------------------------+
+| REAL-TIME EXECUTION FLOW: IN-PLACE B+ TREE MUTATION & ARIES COMMIT PROTOCOL                        |
++---------------------------------------------------------------------------------------------------+
+
+ [1. Inbound SQL Write: UPDATE accounts SET balance = balance - 100 WHERE id = 42;]
+        │
+        ▼ (Postgres Backend Process / Query Executor)
+ [2. Index Root Traversal & Buffer Pool Frame Pinning]
+   ├── Step 2a: Traverse B+ Tree Root (Page 0) ──► Internal Node (Page 14) ──► Leaf Node (Page 108)
+   │
+   ├── Step 2b: Buffer Pool Hash Table Lookup (Page 108):
+   │            ├── [Cache Hit]: Page found in shared_buffers RAM (0.05µs latency)
+   │            │   ──► Acquire Exclusive Buffer Pin & Latch (Lock Page 108 in memory)
+   │            └── [Cache Miss]: Allocate free frame from Clock-Sweep algorithm
+   │                ──► Trigger NVMe Direct I/O read: 8KB block loaded into RAM (45µs latency)
+   │
+   └── Step 2c: In-Memory Slotted Page Mutation (MVCC Non-Destructive Update):
+        │
+        │ [Page 108 Anatomy: 8KB In-Memory Block]
+        │ ┌──────────────────────────────────────────────────────────────────────────────┐
+        │ │ Page Header (LSN: 0/1A92015, Checksum, lower=32, upper=7840, free_space=7808)│
+        │ ├──────────────┬──────────────┬──────────────┬────────────────────────────────┤
+        │ │ LinePtr 1: 0 │ LinePtr 2: 48│ LinePtr 3: 96│ LinePtr 4: (points to new tuple)│ (Grows down)
+        │ ├──────────────┴──────────────┴──────────────┴────────────────────────────────┤
+        │ │                                FREE SPACE                                   │
+        │ ├─────────────────────────────────────────────────────────────────────────────┤
+        │ │ [New Tuple #4]: xmin=CurrentXID, xmax=0, id=42, balance=900 (Grows UP)      │
+        │ │ [Old Tuple #3]: xmin=OldXID, xmax=CurrentXID (Marked dead for VACUUM)       │
+        │ └─────────────────────────────────────────────────────────────────────────────┘
+        │
+        ▼
+ [3. WAL Record Generation (ARIES Redo/Undo Logging Protocol)]
+   ├── Step 3a: Write Redo Vector into WAL Buffer:
+   │            Record: [LSN: 0/1A92015, Type: HEAP2_UPDATE, Page: 108, Offset: 7840, Len: 64]
+   │
+   ├── Step 3b: Update Page Header LSN: Set Page 108 LSN = 0/1A92015
+   │            (Crucial rule: WAL record LSN MUST precede dirty page flush to disk!)
+   │
+   └── Step 3c: Mark Buffer Pool Frame = DIRTY (Do NOT write dirty page to table disk yet!)
+        │
+        ▼
+ [4. Transaction Commit & Synchronous WAL Flush (The fsync Barrier)]
+   ├── Client sends: COMMIT;
+   ├── Engine appends COMMIT Record to WAL Buffer: [LSN: 0/1A92016, Type: COMMIT]
+   ├── Trigger Synchronous Disk Flush: fsync(wal_fd) on pg_wal/00000001000000000000001A (0.8ms)
+   └── Return Success to Client: COMMIT OK (Guaranteed durable against crash / power loss!)
+        │
+        ▼ (Asynchronous Background Thread, Completely Decoupled from Client Latency)
+ [5. Checkpointer & Background Writer Flushes (Every 5 Minutes / 1GB WAL)]
+   ├── Scan shared_buffers for Dirty Pages
+   ├── Flush Page 108 to physical tablespace disk: /base/16384/2619
+   └── Record Checkpoint LSN in global control file (Allows safe truncation of older WAL logs)`}
               </pre>
               <p className="mt-3 text-xs text-muted leading-relaxed">
-                Slotted pages prevent external memory fragmentation. When a row changes size, only its
-                internal line pointer and byte offset are updated; the external physical page address
-                remains invariant.
+                <strong className="text-amber-400">Production Key Insight:</strong> The B+ Tree architecture achieves durability with minimal latency because only the sequential WAL is flushed synchronously on <code className="text-fg">COMMIT</code>. The 8KB data pages in the buffer pool are modified in RAM and flushed asynchronously by background checkpointer threads.
               </p>
             </div>
 
+            {/* Real-Time Flow 2: LSM-Tree Concurrent Write & Read Flow */}
             <div className="rounded-2xl border border-border/80 bg-surface/70 p-6">
-              <h3 className="font-display text-lg font-medium text-emerald-400">
-                LSM-Tree Compaction &amp; SSTable Hierarchy
-              </h3>
-              <pre className="mt-3 overflow-x-auto rounded-xl bg-inset p-4 font-mono text-xs text-fg leading-relaxed">
-{`[ Incoming Writes ]
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3">
+                <h3 className="font-display text-lg font-medium text-emerald-400">
+                  Real-Time LSM-Tree Concurrent Write, Read &amp; Compaction Pipeline (RocksDB / Cassandra)
+                </h3>
+                <span className="font-mono text-[11px] text-muted rounded-md bg-inset px-2 py-0.5 border border-border/60">
+                  Write Path Latency: &lt;0.2ms (Zero Disk Seeks)
+                </span>
+              </div>
+              <pre className="mt-4 overflow-x-auto rounded-xl bg-inset p-4 font-mono text-xs text-fg leading-relaxed">
+{`+---------------------------------------------------------------------------------------------------+
+| REAL-TIME EXECUTION FLOW: LSM-TREE CONCURRENT WRITE PATH & MULTI-LEVEL READ PIPELINE              |
++---------------------------------------------------------------------------------------------------+
+
+ [PHASE A: HIGH-THROUGHPUT CONCURRENT WRITE PATH (150,000 writes/sec)]
+ [1. Inbound Write: PUT user:9921 {"name": "Ada Lovelace", "tier": "Enterprise"}]
         │
-        ├──► [ Write-Ahead Log (WAL on Disk) ]
+        ├──► Step 1a: Append to Write-Ahead Log (WAL on Disk)
+        │             Sequential disk append (O_DIRECT / fdatasync): Zero random head seek (<0.15ms)
+        │
+        └──► Step 1b: Concurrent In-Memory SkipList Insertion (Active MemTable)
+                      Lock-free concurrent skiplist pointer update (0.02ms latency)
+        │
         ▼
-[ MemTable in RAM (SkipList) ]
-        │ (Flush when 64MB full)
+   Return HTTP 200 OK to Client (Total latency: <0.2ms with durability guarantee!)
+        │
+        │ (When Active MemTable reaches 64MB buffer threshold)
         ▼
-Level 0: [ SSTable 1 ] [ SSTable 2 ] [ SSTable 3 ]
-        │ (Merge Sort & Deduplicate)
-        ▼
-Level 1: [ SSTable A (Keys: a-m) ] [ SSTable B (Keys: n-z) ]
-        │ (Leveled Compaction 10x size multiplier)
-        ▼
-Level 2: [ SSTable 10x larger... ]`}
+ [2. Immutable MemTable Freeze & Background Disk Flush]
+   ├── Transition Active MemTable ──► Immutable MemTable (Read-only snapshot)
+   ├── Allocate fresh, empty Active MemTable for new incoming writes (Zero pipeline stalling)
+   └── Background Flush Worker drains Immutable MemTable to Level 0 SSTable file on NVMe:
+        ├── Writes sorted Key-Value blocks (Snappy compressed, 4KB blocks)
+        ├── Generates Block Index Block at tail of SSTable (Enables binary search)
+        └── Computes 10-bit/key Block Bloom Filter (Eliminates 99% of negative disk reads)
+
+ [PHASE B: REAL-TIME POINT READ PIPELINE (GET user:9921)]
+ [3. Inbound Read: GET user:9921]
+        │
+        ├──► Check 1: Active MemTable in RAM (SkipList search)
+        │             ──► If Key Found: Return immediately (50ns latency - Fastest hit!)
+        │
+        ├──► Check 2: Immutable MemTables in RAM (Pending flush)
+        │             ──► If Key Found: Return immediately (100ns latency)
+        │
+        ├──► Check 3: Level 0 SSTables (Uncompacted disk files with overlapping key ranges)
+        │             ├── Query RAM Bloom Filter for SSTable_001.sst: bloom.test("user:9921")
+        │             │   ──► Result: FALSE (Negative) ──► SKIP reading SSTable_001 entirely!
+        │             └── Query RAM Bloom Filter for SSTable_002.sst:
+        │                 ──► Result: TRUE (Key might be present) ──► Read 4KB block from Block Cache
+        │
+        └──► Check 4: Leveled SSTables (L1, L2... Ln: Non-overlapping partitioned key ranges)
+                      ├── Binary search SSTable Manifest for range [user:9000 to user:9999]
+                      ├── Check Level 1 SSTable Bloom Filter & Block Index
+                      └── Decompress matching block from NVMe SSD (40µs) and return record!
+
+ [PHASE C: BACKGROUND LEVELED COMPACTION (Zero Read/Write Stalling)]
+ [4. Compactor Thread Wakes Up: Level 0 Size > 256MB Threshold]
+   ├── Pick overlapping L0 SSTables + target L1 SSTables
+   ├── Execute k-Way Merge Sort in background worker:
+   │     ├── Deduplicate duplicate key updates (Keep only newest timestamp)
+   │     └── Evict Tombstoned records (Purge DELETE tombstones once older levels are cleared)
+   └── Write clean, sequentially sorted Level 1 SSTable files (Frees up NVMe storage)`}
               </pre>
               <p className="mt-3 text-xs text-muted leading-relaxed">
-                Bloom filters in RAM allow skipping 99% of SSTables during point reads. If the Bloom
-                filter reports the key is definitely absent, the engine avoids touching the disk
-                altogether.
+                <strong className="text-emerald-400">Production Key Insight:</strong> LSM-Trees trade read complexity for raw write throughput. By converting random writes into sequential disk appends (WAL + MemTable flush) and using Bloom Filters in RAM to bypass 99% of SSTable disk seeks, LSM-Trees dominate write-intensive workloads like time-series, messaging, and search inverted indexes.
+              </p>
+            </div>
+
+            {/* Real-Time Flow 3: Distributed Raft Consensus & 2PC */}
+            <div className="rounded-2xl border border-border/80 bg-surface/70 p-6">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3">
+                <h3 className="font-display text-lg font-medium text-blue-400">
+                  Real-Time Distributed Consensus: Raft Quorum Replication &amp; State Machine Commit (Spanner / CockroachDB)
+                </h3>
+                <span className="font-mono text-[11px] text-muted rounded-md bg-inset px-2 py-0.5 border border-border/60">
+                  Quorum Consensus: Majority (N/2 + 1)
+                </span>
+              </div>
+              <pre className="mt-4 overflow-x-auto rounded-xl bg-inset p-4 font-mono text-xs text-fg leading-relaxed">
+{`+---------------------------------------------------------------------------------------------------+
+| REAL-TIME EXECUTION FLOW: RAFT LOG REPLICATION QUORUM & TWO-PHASE COMMIT (2PC)                   |
++---------------------------------------------------------------------------------------------------+
+
+ [1. Client Issues Distributed Transaction: Transfer $500 from Account A (Node 1) to B (Node 3)]
+        │
+        ▼ (Coordinator Node receives gRPC request)
+ [2. Phase 1: Raft Log Replication Across Range Replicas (Majority Quorum)]
+   ├── Leader (Node 1, Term 4) appends command to local Raft Log:
+   │     Log Entry: [Index: 1042, Term: 4, Command: "TRANSFER $500", State: UNCOMMITTED]
+   │
+   ├── Leader broadcasts concurrent AppendEntries RPCs over gRPC to Followers:
+   │     ├── Message to Follower 1 (Node 2): AppendEntries(Term 4, PrevIndex 1041, Entry 1042)
+   │     └── Message to Follower 2 (Node 3): AppendEntries(Term 4, PrevIndex 1041, Entry 1042)
+   │
+   └── Follower Nodes Persist Log to Disk & Return Response:
+        ├── Node 2 fsyncs entry to disk ──► Returns Success ACK to Leader (0.6ms)
+        └── Node 3 slow network hiccup  ──► In-flight (Pending)
+        │
+        ▼
+ [3. Majority Quorum Check & Commit Barrier (2 out of 3 Nodes Acknowledged)]
+   ├── Leader verifies Quorum: Leader (Node 1) + Follower (Node 2) = 2 nodes ACKed (Majority met!)
+   ├── Leader advances commitIndex = 1042
+   ├── Leader applies Log Entry 1042 to underlying Storage Engine (Pebble/RocksDB State Machine)
+   └── Return HTTP 200 OK to Client: Transaction Committed! (Zero wait for slow Node 3)
+        │
+        ▼ (Next Heartbeat / Async Piggyback)
+ [4. Leader Notifies Followers of Commit]
+   ├── Leader sends heartbeat: AppendEntries(LeaderCommit = 1042)
+   └── Followers 2 & 3 apply Log Entry 1042 to their local state machines (Guarantees Linearizability)`}
+              </pre>
+              <p className="mt-3 text-xs text-muted leading-relaxed">
+                <strong className="text-blue-400">Production Key Insight:</strong> Raft eliminates single-point-of-failure by requiring only a strict majority quorum (<code className="text-fg">(N/2) + 1</code>) to commit writes. If 1 node in a 3-node cluster crashes or experiences network partitions, write throughput continues at full speed without stalling client requests.
               </p>
             </div>
           </div>

@@ -41,43 +41,57 @@ export type HldCompanyTrack = {
 
 export const HLD_BLUEPRINTS: HldBlueprint[] = [
   {
-    title: "Scale Evolution: From 1 Server to 10M+ Users",
-    subtitle: "The canonical scaling trajectory: vertical scaling -> read replicas -> caching -> sharding -> event-driven microservices",
+    title: "Scale Evolution: 10M+ User Real-Time Request Lifecycle",
+    subtitle: "End-to-end request lifecycle: Anycast DNS -> Edge CDN -> L7 Envoy Rate Limiter -> K8s Pods -> Multi-tier Cache -> Sharded Aurora",
     badge: "10M+ Scale",
     explanation:
-      "Scaling is not about inventing complex distributed systems on day one; it is an iterative journey of eliminating single points of failure (SPOF) and decoupling synchronous bottlenecks. At 10M+ users, state is moved to the edges, reads are served from multi-tier caches, and writes are decoupled via asynchronous message streams.",
-    diagram: `[ Global Clients: Web, Mobile, IoT ]
-                │
-                ▼
-  [ Global Anycast DNS / Geo-DNS (Route 53) ]
-                │
-  ┌─────────────┴─────────────┐
-  ▼                           ▼
-[ Edge CDN (Cloudflare/CloudFront) ] ── (Static Assets / Edge Caching)
-  │ (Dynamic API Requests)
-  ▼
-[ L4 / L7 Load Balancers (HAProxy / AWS ALB) ] ── (TLS Termination, DDOS Shield)
-  │
-  ▼
-[ API Gateway Cluster (Kong / Envoy) ] ── (JWT Auth, Rate Limiter, Path Routing)
-  │
-  ├──► [ Microservices Tier (Kubernetes HPA) ]
-  │      ├── User Service
-  │      ├── Order Service
-  │      └── Payment Service
-  │
-  ├──► [ Distributed Cache Layer ]
-  │      ├── Redis Cluster (Session, Leaderboards, Hot Reads)
-  │      └── Memcached (Object Caching)
-  │
-  ├──► [ Asynchronous Event Mesh ]
-  │      └── Apache Kafka Cluster (Partitioned Event Streams, CDC)
-  │
-  └──► [ Scaled Data Tier ]
-         ├── Primary Database (PostgreSQL / MySQL InnoDB)
-         ├── Read-Replicas (Asynchronous WAL stream)
-         ├── Sharded Databases (Citus / Vitess)
-         └── Data Lakehouse / OLAP (Snowflake / ClickHouse via Kafka)`,
+      "A complete real-time execution trace of an API call in a production system serving 10M+ users. Shows exact network hops, protocol handshakes, sub-millisecond cache lookups, database sharding routers, and asynchronous event streaming.",
+    diagram: `+--------------------------------------------------------------------------------------------------------+
+| REAL-TIME REQUEST LIFECYCLE: 10M+ USER MULTI-TIER SYSTEM ARCHITECTURE                                  |
++--------------------------------------------------------------------------------------------------------+
+ [1. Client: Mobile / Browser (GET /v2/feed?userId=u_9021)]
+        │ (12ms global network RTT, TLS 1.3 0-RTT resumption)
+        ▼
+ [2. Anycast BGP Routing & Cloudflare Edge CDN PoP]
+        ├── Check Edge Cache: Cache-Control: max-age=60 (Public CDN Hit? ──► Return 200 OK, 4ms)
+        ├── DDoS Mitigation: Layer-4 SYN Flood Shield & WAF token inspection
+        └── Cache Miss (Dynamic feed) ──► Proxy to Origin via optimized Tier-1 backbone (<22ms)
+        │
+        ▼
+ [3. Origin L4 / L7 Load Balancers (HAProxy / AWS ALB)]
+        ├── Terminate origin TLS; Balance across 3 Availability Zones (AZ-a, AZ-b, AZ-c)
+        └── Health check polling: HTTP /healthz every 2000ms
+        │
+        ▼
+ [4. API Gateway Cluster (Envoy Proxy / Kong)]
+        ├── Step 4a: Distributed Rate Limiter: Redis Token Bucket (100 req/min per user) ──► Allowed
+        ├── Step 4b: Cryptographic JWT Auth Verification: Verify RS256 signature in-process (<0.2ms)
+        └── Step 4c: Service Mesh Routing: Forward request via gRPC to User Feed Pod in K8s
+        │
+        ▼
+ [5. Stateless Application Pod (Go / Java Spring Boot on K8s HPA)]
+        │
+        ├──► Step 5a: Query L1 Local Caffeine In-Memory Cache (RAM hit? ──► <0.05ms)
+        │             Miss: Query L2 Distributed Cache: Redis Cluster (read-replica, MGET key)
+        │             Result: 85% of feed items found in Redis (<1.2ms)
+        │
+        ├──► Step 5b: Delta Query to Primary Database for remaining 15% uncached items:
+        │             Database Router (Vitess / ProxySQL) hashes userId % NumShards:
+        │             Target: Shard-04 (Aurora PostgreSQL Multi-AZ Primary)
+        │             Query: SELECT item_id, title, payload FROM feed_items WHERE user_id = 'u_9021';
+        │             Execution time: 4.8ms via B+ Tree index scan
+        │
+        ├──► Step 5c: Async Cache Fill: Asynchronously pipeline MSET missing keys back into Redis
+        │
+        └──► Step 5d: Emit User Analytics Event:
+                      Kafka Producer -> [topic: user.feed_impressions, partition_key: 'u_9021']
+                      acks=1 (Non-blocking async fire-and-forget, <0.8ms)
+        │
+        ▼
+ [6. Stream Assembly & Response Compression (brotli)]
+        │ (Status: 200 OK, Content-Type: application/json, Latency: 18.5ms P99)
+        ▼
+ [Client Receives Renderable Feed Payload]`,
     keyComponents: [
       {
         name: "Anycast Geo-DNS & CDN",
@@ -102,30 +116,57 @@ export const HLD_BLUEPRINTS: HldBlueprint[] = [
     ],
   },
   {
-    title: "Distributed Sagas: Orchestration vs Choreography",
-    subtitle: "Maintaining business transaction consistency across independent microservice databases without locking 2PC",
+    title: "Distributed Sagas: Real-Time Order & Rollback Flow",
+    subtitle: "Maintaining transaction consistency across microservices via state machine orchestration and compensating rollbacks",
     badge: "Consistency",
     explanation:
-      "Two-Phase Commit (2PC) blocks resources and couples microservice availability. The Saga pattern executes a series of local database transactions. If one step fails, the Saga executes compensating transactions in reverse order to roll back changes gracefully.",
-    diagram: `[ SAGA ORCHESTRATION ARCHITECTURE ]
-
-[ Client: Buy Flight + Hotel ]
-          │ (POST /reservations)
-          ▼
-[ Saga Orchestrator (State Machine) ]
-  │
-  ├── 1. Reserve Flight (Flight Service DB) ──► OK
-  │
-  ├── 2. Reserve Hotel (Hotel Service DB) ──► OK
-  │
-  ├── 3. Charge Credit Card (Payment Service) ──► FAILED (Card Expired!)
-  │
-  └── 4. [COMPENSATION TRIGGERED]:
-        ├── Undo Hotel Reservation (Hotel Service DB: CANCELLED)
-        └── Undo Flight Reservation (Flight Service DB: CANCELLED)
-  │
-  ▼
-[ Return 422: Payment Failed, All Prior Reservations Refunded ]`,
+      "A real-time trace of an e-commerce checkout transaction failing at payment. Shows how the Saga Orchestrator coordinates forward operations and triggers inverse compensating operations across independent microservice databases without distributed locking.",
+    diagram: `+--------------------------------------------------------------------------------------------------------+
+| REAL-TIME DISTRIBUTED SAGA TRANSACTION FLOW: ORDER CHECKOUT & FAILURE COMPENSATION                     |
++--------------------------------------------------------------------------------------------------------+
+ [1. Client Submits Order]
+   POST /v1/checkout
+   Headers: { X-Idempotency-Key: "idemp_ord_7719", Authorization: "Bearer ..." }
+   Payload: { orderId: "ord_7719", userId: "u_401", items: [{sku: "iphone16", qty: 1}], amount: $1,199 }
+        │
+        ▼
+ [2. Saga Orchestrator Service (Temporal / Cadence State Machine)]
+        │
+        ├──► [STEP 1: Reserve Inventory in Warehouse Service]
+        │      HTTP POST /v1/inventory/reserve {sku: "iphone16", qty: 1, reservationId: "res_901"}
+        │      Database: PostgreSQL row lock \`SELECT qty FROM stock WHERE sku='iphone16' FOR UPDATE\`
+        │      State: SUCCESS ──► Inventory status updated to 'HELD' (TTL: 10 mins)
+        │
+        ├──► [STEP 2: Create Pending Order in Order Service]
+        │      HTTP POST /v1/orders {orderId: "ord_7719", status: "PENDING_PAYMENT"}
+        │      Database: Insert into orders table with status = 'CREATED'
+        │      State: SUCCESS ──► Order state recorded
+        │
+        ├──► [STEP 3: Process Credit Card Payment via Stripe / Bank]
+        │      HTTP POST /v1/payments {orderId: "ord_7719", amount: 119900, token: "tok_card_declined"}
+        │      External Gateway Response: 402 Payment Required {"error": "CARD_EXPIRED_OR_INSUFFICIENT_FUNDS"}
+        │      State: FATAL FAILURE ──► TRIGGER COMPENSATING SAGA WORKFLOW!
+        │
+        ▼
+ [3. Reverse Compensating Workflow (Guaranteed Idempotent Rollbacks)]
+        │
+        ├──► [COMPENSATION 1: Cancel Pending Order]
+        │      HTTP POST /v1/orders/ord_7719/cancel {reason: "PAYMENT_REJECTED"}
+        │      Database: UPDATE orders SET status = 'PAYMENT_FAILED_CANCELLED' WHERE id = 'ord_7719';
+        │      State: ROLLBACK CONFIRMED
+        │
+        ├──► [COMPENSATION 2: Release Reserved Warehouse Inventory]
+        │      HTTP POST /v1/inventory/release {reservationId: "res_901", sku: "iphone16", qty: 1}
+        │      Database: UPDATE stock SET reserved_qty = reserved_qty - 1 WHERE sku = 'iphone16';
+        │      State: INVENTORY UNLOCKED & RESTORED
+        │
+        └──► [COMPENSATION 3: Publish Order Cancellation Event]
+               Kafka -> [topic: orders.cancelled, key: "ord_7719"]
+               Downstream: Customer Notification Service sends SMS: "Payment declined, no charges made."
+        │
+        ▼
+ [4. Response to Client (HTTP 422 Unprocessable Entity)]
+   {"status": "FAILED", "code": "PAYMENT_DECLINED", "reverted": ["INVENTORY", "ORDER_STATE"]}`,
     keyComponents: [
       {
         name: "Saga Orchestrator",
@@ -136,6 +177,120 @@ export const HLD_BLUEPRINTS: HldBlueprint[] = [
         name: "Compensating Transactions",
         role: "Semantic undo operations that restore business state (e.g. Refund rather than rollback)",
         scalingTactic: "Must be strictly idempotent to survive network retry drops",
+      },
+    ],
+  },
+  {
+    title: "Cache Stampede: Probabilistic Early Refresh (XFetch) Flow",
+    subtitle: "Protecting databases from thundering herds when hot keys expire under 10k+ QPS concurrency",
+    badge: "Reliability",
+    explanation:
+      "When a hot cached key expires under heavy traffic, hundreds of concurrent threads hit the database simultaneously. The XFetch algorithm computes an exponential probability curve to trigger background recomputation before expiration, eliminating stampedes.",
+    diagram: `+--------------------------------------------------------------------------------------------------------+
+| REAL-TIME CACHE STAMPEDE MITIGATION: PROBABILISTIC EARLY RECOMPUTE (XFETCH) FLOW                       |
++--------------------------------------------------------------------------------------------------------+
+ [Scenario: Hot Key 'leaderboard:global' has TTL = 300s, Serving 10,000 QPS]
+                                      │
+ ┌────────────────────────────────────┴────────────────────────────────────┐
+ │ At T = 288s (12 seconds before hard expiration):                        │
+ └─────────────────────────────────────────────────────────────────────────┘
+        │
+        ├──► [Request A arrives (Client #482)]
+        │      1. Reads Redis: val = cached_data, ttl_remaining = 12.0s
+        │      2. Evaluates XFetch Equation: -(delta * beta * ln(rand())) > ttl_remaining
+        │         delta = 0.4s (avg DB query time), beta = 1.0, rand() = 0.84
+        │         Calculated: -(0.4 * ln(0.84)) = +0.07s
+        │         Test: 0.07s > 12.0s? ──► FALSE.
+        │      3. Return cached data immediately (Latency: 0.8ms, DB queries: 0)
+        │
+        ├──► [Request B arrives (Client #791) at T = 296s (4s before expiration)]
+        │      1. Reads Redis: val = cached_data, ttl_remaining = 4.0s
+        │      2. Evaluates XFetch Equation: rand() = 0.00008 (statistically expected near edge)
+        │         Calculated: -(0.4 * ln(0.00008)) = -(0.4 * -9.43) = +3.77s
+        │         Test: 3.77s > 4.0s? ──► Close, but false. Return cached data (0.8ms).
+        │
+        └──► [Request C arrives (Client #810) at T = 297s (3s before expiration)]
+               1. Reads Redis: val = cached_data, ttl_remaining = 3.0s
+               2. Evaluates XFetch: rand() = 0.00003 ──► +4.16s
+               3. Test: 4.16s > 3.0s? ──► TRUE! TRIGGER EARLY BACKGROUND REFRESH!
+               4. Client #810 acquires ephemeral Redis mutex: \`SET lock:recompute:leaderboard token NX EX 5\`
+               5. Asynchronously executes DB Query: \`SELECT user_id, score FROM scores ORDER BY score DESC LIMIT 100\`
+               6. Recomputes leaderboard, sets new key with TTL = 300s in Redis.
+               7. Releases mutex lock.
+                                      │
+                                      ▼
+ [Zero Stampede Result: 10,000 QPS served continuously with zero downtime, DB CPU stays < 4%]`,
+    keyComponents: [
+      {
+        name: "Probabilistic XFetch Formula",
+        role: "Calculates smooth probability curve based on delta execution time and random entropy",
+        scalingTactic: "Spreads out the recomputation trigger so only one thread recomputes",
+      },
+      {
+        name: "Single-Flight Redis Mutex",
+        role: "Ensures exactly one worker acquires the compute lease if multiple threads trigger",
+        scalingTactic: "Guarantees database receives exactly 1 query during high load",
+      },
+    ],
+  },
+  {
+    title: "Kafka Exactly-Once Semantics: 2PC Stream Processing Flow",
+    subtitle: "Atomic Consume-Process-Produce loops with Producer IDs, Epochs, and Transaction Coordinators",
+    badge: "Streaming",
+    explanation:
+      "A real-time trace of an end-to-end exactly-once payment fraud scoring pipeline in Kafka. Combines idempotent sequence numbering with Two-Phase Commit transaction markers to guarantee zero message loss and zero duplicates.",
+    diagram: `+--------------------------------------------------------------------------------------------------------+
+| REAL-TIME STREAMING: APACHE KAFKA EXACTLY-ONCE SEMANTICS (EOS) TRANSACTION FLOW                        |
++--------------------------------------------------------------------------------------------------------+
+ [Stream Processor: Read From 'payments.inbound' ──► Compute Fraud Score ──► Write To 'payments.verified']
+                                                                                └── Commit Input Offset
+        │
+        ▼
+ [1. Initialization (Producer Startup)]
+   Producer calls initTransactions()
+   ├── Sends FindCoordinatorRequest(transactional.id = "fraud-detector-01") to Kafka Broker
+   ├── Transaction Coordinator assigns Producer ID (PID = 10482) and increments Epoch (Epoch = 3)
+   └── Fences off any previous zombie instance with PID 10482 & Epoch <= 2 (Zombie Fencing)
+        │
+        ▼
+ [2. Transaction Boundary Begin]
+   Producer calls beginTransaction()
+   ├── Status transitions: Transaction state set to 'InProgress' in __transaction_state topic
+        │
+        ▼
+ [3. Processing Loop & Dual Writes]
+   Step 3a: Consume record from 'payments.inbound' (partition 2, offset 8492)
+   Step 3b: Run fraud scoring rule engine in memory (<1.2ms)
+   Step 3c: Publish verified record to 'payments.verified' (acks=all)
+            Message appended with PID: 10482, Epoch: 3, SequenceNumber: 0
+   Step 3d: Send Offsets to Transaction Coordinator:
+            Producer calls sendOffsetsToTransaction(offset=8492, consumer_group="fraud-audit")
+            Transaction Coordinator appends offset marker to __consumer_offsets partition
+        │
+        ▼
+ [4. Two-Phase Commit Protocol (2PC)]
+   Producer calls commitTransaction()
+   ├── Phase 1 (Prepare): Coordinator writes 'PREPARE_COMMIT' to __transaction_state
+   ├── Phase 2 (Write Markers): Coordinator writes 'COMMIT' control markers to:
+   │     ├── Partition 0 of topic 'payments.verified'
+   │     └── Partition 2 of topic '__consumer_offsets'
+   └── Phase 3 (Complete): Coordinator writes 'COMMITTED' to __transaction_state log
+        │
+        ▼
+ [5. Downstream Consumer Isolation (isolation.level = read_committed)]
+   Consumers configured with \`read_committed\` buffer messages and ONLY expose records
+   once the explicit 'COMMIT' control marker is processed. Uncommitted or aborted
+   transactions are completely invisible to consumers.`,
+    keyComponents: [
+      {
+        name: "Transaction Coordinator",
+        role: "Dedicated broker managing transaction states in __transaction_state internal topic",
+        scalingTactic: "Coordinates 2PC commit protocol without synchronous node-level locks",
+      },
+      {
+        name: "Zombie Fencing",
+        role: "Increments Producer Epoch on restart, rejecting stale writes from split-brain workers",
+        scalingTactic: "Guarantees split-brain network partitions cannot emit ghost records",
       },
     ],
   },

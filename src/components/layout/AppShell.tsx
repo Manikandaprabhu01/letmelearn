@@ -50,7 +50,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
  * hero). Wrapping these in the studio sidebar would frame a landing page inside
  * the product it is trying to sell.
  */
-const BARE_LAYOUT_PATHS = new Set(["/welcome", "/login"]);
+const BARE_LAYOUT_PATHS = new Set(["/welcome", "/login", "/pricing"]);
 
 /**
  * Readable without signing in. Everything else is the studio, which
@@ -59,7 +59,7 @@ const BARE_LAYOUT_PATHS = new Set(["/welcome", "/login"]);
  * Pricing is public on purpose: asking someone to sign in before they can see
  * what the thing costs loses the sale.
  */
-const PUBLIC_PATHS = new Set([...BARE_LAYOUT_PATHS, "/pricing"]);
+const PUBLIC_PATHS = new Set([...BARE_LAYOUT_PATHS]);
 
 function isActive(pathname: string, to: string, match: "exact" | "prefix") {
   if (match === "exact") return pathname === to;
