@@ -22,9 +22,8 @@ import { useEffect, useState } from "react";
 import { RequireSignIn } from "@/components/auth/RequireSignIn";
 import { AccountStrip } from "@/components/layout/AccountStrip";
 import { BackButton } from "@/components/layout/BackButton";
-import { BrightnessControl } from "@/components/layout/BrightnessControl";
+import { DisplayControl } from "@/components/layout/DisplayControl";
 import { LogoMark } from "@/components/layout/Logo";
-import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { CommandSearch } from "@/components/search/CommandSearch";
 import { Button } from "@/components/ui/button";
 import { APP_NAME, NAV_GROUPS, NAV_HOME, type NavItemConfig } from "@/data/nav";
@@ -337,8 +336,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
         </div>
         <div className="flex shrink-0 items-center gap-1">
-          <BrightnessControl />
-          <ThemeToggle />
+          <DisplayControl />
           <Button
             variant="ghost"
             size="icon-sm"
@@ -562,9 +560,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <FlaskConical className="size-3.5 text-pink-400" />
                 Labs
               </Link>
-              <div className="ml-2 pl-3 border-l border-border/70 flex items-center gap-1">
-                <BrightnessControl />
-                <ThemeToggle />
+              <div className="ml-2 pl-3 border-l border-border/70 flex items-center">
+                <DisplayControl />
               </div>
             </div>
           </div>

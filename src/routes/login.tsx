@@ -269,7 +269,7 @@ function SignInPanel({ initialMode = "sign-in" }: { initialMode?: Mode }) {
           const retry = await authClient.signIn.email({ email: normalizedEmail, password });
           if (!retry.error) {
             if (retry.data?.token) setBearerToken(retry.data.token);
-            await navigate({ to: "/" });
+            window.location.href = "/";
             return;
           }
         }
@@ -280,7 +280,7 @@ function SignInPanel({ initialMode = "sign-in" }: { initialMode?: Mode }) {
       if (result.data?.token) {
         setBearerToken(result.data.token);
       }
-      await navigate({ to: "/" });
+      window.location.href = "/";
     } catch {
       setError("Could not reach authentication server. Check your connection.");
       setBusy(false);
