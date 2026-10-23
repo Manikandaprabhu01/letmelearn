@@ -12,3 +12,8 @@ node_modules/
 # static reading build (site/)
 site/.build/
 site/letmelearn.html
+
+# Local test artifacts & OS files
+scratch/
+screenshots/
+.DS_Store

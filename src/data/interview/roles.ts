@@ -1094,19 +1094,39 @@ class FencedStorage:
       "Balancing model latency vs context window, quantifying token costs, implementing semantic caching to reduce API costs by 70%, preventing data leakage in shared caches, and explaining systematic testing of AI code.",
     companyTrends: [
       {
+        company: "Palantir",
+        focus: "Forward Deployed SE: Raw data ingestion, Foundry ontology mapping, decomposition of messy legacy systems, high-stress live client debugging.",
+        typicalRounds: "Decomposition Round + Practical Data Ingestion + Live Systems Debugging + Client Role-Play",
+      },
+      {
+        company: "OpenAI",
+        focus: "Applied AI / Solutions: Frontier API mastery, native tool-calling, strict JSON Schema, prompt prefix caching, sub-800ms TTFT.",
+        typicalRounds: "LLM System Architecture + Practical Tool-Use & Coding + Structured Outputs + Customer Discovery",
+      },
+      {
+        company: "Anthropic",
+        focus: "Deployed Solutions MTS: Constitutional guardrails, 200k+ multimodal vision extraction, adversarial customer role-play, sycophancy mitigation.",
+        typicalRounds: "Adversarial Customer Role-Play + Constitutional Guardrails + Multimodal Extraction + Systems Interview",
+      },
+      {
+        company: "Databricks",
+        focus: "Mosaic AI: Vector Search at scale, Delta Lake change data feed, Unity Catalog row-level security, fine-tuning vs RAG decision matrices.",
+        typicalRounds: "Vector Search at Scale + Unity Catalog Governance + Fine-Tuning vs RAG + Spark Batch Ingestion",
+      },
+      {
+        company: "Scale AI",
+        focus: "Forward Deployed ML: Automated evals (Ragas triad, LLM-as-a-judge), RLHF data pipelines, air-gapped federal/defense VPC deployments.",
+        typicalRounds: "Data Annotation Engine Design + Automated Evals & RLHF + Air-Gapped Defense System Design",
+      },
+      {
         company: "Google / DeepMind",
-        focus: "Applied AI: Gemini API integration, vector indexing, hallucination benchmarks, latency budgets.",
+        focus: "Applied AI: Gemini API integration, multimodal streaming, vector indexing, hallucination benchmarks, latency budgets.",
         typicalRounds: "Coding + AI Architecture Design + ML Fundamentals + Googliness",
       },
       {
         company: "Meta",
-        focus: "Llama inference serving, embedding generation pipelines, semantic cache at scale.",
+        focus: "Llama inference serving, vLLM PagedAttention, KV cache sizing, FP8 quantization, semantic cache at scale.",
         typicalRounds: "Coding + AI System Design + ML Scaling + Leadership",
-      },
-      {
-        company: "Amazon / AWS",
-        focus: "Bedrock integration, RAG document processing, cost-governed token budgeting, prompt guardrails.",
-        typicalRounds: "4 Onsite rounds with AI architectural focus & Leadership Principles",
       },
     ],
     questions: [

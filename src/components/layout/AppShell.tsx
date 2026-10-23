@@ -6,6 +6,7 @@ import {
   BrainCircuit,
   Building2,
   Coffee,
+  Database,
   FlaskConical,
   LayoutDashboard,
   Menu,
@@ -41,6 +42,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   FlaskConical,
   Terminal,
   BookOpen,
+  Database,
 };
 
 /**

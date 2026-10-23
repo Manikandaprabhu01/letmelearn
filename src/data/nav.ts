@@ -19,7 +19,8 @@ export interface NavItemConfig {
     | "Building2"
     | "FlaskConical"
     | "Terminal"
-    | "BookOpen";
+    | "BookOpen"
+    | "Database";
   image: string;
   badge?: string;
   badgeVariant?: "hot" | "new" | "accent" | "muted";
@@ -163,6 +164,25 @@ const TRACKS: readonly NavItemConfig[] = [
       activeBorder: "border-emerald-400",
       activeBg: "bg-emerald-500/20",
       glow: "shadow-[0_0_12px_rgba(16,185,129,0.4)]",
+    },
+  },
+  {
+    to: "/databases",
+    label: "SQL & NoSQL Concepts",
+    subtitle: "RDBMS, NoSQL & NewSQL",
+    match: "prefix",
+    iconName: "Database",
+    image: "/images/nav/hld.jpg",
+    badge: "HOT",
+    badgeVariant: "hot",
+    color: {
+      accent: "#f59e0b",
+      text: "text-amber-400",
+      bg: "bg-amber-500/10",
+      border: "border-amber-500/30",
+      activeBorder: "border-amber-400",
+      activeBg: "bg-amber-500/20",
+      glow: "shadow-[0_0_12px_rgba(245,158,11,0.4)]",
     },
   },
 ];

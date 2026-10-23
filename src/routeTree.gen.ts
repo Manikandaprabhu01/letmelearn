@@ -14,8 +14,10 @@ import { Route as CompilerRouteImport } from './routes/compiler'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as ApiRunRouteImport } from './routes/api/run'
+import { Route as DatabasesIndexRouteImport } from './routes/databases/index'
 import { Route as ExamplesIndexRouteImport } from './routes/examples/index'
 import { Route as ExamplesSlugRouteImport } from './routes/examples/$slug'
 import { Route as FdeIndexRouteImport } from './routes/fde/index'
@@ -63,6 +65,11 @@ const ResourcesRoute = ResourcesRouteImport.update({
   path: '/resources',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
@@ -71,6 +78,11 @@ const WelcomeRoute = WelcomeRouteImport.update({
 const ApiRunRoute = ApiRunRouteImport.update({
   id: '/api/run',
   path: '/api/run',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DatabasesIndexRoute = DatabasesIndexRouteImport.update({
+  id: '/databases/',
+  path: '/databases/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExamplesIndexRoute = ExamplesIndexRouteImport.update({
@@ -188,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/resources': typeof ResourcesRoute
+  '/signup': typeof SignupRoute
   '/welcome': typeof WelcomeRoute
   '/api/run': typeof ApiRunRoute
   '/examples/$slug': typeof ExamplesSlugRoute
@@ -197,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/lld/$slug': typeof LldSlugRoute
   '/playgrounds/$slug': typeof PlaygroundsSlugRoute
   '/python/$slug': typeof PythonSlugRoute
+  '/databases/': typeof DatabasesIndexRoute
   '/examples/': typeof ExamplesIndexRoute
   '/fde/': typeof FdeIndexRoute
   '/hld/': typeof HldIndexRoute
@@ -218,6 +232,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/resources': typeof ResourcesRoute
+  '/signup': typeof SignupRoute
   '/welcome': typeof WelcomeRoute
   '/api/run': typeof ApiRunRoute
   '/examples/$slug': typeof ExamplesSlugRoute
@@ -227,6 +242,7 @@ export interface FileRoutesByTo {
   '/lld/$slug': typeof LldSlugRoute
   '/playgrounds/$slug': typeof PlaygroundsSlugRoute
   '/python/$slug': typeof PythonSlugRoute
+  '/databases': typeof DatabasesIndexRoute
   '/examples': typeof ExamplesIndexRoute
   '/fde': typeof FdeIndexRoute
   '/hld': typeof HldIndexRoute
@@ -249,6 +265,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/resources': typeof ResourcesRoute
+  '/signup': typeof SignupRoute
   '/welcome': typeof WelcomeRoute
   '/api/run': typeof ApiRunRoute
   '/examples/$slug': typeof ExamplesSlugRoute
@@ -258,6 +275,7 @@ export interface FileRoutesById {
   '/lld/$slug': typeof LldSlugRoute
   '/playgrounds/$slug': typeof PlaygroundsSlugRoute
   '/python/$slug': typeof PythonSlugRoute
+  '/databases/': typeof DatabasesIndexRoute
   '/examples/': typeof ExamplesIndexRoute
   '/fde/': typeof FdeIndexRoute
   '/hld/': typeof HldIndexRoute
@@ -281,6 +299,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/pricing'
     | '/resources'
+    | '/signup'
     | '/welcome'
     | '/api/run'
     | '/examples/$slug'
@@ -290,6 +309,7 @@ export interface FileRouteTypes {
     | '/lld/$slug'
     | '/playgrounds/$slug'
     | '/python/$slug'
+    | '/databases/'
     | '/examples/'
     | '/fde/'
     | '/hld/'
@@ -311,6 +331,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/pricing'
     | '/resources'
+    | '/signup'
     | '/welcome'
     | '/api/run'
     | '/examples/$slug'
@@ -320,6 +341,7 @@ export interface FileRouteTypes {
     | '/lld/$slug'
     | '/playgrounds/$slug'
     | '/python/$slug'
+    | '/databases'
     | '/examples'
     | '/fde'
     | '/hld'
@@ -341,6 +363,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/pricing'
     | '/resources'
+    | '/signup'
     | '/welcome'
     | '/api/run'
     | '/examples/$slug'
@@ -350,6 +373,7 @@ export interface FileRouteTypes {
     | '/lld/$slug'
     | '/playgrounds/$slug'
     | '/python/$slug'
+    | '/databases/'
     | '/examples/'
     | '/fde/'
     | '/hld/'
@@ -372,6 +396,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PricingRoute: typeof PricingRoute
   ResourcesRoute: typeof ResourcesRoute
+  SignupRoute: typeof SignupRoute
   WelcomeRoute: typeof WelcomeRoute
   ApiRunRoute: typeof ApiRunRoute
   ExamplesSlugRoute: typeof ExamplesSlugRoute
@@ -381,6 +406,7 @@ export interface RootRouteChildren {
   LldSlugRoute: typeof LldSlugRoute
   PlaygroundsSlugRoute: typeof PlaygroundsSlugRoute
   PythonSlugRoute: typeof PythonSlugRoute
+  DatabasesIndexRoute: typeof DatabasesIndexRoute
   ExamplesIndexRoute: typeof ExamplesIndexRoute
   FdeIndexRoute: typeof FdeIndexRoute
   HldIndexRoute: typeof HldIndexRoute
@@ -434,6 +460,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/welcome': {
       id: '/welcome'
       path: '/welcome'
@@ -446,6 +479,13 @@ declare module '@tanstack/react-router' {
       path: '/api/run'
       fullPath: '/api/run'
       preLoaderRoute: typeof ApiRunRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/databases/': {
+      id: '/databases/'
+      path: '/databases'
+      fullPath: '/databases/'
+      preLoaderRoute: typeof DatabasesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/examples/': {
@@ -604,6 +644,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PricingRoute: PricingRoute,
   ResourcesRoute: ResourcesRoute,
+  SignupRoute: SignupRoute,
   WelcomeRoute: WelcomeRoute,
   ApiRunRoute: ApiRunRoute,
   ExamplesSlugRoute: ExamplesSlugRoute,
@@ -613,6 +654,7 @@ const rootRouteChildren: RootRouteChildren = {
   LldSlugRoute: LldSlugRoute,
   PlaygroundsSlugRoute: PlaygroundsSlugRoute,
   PythonSlugRoute: PythonSlugRoute,
+  DatabasesIndexRoute: DatabasesIndexRoute,
   ExamplesIndexRoute: ExamplesIndexRoute,
   FdeIndexRoute: FdeIndexRoute,
   HldIndexRoute: HldIndexRoute,
